@@ -39,8 +39,8 @@ Lưu trữ thông tin xác thực cho Caregiver, Doctor và Quản trị viên `
 | `updated_at` | `TIMESTAMPTZ` | Not Null | `CURRENT_TIMESTAMP` | Thời điểm cập nhật cuối cùng |
 
 * **Chỉ mục (Indexes):**
-  * `idx_accounts_phone` (B-Tree) trên `phone_number`: Tối ưu hóa đăng nhập OTP (UC-01).
-  * `idx_accounts_username` (B-Tree) trên `username`: Tối ưu hóa đăng nhập Bác sĩ (UC-11).
+  * `idx_accounts_phone` (B-Tree) trên `phone_number`: Tối ưu hóa đăng nhập OTP (UC-001).
+  * `idx_accounts_username` (B-Tree) trên `username`: Tối ưu hóa đăng nhập Bác sĩ (UC-002).
 
 ---
 
@@ -70,7 +70,7 @@ Thông tin của thân nhân / người chăm sóc trực tiếp bệnh nhân.
 ---
 
 #### 4. Bảng `otp_verifications` (Mã xác thực OTP đăng nhập)
-Quản lý vòng đời mã OTP gửi qua tin nhắn SMS (UC-01).
+Quản lý vòng đời mã OTP gửi qua tin nhắn SMS (UC-001).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
@@ -90,7 +90,7 @@ Quản lý vòng đời mã OTP gửi qua tin nhắn SMS (UC-01).
 ### PHÂN HỆ II: HỒ SƠ BỆNH NHÂN & ỦY QUYỀN CHĂM SÓC
 
 #### 5. Bảng `patients` (Hồ sơ Bệnh nhân)
-Quản lý thông tin định danh, bệnh lý và các trường lâm sàng tùy biến theo loại mổ (UC-12).
+Quản lý thông tin định danh, bệnh lý và các trường lâm sàng tùy biến theo loại mổ (UC-004).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
@@ -103,7 +103,7 @@ Quản lý thông tin định danh, bệnh lý và các trường lâm sàng tù
 | `surgery_type` | `VARCHAR(50)` | Not Null | — | Loại phẫu thuật: `'Phaco'`, `'Lác'`, `'LASIK'`, `'Cắt dịch kính'`... (BR15) |
 | `surgery_date` | `DATE` | Nullable | NULL | Ngày phẫu thuật |
 | `operated_eye` | `VARCHAR(10)` | Not Null | — | ENUM: `'LEFT'`, `'RIGHT'`, `'BOTH'` (Mắt phẫu thuật) |
-| `clinical_custom_data`| `JSONB` | Nullable | `'{}'` | **Trường tùy biến lâm sàng động theo ca mổ** (UC-12.1) |
+| `clinical_custom_data`| `JSONB` | Nullable | `'{}'` | **Trường tùy biến lâm sàng động theo ca mổ** (UC-004) |
 | `medical_notes` | `TEXT` | Nullable | NULL | Ghi chú y khoa bổ sung |
 | `status` | `VARCHAR(20)` | Not Null | `'ACTIVE'` | ENUM: `'ACTIVE'`, `'ARCHIVED'` (Xóa mềm - BR25) |
 | `created_by_doctor_id`| `UUID` | **FK** -> `doctor_profiles(doctor_id)`, Not Null | — | Bác sĩ tiếp nhận hồ sơ (BR14) |
@@ -122,13 +122,13 @@ Quản lý thông tin định danh, bệnh lý và các trường lâm sàng tù
   }
   ```
 * **Chỉ mục (Indexes):**
-  * `idx_patients_search` trên `(full_name, phone_number)`: Tìm kiếm nhanh bệnh nhân (UC-12.2).
+  * `idx_patients_search` trên `(full_name, phone_number)`: Tìm kiếm nhanh bệnh nhân (UC-004).
   * `idx_patients_status_type` trên `(status, surgery_type)`: Lọc theo trạng thái và loại phẫu thuật.
 
 ---
 
 #### 6. Bảng `caregiver_patient_links` (Liên kết Caregiver - Bệnh nhân)
-Lưu quan hệ ủy quyền sau khi quét mã QR thành công (UC-02).
+Lưu quan hệ ủy quyền sau khi quét mã QR thành công (UC-003).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
@@ -148,7 +148,7 @@ Lưu quan hệ ủy quyền sau khi quét mã QR thành công (UC-02).
 ### PHÂN HỆ III: MASTER CARE PLAN TEMPLATE (CẤU HÌNH MẪU CHUẨN)
 
 #### 7. Bảng `care_plan_templates` (Master Care Plan Template)
-Gói phác đồ mẫu gốc gắn với loại phẫu thuật (UC-13).
+Gói phác đồ mẫu gốc gắn với loại phẫu thuật (UC-005).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
@@ -164,12 +164,12 @@ Gói phác đồ mẫu gốc gắn với loại phẫu thuật (UC-13).
 * **Chỉ mục (Indexes):**
   * `idx_templates_surgery_status` trên `(surgery_type, status)`: Tra cứu mẫu áp dụng cho ca phẫu thuật.
 * **Ràng buộc duy nhất (Unique Constraints):**
-  * `uq_template_name_surgery` trên `(template_name, surgery_type)`: Chống trùng tên template trong cùng loại phẫu thuật (UC-13.1 E1).
+  * `uq_template_name_surgery` trên `(template_name, surgery_type)`: Chống trùng tên template trong cùng loại phẫu thuật (UC-005).
 
 ---
 
 #### 8. Bảng `template_learning_modules` (Bài học trong Learning Path)
-Các bài học đào tạo Caregiver theo lộ trình phục hồi (UC-14).
+Các bài học đào tạo Caregiver theo lộ trình phục hồi (UC-009).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
@@ -180,14 +180,14 @@ Các bài học đào tạo Caregiver theo lộ trình phục hồi (UC-14).
 | `content_text` | `TEXT` | Not Null | — | Văn bản mô tả hướng dẫn chi tiết |
 | `media_type` | `VARCHAR(20)` | Not Null | `'VIDEO'` | ENUM: `'VIDEO'`, `'IMAGE'`, `'INFOGRAPHIC'`, `'TEXT'` |
 | `media_url` | `VARCHAR(500)` | Nullable | NULL | Đường dẫn video/ảnh minh họa |
-| `display_order` | `INT` | Not Null | `1` | Thứ tự xuất hiện trong Learning Path (UC-14.5) |
+| `display_order` | `INT` | Not Null | `1` | Thứ tự xuất hiện trong Learning Path (UC-009) |
 | `created_at` | `TIMESTAMPTZ` | Not Null | `CURRENT_TIMESTAMP` | Thời điểm tạo |
 | `updated_at` | `TIMESTAMPTZ` | Not Null | `CURRENT_TIMESTAMP` | Thời điểm sửa |
 
 ---
 
 #### 9. Bảng `template_quiz_questions` (Câu hỏi trắc nghiệm Mini Quiz)
-Bộ 3 câu hỏi trắc nghiệm kiểm tra kiến thức ở cuối bài học (UC-03, UC-14.1).
+Bộ 3 câu hỏi trắc nghiệm kiểm tra kiến thức ở cuối bài học (UC-017 / Phase 2).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
@@ -205,13 +205,13 @@ Bộ 3 câu hỏi trắc nghiệm kiểm tra kiến thức ở cuối bài học
 ---
 
 #### 10. Bảng `template_medications` (Thuốc mẫu trong Medication Template)
-Danh mục đơn thuốc chuẩn hóa kèm mô tả nhận diện và lưu ý lâm sàng (UC-15).
+Danh mục đơn thuốc chuẩn hóa kèm mô tả nhận diện và lưu ý lâm sàng (UC-007).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
 | `medication_template_id` | `UUID` | **PK**, Not Null | `gen_random_uuid()` | Khóa chính thuốc mẫu |
 | `template_id` | `UUID` | **FK** -> `care_plan_templates(template_id)`, On Delete Cascade | — | Thuộc template nào |
-| `surgery_type` | `VARCHAR(50)` | Not Null | — | Loại phẫu thuật áp dụng (UC-15.1 Step 2) |
+| `surgery_type` | `VARCHAR(50)` | Not Null | — | Loại phẫu thuật áp dụng (UC-007) |
 | `drug_name` | `VARCHAR(150)` | Not Null | — | Tên thuốc, hoạt chất và hàm lượng |
 | `drug_form` | `VARCHAR(20)` | Not Null | — | ENUM: `'EYE_DROP'`, `'ORAL'` |
 | `dosage` | `VARCHAR(50)` | Not Null | — | Liều lượng (1 giọt, 1 viên...) |
@@ -220,21 +220,21 @@ Danh mục đơn thuốc chuẩn hóa kèm mô tả nhận diện và lưu ý l�
 | `meal_relation` | `VARCHAR(20)` | Not Null | `'NONE'` | ENUM: `'BEFORE_MEAL'`, `'AFTER_MEAL'`, `'NONE'` |
 | `duration_days` | `INT` | Not Null | `7` | Số ngày chỉ định dùng thuốc |
 | `order_index` | `INT` | Not Null | `1` | Thứ tự sử dụng trong cữ |
-| `visual_identification`| `TEXT` | Not Null | — | **Mô tả nhận diện về thuốc** (vỏ, nắp, màu) (UC-15.1 Step 2) |
-| `clinical_cautions` | `TEXT` | Not Null | — | **Lưu ý về loại thuốc** (lắc kỹ, bảo quản lạnh, giãn cách 5 phút...) (BR23, UC-15.1 Step 2) |
+| `visual_identification`| `TEXT` | Not Null | — | **Mô tả nhận diện về thuốc** (vỏ, nắp, màu) (UC-007) |
+| `clinical_cautions` | `TEXT` | Not Null | — | **Lưu ý về loại thuốc** (lắc kỹ, bảo quản lạnh, giãn cách 5 phút...) (BR23, UC-007) |
 | `created_at` | `TIMESTAMPTZ` | Not Null | `CURRENT_TIMESTAMP` | Thời điểm tạo |
 | `updated_at` | `TIMESTAMPTZ` | Not Null | `CURRENT_TIMESTAMP` | Thời điểm cập nhật |
 
 ---
 
 #### 11. Bảng `template_recovery_milestones` (Mốc khảo sát Recovery Check mẫu)
-Mốc thời gian khảo sát phục hồi chuẩn theo ngày (UC-16).
+Mốc thời gian khảo sát phục hồi chuẩn theo ngày (UC-008).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
 | `milestone_template_id` | `UUID` | **PK**, Not Null | `gen_random_uuid()` | Khóa chính mốc mẫu |
 | `template_id` | `UUID` | **FK** -> `care_plan_templates(template_id)`, On Delete Cascade | — | Thuộc template nào |
-| `surgery_type` | `VARCHAR(50)` | Not Null | — | Loại phẫu thuật áp dụng (UC-16.1 Step 2) |
+| `surgery_type` | `VARCHAR(50)` | Not Null | — | Loại phẫu thuật áp dụng (UC-008) |
 | `milestone_name` | `VARCHAR(50)` | Not Null | — | Tên mốc khảo sát (ví dụ: "Ngày 1", "Ngày 3", "Ngày 7") |
 | `days_post_op` | `INT` | Not Null | — | Số ngày sau mổ kích hoạt khảo sát (1, 3, 7, 14...) |
 | `description` | `TEXT` | Nullable | NULL | Mục tiêu đánh giá của mốc |
@@ -247,7 +247,7 @@ Mốc thời gian khảo sát phục hồi chuẩn theo ngày (UC-16).
 ---
 
 #### 12. Bảng `template_recovery_questions` (Câu hỏi khảo sát phục hồi mẫu)
-Bộ 3–5 câu hỏi khảo sát triệu chứng kèm quy chuẩn cờ cảnh báo (UC-16).
+Bộ 3–5 câu hỏi khảo sát triệu chứng kèm quy chuẩn cờ cảnh báo (UC-008).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
@@ -264,30 +264,30 @@ Bộ 3–5 câu hỏi khảo sát triệu chứng kèm quy chuẩn cờ cảnh b
 ---
 
 #### 13. Bảng `template_red_flags` (Dấu hiệu nguy hiểm Red Flag mẫu)
-Danh mục cảnh báo biến chứng nguy hiểm khẩn cấp và hotline bệnh viện (UC-17).
+Danh mục cảnh báo biến chứng nguy hiểm khẩn cấp và hotline bệnh viện (UC-008).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
 | `red_flag_template_id` | `UUID` | **PK**, Not Null | `gen_random_uuid()` | Khóa chính dấu hiệu Red Flag |
 | `template_id` | `UUID` | **FK** -> `care_plan_templates(template_id)`, On Delete Cascade | — | Thuộc template nào |
-| `surgery_type` | `VARCHAR(50)` | Not Null | — | Loại phẫu thuật áp dụng (UC-17.1 Step 2) |
+| `surgery_type` | `VARCHAR(50)` | Not Null | — | Loại phẫu thuật áp dụng (UC-008) |
 | `sign_name` | `VARCHAR(150)` | Not Null | — | Tên dấu hiệu nguy hiểm (ví dụ: *Đau nhức dữ dội lan nửa đầu*) |
 | `warning_level` | `VARCHAR(20)` | Not Null | `'EMERGENCY'` | ENUM: `'EMERGENCY'`, `'SAME_DAY_EXAM'` |
 | `trigger_condition` | `TEXT` | Nullable | NULL | Điều kiện kích hoạt từ kết quả Recovery Check |
 | `first_aid_instructions`| `TEXT` | Not Null | — | Hướng dẫn sơ cứu khẩn cấp ban đầu (BR11) |
-| `emergency_hotline` | `VARCHAR(20)` | Not Null | — | Số điện thoại đường dây nóng cấp cứu 24/7 (UC-17.1) |
+| `emergency_hotline` | `VARCHAR(20)` | Not Null | — | Số điện thoại đường dây nóng cấp cứu 24/7 (UC-008, UC-020) |
 | `order_index` | `INT` | Not Null | `1` | Thứ tự ưu tiên hiển thị |
 
 ---
 
 #### 14. Bảng `template_do_dont_items` (Chỉ dẫn Nên làm / Cần tránh mẫu)
-Danh mục hành vi sinh hoạt được phép và cấm kỵ hậu phẫu (UC-18).
+Danh mục hành vi sinh hoạt được phép và cấm kỵ hậu phẫu (UC-009).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
 | `do_dont_template_id` | `UUID` | **PK**, Not Null | `gen_random_uuid()` | Khóa chính mục Do & Don't |
 | `template_id` | `UUID` | **FK** -> `care_plan_templates(template_id)`, On Delete Cascade | — | Thuộc template nào |
-| `surgery_type` | `VARCHAR(50)` | Not Null | — | Loại phẫu thuật áp dụng (UC-18.1 Step 2) |
+| `surgery_type` | `VARCHAR(50)` | Not Null | — | Loại phẫu thuật áp dụng (UC-009) |
 | `item_type` | `VARCHAR(10)` | Not Null | — | ENUM: `'DO'`, `'DONT'` (Nên làm / Cần tránh) (BR22) |
 | `category` | `VARCHAR(20)` | Not Null | — | ENUM: `'HYGIENE'`, `'ACTIVITY'`, `'DIET'`, `'SLEEP'` |
 | `behavior_title` | `VARCHAR(200)` | Not Null | — | Tên hành vi sinh hoạt |
@@ -300,7 +300,7 @@ Danh mục hành vi sinh hoạt được phép và cấm kỵ hậu phẫu (UC-1
 ### PHÂN HỆ IV: THỰC THỂ KẾ HOẠCH BỆNH NHÂN (PATIENT CARE PLAN INSTANCE)
 
 #### 15. Bảng `patient_care_plans` (Kế hoạch chăm sóc bệnh nhân thực tế)
-Bản thể hiện độc lập được kích hoạt cho từng bệnh nhân cụ thể (UC-19).
+Bản thể hiện độc lập được kích hoạt cho từng bệnh nhân cụ thể (UC-010).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
@@ -326,7 +326,7 @@ Bản thể hiện độc lập được kích hoạt cho từng bệnh nhân c�
 ---
 
 #### 16. Bảng `patient_medications` (Đơn thuốc thực tế của bệnh nhân)
-Danh mục thuốc riêng của bệnh nhân sau khi Bác sĩ đã tùy biến liều lượng (UC-06, UC-19).
+Danh mục thuốc riêng của bệnh nhân sau khi Bác sĩ đã tùy biến liều lượng (UC-014, UC-015, UC-010).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
@@ -348,7 +348,7 @@ Danh mục thuốc riêng của bệnh nhân sau khi Bác sĩ đã tùy biến l
 ---
 
 #### 17. Bảng `patient_followup_appointments` (Lịch hẹn tái khám của bệnh nhân)
-Lịch hẹn cụ thể do bác sĩ thiết lập cho đợt điều trị (UC-07, UC-19).
+Lịch hẹn cụ thể do bác sĩ thiết lập cho đợt điều trị (UC-018, UC-010).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
@@ -366,7 +366,7 @@ Lịch hẹn cụ thể do bác sĩ thiết lập cho đợt điều trị (UC-0
 ---
 
 #### 18. Bảng `patient_qr_codes` (Mã QR bảo mật định danh Care Plan)
-Token QR mã hóa gắn liền với phiếu xuất viện (UC-02, UC-20).
+Token QR mã hóa gắn liền với phiếu xuất viện (UC-003, UC-011).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
@@ -376,7 +376,7 @@ Token QR mã hóa gắn liền với phiếu xuất viện (UC-02, UC-20).
 | `issued_by_doctor_id`| `UUID` | **FK** -> `doctor_profiles(doctor_id)`, Not Null | — | Bác sĩ cấp phát |
 | `issued_at` | `TIMESTAMPTZ` | Not Null | `CURRENT_TIMESTAMP` | Thời điểm tạo mã |
 | `status` | `VARCHAR(20)` | Not Null | `'ACTIVE'` | ENUM: `'ACTIVE'`, `'REVOKED'` (BR4) |
-| `print_count` | `INT` | Not Null | `1` | Số lần in ấn / tạo lại phiếu (UC-20 A1) |
+| `print_count` | `INT` | Not Null | `1` | Số lần in ấn / tạo lại phiếu (UC-012, UC-013) |
 
 * **Chỉ mục (Indexes):**
   * `idx_qr_token_active` trên `(qr_token, status)`: Quét và giải mã QR cực nhanh khi Caregiver scan camera.
@@ -386,7 +386,7 @@ Token QR mã hóa gắn liền với phiếu xuất viện (UC-02, UC-20).
 ### PHÂN HỆ V: GIAO DỊCH & SỰ KIỆN LÂM SÀNG THỰC TẾ
 
 #### 19. Bảng `medication_logs` (Nhật ký xác nhận dùng thuốc)
-Ghi nhận Caregiver đánh dấu hoàn thành cữ thuốc (UC-06).
+Ghi nhận Caregiver đánh dấu hoàn thành cữ thuốc (UC-014, UC-015).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
@@ -405,7 +405,7 @@ Ghi nhận Caregiver đánh dấu hoàn thành cữ thuốc (UC-06).
 ---
 
 #### 20. Bảng `caregiver_quiz_submissions` (Kết quả Mini Quiz của Caregiver)
-Ghi nhận kết quả làm bài trắc nghiệm sau khi hoàn thành bài học Learning Path (UC-03).
+Ghi nhận kết quả làm bài trắc nghiệm sau khi hoàn thành bài học Learning Path (UC-017).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
@@ -423,7 +423,7 @@ Ghi nhận kết quả làm bài trắc nghiệm sau khi hoàn thành bài học
 ---
 
 #### 21. Bảng `recovery_check_submissions` (Lượt nộp bảng kiểm phục hồi)
-Ghi nhận kết quả khảo sát triệu chứng phục hồi theo mốc (UC-08, UC-21).
+Ghi nhận kết quả khảo sát triệu chứng phục hồi theo mốc (UC-019, UC-021).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
@@ -434,16 +434,16 @@ Ghi nhận kết quả khảo sát triệu chứng phục hồi theo mốc (UC-0
 | `submitted_at` | `TIMESTAMPTZ` | Not Null | `CURRENT_TIMESTAMP` | Thời điểm nộp bảng kiểm |
 | `overall_status` | `VARCHAR(20)` | Not Null | — | ENUM: `'NORMAL'`, `'NEEDS_ATTENTION'`, `'RED_FLAG'` (BR10) |
 | `doctor_viewed` | `BOOLEAN` | Not Null | `FALSE` | Bác sĩ đã xem xét kết quả hay chưa |
-| `doctor_viewed_at` | `TIMESTAMPTZ` | Nullable | NULL | Thời điểm Bác sĩ mở xem xét (UC-21) |
+| `doctor_viewed_at` | `TIMESTAMPTZ` | Nullable | NULL | Thời điểm Bác sĩ mở xem xét (UC-021) |
 | `doctor_notes` | `TEXT` | Nullable | NULL | Nhận xét chuyên môn của Bác sĩ |
 
 * **Chỉ mục (Indexes):**
-  * `idx_recovery_doctor_alert` trên `(doctor_viewed, overall_status, submitted_at)`: Tối ưu Bảng điều khiển Bác sĩ lọc các ca có cờ cảnh báo Red Flag chưa xem xét (UC-21).
+  * `idx_recovery_doctor_alert` trên `(doctor_viewed, overall_status, submitted_at)`: Tối ưu Bảng điều khiển Bác sĩ lọc các ca có cờ cảnh báo Red Flag chưa xem xét (UC-021).
 
 ---
 
 #### 22. Bảng `recovery_check_answers` (Chi tiết câu trả lời khảo sát)
-Lưu đáp án từng câu hỏi trong bảng kiểm phục hồi (UC-08, UC-21).
+Lưu đáp án từng câu hỏi trong bảng kiểm phục hồi (UC-019, UC-021).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
@@ -456,17 +456,17 @@ Lưu đáp án từng câu hỏi trong bảng kiểm phục hồi (UC-08, UC-21)
 ---
 
 #### 23. Bảng `red_flag_incidents` (Sự kiện cảnh báo khẩn cấp)
-Theo dõi các tình huống khẩn cấp xảy ra với bệnh nhân (UC-09, UC-21).
+Theo dõi các tình huống khẩn cấp xảy ra với bệnh nhân (UC-020, UC-022).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
 | `incident_id` | `UUID` | **PK**, Not Null | `gen_random_uuid()` | Khóa chính sự kiện |
 | `care_plan_id` | `UUID` | **FK** -> `patient_care_plans(...)`, Not Null | — | Kế hoạch chăm sóc của bệnh nhân |
 | `caregiver_id` | `UUID` | **FK** -> `caregiver_profiles(...)`, Not Null | — | Người phát hiện / liên hệ |
-| `trigger_source` | `VARCHAR(20)` | Not Null | — | ENUM: `'RECOVERY_CHECK'`, `'MANUAL_BUTTON'` (UC-09) |
+| `trigger_source` | `VARCHAR(20)` | Not Null | — | ENUM: `'RECOVERY_CHECK'`, `'MANUAL_BUTTON'` (UC-020) |
 | `red_flag_template_id` | `UUID` | **FK** -> `template_red_flags(...)`, Nullable | NULL | Dấu hiệu nguy hiểm tương ứng nếu xác định được |
 | `triggered_at` | `TIMESTAMPTZ` | Not Null | `CURRENT_TIMESTAMP` | Thời điểm phát sinh cảnh báo |
-| `call_initiated` | `BOOLEAN` | Not Null | `FALSE` | Đã bấm nút gọi đường dây nóng hay chưa (UC-09 Step 3) |
+| `call_initiated` | `BOOLEAN` | Not Null | `FALSE` | Đã bấm nút gọi đường dây nóng hay chưa (UC-020 Step 2) |
 | `call_initiated_at` | `TIMESTAMPTZ` | Nullable | NULL | Thời điểm bấm gọi |
 | `acknowledged_by_doctor_id`| `UUID` | **FK** -> `doctor_profiles(...)`, Nullable | NULL | Bác sĩ tiếp nhận ca cấp cứu |
 | `acknowledged_at` | `TIMESTAMPTZ` | Nullable | NULL | Thời điểm tiếp nhận |

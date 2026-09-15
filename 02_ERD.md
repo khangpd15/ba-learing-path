@@ -366,25 +366,25 @@ erDiagram
     PATIENT_CARE_PLANS ||--|| PATIENT_QR_CODES : "quét mã QR để liên kết"
 ```
 
-* **Ý nghĩa:** Giải quyết trọn vẹn luồng [UC-01 (Đăng nhập Caregiver)](file:///d:/DOC_BA/docs_of_projects/file_use_case_spec.md#L11-L49), [UC-02 (Quét mã QR liên kết)](file:///d:/DOC_BA/docs_of_projects/file_use_case_spec.md#L51-L84) và [UC-11 (Đăng nhập Bác sĩ)](file:///d:/DOC_BA/docs_of_projects/file_use_case_spec.md#L287-L319).
+* **Ý nghĩa:** Giải quyết trọn vẹn luồng [UC-001 (Đăng nhập Caregiver)](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/file_use_case_spec.md), [UC-003 (Quét mã QR liên kết)](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/file_use_case_spec.md) và [UC-002 (Đăng nhập Nhân viên Y tế)](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/file_use_case_spec.md).
 * Caregiver không cần tài khoản tạo trước, đăng nhập OTP tạo bản ghi trong `accounts` và `caregiver_profiles`. Khi quét QR của bệnh nhân, bảng `caregiver_patient_links` thiết lập quan hệ ràng buộc an toàn (BR5).
 
 ---
 
-### 3.2 Phân Hệ 2: Cấu Hình Master Care Plan Template (Nhóm UC-13 đến UC-18)
+### 3.2 Phân Hệ 2: Cấu Hình Master Care Plan Template (Nhóm UC-005 đến UC-009)
 
 ```mermaid
 erDiagram
-    CARE_PLAN_TEMPLATES ||--o{ TEMPLATE_LEARNING_MODULES : "Tab 1: Learning Path (UC-14)"
+    CARE_PLAN_TEMPLATES ||--o{ TEMPLATE_LEARNING_MODULES : "Tab 1: Learning Path Infographic (UC-009, UC-017)"
     TEMPLATE_LEARNING_MODULES ||--o{ TEMPLATE_QUIZ_QUESTIONS : "Cuối bài: 3 câu Mini Quiz"
-    CARE_PLAN_TEMPLATES ||--o{ TEMPLATE_MEDICATIONS : "Tab 2: Thuốc mẫu (UC-15)"
-    CARE_PLAN_TEMPLATES ||--o{ TEMPLATE_RECOVERY_MILESTONES : "Tab 3: Mốc Recovery Check (UC-16)"
+    CARE_PLAN_TEMPLATES ||--o{ TEMPLATE_MEDICATIONS : "Tab 2: Thuốc mẫu & Timer (UC-007)"
+    CARE_PLAN_TEMPLATES ||--o{ TEMPLATE_RECOVERY_MILESTONES : "Tab 3: Mốc Recovery Check (UC-008)"
     TEMPLATE_RECOVERY_MILESTONES ||--o{ TEMPLATE_RECOVERY_QUESTIONS : "3-5 câu hỏi/mốc"
-    CARE_PLAN_TEMPLATES ||--o{ TEMPLATE_RED_FLAGS : "Tab 4: Cảnh báo Red Flag (UC-17)"
-    CARE_PLAN_TEMPLATES ||--o{ TEMPLATE_DO_DONT_ITEMS : "Tab 5: Chỉ dẫn Do & Don't (UC-18)"
+    CARE_PLAN_TEMPLATES ||--o{ TEMPLATE_RED_FLAGS : "Tab 4: Cảnh báo Red Flag (UC-008)"
+    CARE_PLAN_TEMPLATES ||--o{ TEMPLATE_DO_DONT_ITEMS : "Tab 5: Chỉ dẫn Do & Don't (UC-009)"
 ```
 
-* **Ý nghĩa:** Hỗ trợ không gian cấu hình 5 tab thành phần con trong [UC-13.1](file:///d:/DOC_BA/docs_of_projects/file_use_case_spec.md#L465-L489) và [UC-13.4](file:///d:/DOC_BA/docs_of_projects/file_use_case_spec.md#L536-L561).
+* **Ý nghĩa:** Hỗ trợ không gian cấu hình 5 tab thành phần con trong [UC-005 (Quản lý Master Template)](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/file_use_case_spec.md).
 * Mọi cấu phần đều gắn liền với `template_id` và lưu trường `surgery_type` áp dụng theo đúng yêu cầu vừa chuẩn hóa.
 
 ---
@@ -393,21 +393,21 @@ erDiagram
 
 ```mermaid
 erDiagram
-    PATIENT_CARE_PLANS ||--o{ PATIENT_MEDICATIONS : "Đơn thuốc cá nhân hóa (UC-19)"
-    PATIENT_MEDICATIONS ||--o{ MEDICATION_LOGS : "Xác nhận uống thuốc (UC-06)"
+    PATIENT_CARE_PLANS ||--o{ PATIENT_MEDICATIONS : "Đơn thuốc cá nhân hóa (UC-010)"
+    PATIENT_MEDICATIONS ||--o{ MEDICATION_LOGS : "Xác nhận uống thuốc (UC-014, UC-015)"
     
-    PATIENT_CARE_PLANS ||--o{ PATIENT_FOLLOWUP_APPOINTMENTS : "Lịch hẹn tái khám (UC-07, 19)"
+    PATIENT_CARE_PLANS ||--o{ PATIENT_FOLLOWUP_APPOINTMENTS : "Lịch hẹn tái khám (UC-018, UC-010)"
     
-    TEMPLATE_LEARNING_MODULES ||--o{ CAREGIVER_QUIZ_SUBMISSIONS : "Kết quả Quiz sau xem bài (UC-03)"
+    TEMPLATE_LEARNING_MODULES ||--o{ CAREGIVER_QUIZ_SUBMISSIONS : "Kết quả Quiz mở rộng Phase 2 (UC-017)"
     
-    PATIENT_CARE_PLANS ||--o{ RECOVERY_CHECK_SUBMISSIONS : "Nộp bảng kiểm (UC-08, 21)"
+    PATIENT_CARE_PLANS ||--o{ RECOVERY_CHECK_SUBMISSIONS : "Nộp bảng kiểm (UC-019, UC-021)"
     RECOVERY_CHECK_SUBMISSIONS ||--o{ RECOVERY_CHECK_ANSWERS : "Chi tiết đáp án & cờ cảnh báo"
     
-    PATIENT_CARE_PLANS ||--o{ RED_FLAG_INCIDENTS : "Sự kiện khẩn cấp & cuộc gọi hotline (UC-09)"
+    PATIENT_CARE_PLANS ||--o{ RED_FLAG_INCIDENTS : "Sự kiện khẩn cấp & cuộc gọi hotline (UC-020, UC-022)"
 ```
 
 * **Ý nghĩa:**
-  * Thể hiện tính nguyên khối và cô lập của dữ liệu bệnh nhân (BR17, BR18). Khi bác sĩ nhân bản từ template sang cho bệnh nhân (UC-19), đơn thuốc thực tế được ghi vào `patient_medications` độc lập.
+  * Thể hiện tính nguyên khối và cô lập của dữ liệu bệnh nhân (BR17, BR18). Khi bác sĩ nhân bản từ template sang cho bệnh nhân (UC-010), đơn thuốc thực tế được ghi vào `patient_medications` độc lập.
   * Mọi hành động của Caregiver nộp bảng kiểm, xác nhận uống thuốc hay gọi cấp cứu đều sinh bản ghi giao dịch có dấu thời gian chính xác.
 
 ---

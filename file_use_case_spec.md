@@ -1,1243 +1,992 @@
-# II. Đặc Tả Yêu Cầu Nghiệp Vụ (Requirement Specifications)
+# II. ĐẶC TẢ YÊU CẦU NGHIỆP VỤ (REQUIREMENT SPECIFICATIONS)
+# DANH MỤC VÀ ĐẶC TẢ CHI TIẾT CÁC USE CASE (FILE_USE_CASE_SPEC.MD)
 
-## 1. Danh Mục và Đặc Tả Chi Tiết Các Use Case
+> **Dự án:** RemiCare Ophthalmic Post-Op Platform (Nền tảng Hướng dẫn và Giám sát Chăm sóc Hậu phẫu Nhãn khoa)  
+> **Doanh nghiệp mục tiêu:** Công ty Cổ phần Tập đoàn Y khoa VISI (VISI Medical Group)  
+> **Phiên bản:** V1 (Chuẩn hóa toàn diện theo US_US_V1 - Sắp xếp nghiêm ngặt theo Use Case ID từ UC-001 đến UC-028)  
+> **Ngày phê duyệt:** 15/09/2026  
+> **Tổng số Use Cases:** 31 Ca sử dụng (28 mã chính UC-001 đến UC-028 cùng 3 ca mở rộng UC-010b, UC-010c, UC-022b)  
 
 ---
 
-## PHÂN HỆ 1: NGƯỜI CHĂM SÓC (CAREGIVER)
+## 1. TỔNG QUAN DANH MỤC USE CASE HỆ THỐNG
+
+| Use Case ID | Tên Use Case | Actor chính | Actor hỗ trợ | Mục tiêu nghiệp vụ | Feature ID | Priority |
+| :--- | :--- | :--- | :--- | :--- | :--- | :---: |
+| **UC-001** | Đăng ký và Đăng nhập Caregiver qua OTP | ACT-001 (Caregiver) | ACT-009 (SMS / ZNS Gateway) | Xác thực số điện thoại và định danh an toàn cho Caregiver không cần mậ... | F-001, F-003 | **P0** |
+| **UC-002** | Đăng nhập Nhân viên Y tế và Xác thực 2FA | ACT-002 (Bác sĩ), ACT-003 (Điều dưỡng), ACT-004 (CSKH) | ACT-007 (System Admin) | Xác thực danh tính chuyên môn nhân viên y tế theo vai trò và cơ sở bện... | F-002, F-023 | **P0** |
+| **UC-003** | Quét Mã QR Bàn Giao Liên Kết Hồ Sơ Bệnh Nhân | ACT-001 (Caregiver) | ACT-003 (Điều dưỡng), ACT-006 (Bệnh nhân) | Giải mã QR token từ phiếu xuất viện và thiết lập liên kết điện tử bảo ... | F-004, F-021 | **P0** |
+| **UC-004** | Quản lý Hồ sơ Định danh Bệnh Nhân | ACT-003 (Điều dưỡng xuất viện), ACT-002 (Bác sĩ điều trị) | ACT-006 (Bệnh nhân), ACT-010 (HIS) | Tạo mới, tra cứu và quản lý thông tin lâm sàng tối thiểu của bệnh nhân... | F-005 | **P0** |
+| **UC-005** | Quản lý Danh mục Mẫu Kế Hoạch Chăm Sóc | ACT-002 (Bác sĩ điều trị) | ACT-005 (Clinical Approver / GCMO) | Thiết lập, cập nhật và quản lý các gói phác đồ chuẩn hóa theo loại phẫ... | F-006 | **P0** |
+| **UC-006** | Phê Duyệt Lâm Sàng Master Template | ACT-005 (Clinical Approver / GCMO) | ACT-002 (Bác sĩ điều trị) | Thẩm định chuyên môn y khoa và ban hành chính thức các phiên bản Maste... | F-007 | **P1** |
+| **UC-007** | Cấu Hình Danh Mục Thuốc Mẫu Trong Template | ACT-002 (Bác sĩ điều trị) | ACT-005 (GCMO) | Cài đặt danh mục biệt dược mẫu, liều dùng, cữ dùng và khoảng cách giãn... | F-006, F-009, F-010 | **P0** |
+| **UC-008** | Cấu Hình Bộ Câu Hỏi Recovery Check & Red Flag | ACT-002 (Bác sĩ điều trị) | ACT-005 (GCMO) | Thiết lập các câu hỏi khảo sát phục hồi định kỳ 3 mức (Xanh/Vàng/Đỏ) v... | F-006, F-016, F-017 | **P0** |
+| **UC-009** | Cấu Hình Cẩm Nang Hướng Dẫn và Quy Tắc Sinh Hoạt trong Master Template | ACT-002 (Bác sĩ điều trị) | ACT-005 (Clinical Approver / GCMO) | Thiết lập cẩm nang 24h đầu, quy tắc nên làm/cần tránh (Do/Don't) và ng... | F-006, F-012, F-013, F-028 | **P0** |
+| **UC-010** | Khởi Tạo và Cá Nhân Hóa Care Plan Bệnh Nhân | ACT-003 (Điều dưỡng xuất viện) | ACT-002 (Bác sĩ điều trị) | Nhân bản Master Template thành Care Plan thực tế cho bệnh nhân trong <... | F-008 | **P0** |
+| **UC-010b** | Thực Hiện Bàn Giao Xuất Viện Tại Phòng Lưu Viện | ACT-003 (Điều dưỡng xuất viện) | ACT-001 (Caregiver), ACT-006 (Bệnh nhân) | Điều dưỡng trực tiếp kiểm tra mắt, dán khiên bảo hộ, trao phiếu xuất v... | F-008, F-022 | **P0** |
+| **UC-010c** | Xác Nhận Hoàn Tất Bàn Giao Lâm Sàng | ACT-003 (Điều dưỡng xuất viện) | ACT-001 (Caregiver) | Hệ thống ghi nhận trạng thái Care Plan chuyển sang `ACTIVE` toàn diện ... | F-004, F-008 | **P0** |
+| **UC-011** | Tạo và Phát Hành Mã QR Xuất Viện | ACT-003 (Điều dưỡng xuất viện) | ACT-001 (Caregiver), ACT-006 (Bệnh nhân) | Hệ thống sinh mã token mã hóa ngẫu nhiên an toàn (UUIDv4/JWT có chữ ký... | F-021 | **P0** |
+| **UC-012** | In Phiếu Hướng Dẫn Xuất Viện Kèm Mã QR | ACT-003 (Điều dưỡng xuất viện) | ACT-001 (Caregiver) | Xuất lệnh in trực tiếp Phiếu xuất viện khổ chuẩn (A5/A4/decal) có chứa... | F-022 | **P0** |
+| **UC-013** | Cấp Lại hoặc Thu Hồi Mã QR Bàn Giao | ACT-003 (Điều dưỡng), ACT-002 (Bác sĩ) | ACT-001 (Caregiver) | Tạo mã QR mới thay thế khi bị mất phiếu hoặc khi Bác sĩ đổi phác đồ th... | F-021, F-022 | **P0** |
+| **UC-014** | Xem Lịch Dùng Thuốc và Hướng Dẫn Nhỏ Mắt | ACT-001 (Caregiver) | ACT-006 (Bệnh nhân) | Hiển thị cữ thuốc trong ngày theo dòng thời gian (Sáng, Trưa, Chiều, T... | F-009, F-011 | **P0** |
+| **UC-015** | Xác Nhận Dùng Thuốc và Kích Hoạt Bộ Đếm Giãn Cách | ACT-001 (Caregiver) | ACT-006 (Bệnh nhân) | Ghi nhận cữ thuốc hoàn thành kèm timestamp đồng bộ; tự động đếm lùi 5–... | F-009, F-010 | **P0** |
+| **UC-016** | Xem Cẩm Nang 24h Đầu và Bảng Nên Làm / Cần Tránh | ACT-001 (Caregiver) | ACT-006 (Bệnh nhân) | Tra cứu tức thì các hành động cấp thiết trong 24h đầu sau mổ và danh m... | F-012, F-013 | **P0** |
+| **UC-017** | Xem Lộ Trình Học Viện Caregiver - Infographic Tĩnh | ACT-001 (Caregiver) | ACT-006 (Bệnh nhân) | Học tập kiến thức chăm sóc mắt qua các infographic trực quan tinh gọn ... | F-014 | **P1** |
+| **UC-018** | Xem Lịch Tái Khám và Nhận Thông Báo Nhắc Hẹn | ACT-001 (Caregiver) | ACT-009 (SMS / ZNS Gateway), ACT-004 (CSKH) | Theo dõi 5 mốc tái khám chuẩn VISI (Day 1, 7, Month 1, 3, 6) và nhận t... | F-015, F-027 | **P0** |
+| **UC-019** | Thực Hiện Khảo Sát Đánh Giá Phục Hồi Định Kỳ | ACT-001 (Caregiver) | ACT-006 (Bệnh nhân), ACT-002 (Bác sĩ) | Trả lời 3–5 câu hỏi sàng lọc định kỳ mỗi sáng trong 7 ngày đầu để hệ t... | F-016 | **P0** |
+| **UC-020** | Kích Hoạt Xử Lý Biến Chứng Báo Động Đỏ | ACT-001 (Caregiver) | ACT-004 (CSKH), ACT-008 (Cấp cứu ngoại viện) | Chuyển giao diện khẩn cấp toàn màn hình, cung cấp nút gọi 1 chạm đến H... | F-017 | **P0** |
+| **UC-021** | Giám Sát Dashboard Phục Hồi Bệnh Nhân Tập Trung | ACT-004 (CSKH / Medical Monitor), ACT-003 (Điều dưỡng) | ACT-002 (Bác sĩ điều trị) | Theo dõi danh sách toàn bộ bệnh nhân của cơ sở theo trạng thái tuân th... | F-018 | **P0** |
+| **UC-022** | Tiếp Nhận, Phân Loại và Điều Phối Cảnh Báo Red Flag | ACT-004 (CSKH / Medical Monitor) | ACT-002 (Bác sĩ trực), ACT-001 (Caregiver) | Tiếp nhận ca cảnh báo đỏ, chuyển trạng thái xử lý, gọi điện can thiệp ... | F-019 | **P0** |
+| **UC-022b** | Tự Động Leo Thang Cảnh Báo Red Flag Chưa Xử Lý | ACT-007 (System / Admin) | ACT-004 (CSKH), ACT-002 (Bác sĩ trực) | Tự động phát chuông cấp độ 2 và gửi tin nhắn khẩn cấp lên Bác sĩ trực/... | F-019 | **P0** |
+| **UC-023** | Ghi Nhận Nhật Ký Cuộc Gọi và Can Thiệp Lâm Sàng | ACT-004 (CSKH), ACT-003 (Điều dưỡng) | ACT-002 (Bác sĩ điều trị) | Ghi nhận chi tiết kết quả cuộc gọi tư vấn, lời dặn y tế và trạng thái ... | F-020 | **P0** |
+| **UC-024** | Tra Cứu Tình Huống Chăm Sóc Khẩn Cấp - FAQ Lâm Sàng | ACT-001 (Caregiver) | ACT-006 (Bệnh nhân) | Tra cứu nhanh chỉ dẫn chuẩn y khoa theo tình huống thường gặp tại nhà ... | F-028 | **P1** |
+| **UC-025** | Kích Hoạt Chế Độ Trợ Năng Nhãn Khoa | ACT-006 (Bệnh nhân), ACT-001 (Caregiver) | Không có | Chuyển giao diện sang chữ lớn (≥18pt), tương phản cao High Contrast và... | F-026 | **P1** |
+| **UC-026** | Quản Lý Tài Khoản Nhân Viên và Phân Quyền Cơ Sở | ACT-007 (Quản trị viên hệ thống) | ACT-002, ACT-003, ACT-004 | Khởi tạo tài khoản và phân quyền truy cập nghiêm ngặt theo vai trò và ... | F-023 | **P0** |
+| **UC-027** | Tra Cứu Nhật Ký Kiểm Toán Hệ Thống | ACT-007 (Quản trị viên hệ thống) | Ban Giám Đốc (CEO, COO) | Truy vấn và kết xuất nhật ký thao tác lâm sàng phục vụ kiểm tra an toà... | F-024 | **P1** |
+| **UC-028** | Kết Xuất Báo Cáo Vận Hành và Chỉ Số Tuân Thủ KPI | Ban Giám Đốc (CEO, COO) | ACT-007 (System Admin) | Tổng hợp các chỉ số KPIs: tỷ lệ kích hoạt QR (mục tiêu ≥85%), tỷ lệ tu... | F-025 | **P1** |
 
 ---
 
-### 1.1 UC-01: Đăng nhập hệ thống (Caregiver Login System)
+## 2. ĐẶC TẢ CHI TIẾT TỪNG USE CASE (UC-001 ĐẾN UC-028)
+
+### UC-001: Đăng ký và Đăng nhập Caregiver qua OTP (Caregiver Authentication)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-01 | | |
-| **Tên Use Case (Use Case Name)** | Đăng nhập hệ thống (Caregiver Login System) | | |
-| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Người chăm sóc (Caregiver) | | |
-| **Mô tả tóm tắt (Brief Description)** | Use case này mô tả cách Caregiver đăng nhập vào hệ thống bằng số điện thoại đã đăng ký và xác thực mã OTP để truy cập các chức năng Kế hoạch chăm sóc (Care Plan), Học viện Caregiver (Caregiver Academy) và theo dõi bệnh nhân. | | |
-| **Mục tiêu (Goal)** | Xác thực danh tính Caregiver an toàn và cấp quyền truy cập các tính năng chăm sóc bệnh nhân | | |
-| **Tác nhân kích hoạt (Trigger)** | Caregiver nhấn nút “Đăng nhập” trên màn hình đăng nhập. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | 1. Caregiver có tài khoản đã đăng ký hợp lệ trong hệ thống.<br>2. Tài khoản không bị khóa, vô hiệu hóa hoặc xóa.<br>3. Số điện thoại đăng ký sẵn sàng nhận tin nhắn SMS chứa OTP. | | |
-| **Điều kiện sau (Post-conditions)** | 1. Caregiver đăng nhập thành công vào hệ thống.<br>2. Hệ thống thiết lập phiên làm việc bảo mật.<br>3. Caregiver được chuyển hướng đến Trang chủ hiển thị các bệnh nhân và Care Plan được phân quyền. | | |
+| **Mã Use Case (Use Case ID)** | **UC-001** | | |
+| **Tên Use Case (Use Case Name)** | Đăng ký và Đăng nhập Caregiver qua OTP (Caregiver Authentication) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-001 (Caregiver) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-009 (SMS / ZNS Gateway) | | |
+| **Tính năng liên quan (Features)** | F-001, F-003 | | |
+| **Mô tả tóm tắt (Brief Description)** | Use case này mô tả quy trình Caregiver đăng nhập hoặc đăng ký tài khoản lần đầu bằng Số điện thoại di động và mã OTP gửi qua SMS/ZNS để truy cập vào hệ thống chăm sóc hậu phẫu. | | |
+| **Mục tiêu (Goal)** | Xác thực số điện thoại và định danh an toàn cho Caregiver không cần mật khẩu; thiết lập phiên làm việc bảo mật theo Nghị định 13/2023/NĐ-CP. | | |
+| **Tác nhân kích hoạt (Trigger)** | Caregiver mở ứng dụng Web App (PWA) hoặc quét mã QR trên phiếu xuất viện khi chưa có phiên đăng nhập. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | 1. Caregiver có thiết bị di động có kết nối internet và trình duyệt web.<br>2. Số điện thoại sẵn sàng nhận tin nhắn SMS hoặc Zalo ZNS.<br>3. Cổng viễn thông ACT-009 đang hoạt động bình thường. | | |
+| **Điều kiện sau (Post-conditions)** | 1. Phiên làm việc bảo mật (JWT) được thiết lập trên thiết bị.<br>2. Hồ sơ Caregiver được tạo mới hoặc cập nhật.<br>3. Chuyển tiếp vào Trang chủ hoặc luồng liên kết bệnh nhân. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Caregiver nhấn nút “Đăng nhập” | Hệ thống hiển thị giao diện đăng nhập với ô nhập số điện thoại |
-| | 2 | Caregiver nhập số điện thoại đã đăng ký và nhấn “Tiếp tục” | Hệ thống kiểm tra định dạng số điện thoại, kiểm tra tài khoản đang hoạt động, tạo mã OTP ngẫu nhiên, gửi mã OTP qua SMS và hiển thị màn hình xác thực OTP |
-| | 3 | Caregiver nhập mã OTP nhận được từ tin nhắn | Hệ thống kiểm tra tính chính xác và thời hạn hiệu lực của OTP, chứng thực tài khoản, tạo phiên làm việc bảo mật và chuyển hướng Caregiver đến Trang chủ |
+| | 1 | Caregiver nhập số điện thoại di động (10 chữ số) và nhấn 'Tiếp tục' | Hệ thống kiểm tra định dạng số điện thoại Việt Nam (BR1). Nếu hợp lệ, tạo mã OTP 6 chữ số ngẫu nhiên có hiệu lực 5 phút, gọi SMS/ZNS Gateway để gửi mã và hiển thị màn hình nhập OTP. |
+| | 2 | Caregiver kiểm tra tin nhắn và nhập mã OTP 6 chữ số vào ứng dụng | Hệ thống kiểm tra tính chính xác và thời hạn của OTP (BR2). Nếu đúng, cấp phát JWT token, tạo mới hồ sơ nếu là người dùng mới (F-003), và chuyển tiếp vào ứng dụng. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **A1: Đăng nhập sau khi quét mã QR** | 1 | Caregiver quét mã QR do bệnh viện cấp khi chưa đăng nhập ứng dụng | Hệ thống mở trang Đăng nhập và lưu tạm mã định danh QR trong phiên làm việc |
-| | 2 | Caregiver thực hiện đăng nhập bằng số điện thoại và OTP | Hệ thống xác thực đăng nhập, kiểm tra mã QR, tự động tạo liên kết Caregiver với bệnh nhân và mở thẳng Kế hoạch chăm sóc của bệnh nhân |
+| **A1: Đăng nhập sau khi quét QR xuất viện** | 1 | Caregiver quét mã QR trên phiếu xuất viện khi chưa đăng nhập | Hệ thống lưu tạm token QR vào bộ nhớ đệm, hoàn tất đăng nhập OTP xong thì tự động thực hiện liên kết bệnh nhân (UC-003) và mở thẳng Care Plan. |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Số điện thoại không hợp lệ** | 1 | Caregiver nhập số điện thoại sai định dạng | Hệ thống phát hiện định dạng sai, chặn xử lý và hiển thị thông báo lỗi: “Số điện thoại không hợp lệ.” |
-| **E2: Tài khoản chưa đăng ký** | 1 | Caregiver nhập số điện thoại chưa tồn tại trong hệ thống | Hệ thống phát hiện không tìm thấy tài khoản, hiển thị thông báo: “Số điện thoại chưa được đăng ký trong hệ thống.” kèm nút chuyển sang Đăng ký |
-| **E3: Sai mã OTP** | 1 | Caregiver nhập không đúng mã OTP | Hệ thống từ chối xác thực và hiển thị: “Mã OTP không chính xác.” |
-| **E4: Mã OTP hết hạn** | 1 | Caregiver nhập mã OTP sau thời gian hiệu lực | Hệ thống từ chối xác thực, hiển thị: “Mã OTP đã hết hạn.” và cung cấp nút gửi lại mã mới |
-| **E5: Tài khoản bị vô hiệu hóa** | 1 | Caregiver cố gắng đăng nhập vào tài khoản bị khóa | Hệ thống từ chối đăng nhập và thông báo: “Tài khoản đã bị vô hiệu hóa.” |
-| **E6: Vượt giới hạn yêu cầu OTP** | 1 | Caregiver nhấn gửi lại OTP quá nhiều lần trong thời gian ngắn | Hệ thống tạm thời chặn gửi OTP và thông báo thời gian chờ cần thiết |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR1, BR2, BR3 | | |
-
-#### Quy tắc nghiệp vụ (Business Rules)
-| Mã BR | Tên Quy tắc Nghiệp vụ | Mô tả Quy tắc Nghiệp vụ |
-|---|---|---|
-| BR1 | Kiểm tra tính hợp lệ của số điện thoại | Hệ thống phải xác thực định dạng số điện thoại của Caregiver trước khi khởi tạo quy trình gửi mã OTP. |
-| BR2 | Xác thực mã OTP | Mã OTP phải chính xác, khớp với mã hệ thống đã sinh ra và được sử dụng trong khoảng thời gian hiệu lực quy định. |
-| BR3 | Phân quyền tài khoản | Chỉ những tài khoản Caregiver đang ở trạng thái hoạt động (Active) mới được phép xác thực thành công và truy cập các chức năng của Caregiver. |
+| **E1: Số điện thoại không đúng định dạng** | 1 | Caregiver nhập thiếu/thừa số hoặc ký tự lạ | Hệ thống hiển thị thông báo lỗi 'Số điện thoại không hợp lệ' và yêu cầu nhập lại. |
+| **E2: Sai mã OTP** | 1 | Caregiver nhập mã không khớp | Hệ thống thông báo 'Mã OTP không chính xác' và hiển thị số lần thử còn lại. |
+| **E3: Vượt quá giới hạn thử OTP** | 1 | Nhập sai quá 5 lần liên tiếp | Hệ thống tạm khóa yêu cầu OTP trong 15 phút để chống tấn công brute-force. |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR1 (Kiểm tra SĐT), BR2 (Xác thực OTP), BR3 (Phân quyền Caregiver) | | |
 
 ---
 
-### 1.2 UC-02: Quét mã QR liên kết hồ sơ bệnh nhân (Scan QR Code)
+### UC-002: Đăng nhập Nhân viên Y tế và Xác thực 2FA (Staff Authentication & 2FA)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-02 | | |
-| **Tên Use Case (Use Case Name)** | Quét mã QR liên kết hồ sơ bệnh nhân (Scan QR Code to Link Patient Profile) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Tác nhân chính: Caregiver<br>Tác nhân phụ: Bác sĩ (Doctor), Bệnh nhân (Patient) | | |
-| **Mô tả tóm tắt (Brief Description)** | Use case này mô tả cách Caregiver quét mã QR do bệnh viện phát hành gắn với Kế hoạch chăm sóc của bệnh nhân, xác thực thông tin bệnh nhân và thiết lập liên kết bảo mật giữa Caregiver và Kế hoạch chăm sóc. | | |
-| **Mục tiêu (Goal)** | Liên kết tài khoản Caregiver với hồ sơ bệnh nhân và Kế hoạch chăm sóc tương ứng bằng mã QR | | |
-| **Tác nhân kích hoạt (Trigger)** | Caregiver nhấn nút “Quét mã QR” trên trang chủ ứng dụng. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | 1. Caregiver đã đăng nhập vào hệ thống.<br>2. Ứng dụng được cấp quyền sử dụng camera [ASSUMPTION].<br>3. Mã QR liên kết với Kế hoạch chăm sóc đang Hoạt động (Active) đã được Bác sĩ phát hành. | | |
-| **Điều kiện sau (Post-conditions)** | 1. Caregiver liên kết thành công với Kế hoạch chăm sóc của bệnh nhân.<br>2. Caregiver được phân quyền truy cập thông tin chăm sóc của bệnh nhân này.<br>3. Hệ thống ghi nhận lịch sử liên kết vào nhật ký kiểm toán. | | |
+| **Mã Use Case (Use Case ID)** | **UC-002** | | |
+| **Tên Use Case (Use Case Name)** | Đăng nhập Nhân viên Y tế và Xác thực 2FA (Staff Authentication & 2FA) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-002 (Bác sĩ), ACT-003 (Điều dưỡng), ACT-004 (CSKH) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-007 (System Admin) | | |
+| **Tính năng liên quan (Features)** | F-002, F-023 | | |
+| **Mô tả tóm tắt (Brief Description)** | Use case này mô tả quy trình nhân viên y tế (Bác sĩ, Điều dưỡng, CSKH) đăng nhập vào cổng thông tin bệnh viện RemiCare Portal bằng tài khoản nội bộ cấp phát kết hợp xác thực 2 lớp (2FA). | | |
+| **Mục tiêu (Goal)** | Xác thực danh tính chuyên môn nhân viên y tế theo vai trò và cơ sở bệnh viện (5 bệnh viện chuỗi VISI), bảo vệ dữ liệu bệnh án nhạy cảm. | | |
+| **Tác nhân kích hoạt (Trigger)** | Nhân viên y tế truy cập cổng quản trị `portal.remicare.visi.vn` trên máy trạm bệnh viện. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | 1. Tài khoản đã được Quản trị viên (ACT-007) cấp phát và gán vai trò RBAC cùng chi nhánh bệnh viện (F-023).<br>2. Tài khoản đang ở trạng thái Hoạt động (`ACTIVE`). | | |
+| **Điều kiện sau (Post-conditions)** | 1. Nhân viên đăng nhập thành công vào phân hệ được phân quyền tương ứng (Bác sĩ -> Cấu hình/bệnh án, Điều dưỡng -> Quầy lưu viện/in QR, CSKH -> Dashboard giám sát).<br>2. Ghi nhận nhật ký đăng nhập vào Audit Trail. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Caregiver nhấn nút “Quét mã QR” | Hệ thống mở camera và hiển thị khung ngắm quét mã |
-| | 2 | Caregiver hướng camera vào mã QR trên phiếu xuất viện của bệnh nhân | Hệ thống quét và giải mã dữ liệu, kiểm tra tính hợp lệ và hiển thị tóm tắt thông tin bệnh nhân: Họ và tên, Năm sinh/Tuổi, Loại phẫu thuật, Bác sĩ điều trị |
-| | 3 | Caregiver kiểm tra thông tin và nhấn “Xác nhận liên kết” | Hệ thống lưu thông tin liên kết, hiển thị thông báo: “Liên kết hồ sơ bệnh nhân thành công.” và chuyển đến Bảng điều khiển Care Plan của bệnh nhân |
+| | 1 | Nhân viên nhập Tên đăng nhập và Mật khẩu nội bộ | Hệ thống kiểm tra thông tin đăng nhập, xác định vai trò và chi nhánh công tác. |
+| | 2 | Nhân viên nhập mã xác thực 2 lớp (2FA) từ ứng dụng Authenticator hoặc OTP SMS | Hệ thống xác minh mã 2FA, cấp phiên làm việc có chữ ký số và điều hướng vào bảng điều khiển theo vai trò (BR14, BR15). |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **A1: Hủy liên kết** | 1 | Caregiver đối chiếu thông tin phát hiện sai bệnh nhân và nhấn “Hủy bỏ” | Hệ thống hủy yêu cầu liên kết, không lưu dữ liệu và đưa Caregiver về Trang chủ |
+| **A1: Đổi mật khẩu lần đầu** | 1 | Nhân viên đăng nhập bằng mật khẩu khởi tạo | Hệ thống bắt buộc nhân viên đổi mật khẩu mới có độ phức tạp cao trước khi truy cập chức năng. |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Không có quyền camera** | 1 | Caregiver từ chối cấp quyền camera | Hệ thống hiển thị: “Vui lòng cấp quyền truy cập camera để quét mã QR.” kèm nút mở Cài đặt thiết bị |
-| **E2: Mã QR không hợp lệ** | 1 | Caregiver quét mã QR không đúng chuẩn hệ thống | Hệ thống báo lỗi: “Mã QR không hợp lệ hoặc không thuộc hệ thống.” và tiếp tục mở khung quét |
-| **E3: Kế hoạch chăm sóc đã đóng** | 1 | Quét mã QR của Kế hoạch chăm sóc đã hoàn tất hoặc bị vô hiệu hóa | Hệ thống từ chối và hiển thị: “Kế hoạch chăm sóc gắn với mã QR này đã kết thúc hoặc bị vô hiệu hóa.” |
-| **E4: Đã liên kết trước đó** | 1 | Quét mã QR của bệnh nhân đã có trong danh sách | Hệ thống thông báo: “Bạn đã được liên kết với hồ sơ bệnh nhân này.” và chuyển đến màn hình chi tiết bệnh nhân |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR4, BR5 | | |
-
-#### Quy tắc nghiệp vụ (Business Rules)
-| Mã BR | Tên Quy tắc Nghiệp vụ | Mô tả Quy tắc Nghiệp vụ |
-|---|---|---|
-| BR4 | Tính hợp lệ của mã QR | Hệ thống phải xác thực mã QR được tạo từ hệ thống bệnh viện và liên kết với Kế hoạch chăm sóc đang ở trạng thái Hoạt động (Active) trước khi cho phép liên kết. |
-| BR5 | Tính toàn vẹn liên kết Caregiver - Bệnh nhân | Một Caregiver có thể liên kết với nhiều bệnh nhân, nhưng mỗi liên kết phải có sự xác nhận rõ ràng từ Caregiver và phải được lưu vết kèm thời gian và thông tin kiểm toán. |
+| **E1: Sai thông tin đăng nhập hoặc 2FA** | 1 | Nhập sai mật khẩu hoặc mã 2FA | Hệ thống báo lỗi và ghi nhận số lần thất bại; khóa tài khoản sau 5 lần sai liên tiếp. |
+| **E2: Tài khoản bị khóa / hết hạn** | 1 | Nhân viên đã nghỉ việc hoặc bị đình chỉ | Hệ thống từ chối truy cập và yêu cầu liên hệ IT Bệnh viện. |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR14 (Kiểm soát quyền truy cập nhân viên), BR15 (Phân tách dữ liệu theo cơ sở bệnh viện) | | |
 
 ---
 
-### 1.3 UC-03: Xem hướng dẫn chăm sóc, Learning Path và kiểm tra kiến thức (View Care Instructions, Learning Path & Mini Quiz)
+### UC-003: Quét Mã QR Bàn Giao Liên Kết Hồ Sơ Bệnh Nhân (Caregiver-Patient Linking)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-03 | | |
-| **Tên Use Case (Use Case Name)** | Xem hướng dẫn chăm sóc, Learning Path và kiểm tra kiến thức (View Care Instructions, Learning Path & Mini Quiz) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Người chăm sóc (Caregiver) | | |
-| **Mô tả tóm tắt (Brief Description)** | Use case này mô tả cách Caregiver truy cập và học các hướng dẫn chăm sóc theo lộ trình (Learning Path) gồm các giai đoạn (phase) bằng video hoặc hình ảnh minh họa được Bác sĩ cấu hình riêng cho loại phẫu thuật. Khi Caregiver xem hết các phase video hoặc hình ảnh của bài học, ở cuối sẽ xuất hiện 3 câu hỏi trắc nghiệm kiểm tra nhanh (Mini Quiz) để củng cố kiến thức và đánh giá sự thấu hiểu của Caregiver. | | |
-| **Mục tiêu (Goal)** | Giúp Caregiver nắm vững kiến thức, thao tác chăm sóc bệnh nhân chuẩn y khoa và kiểm tra nhanh mức độ hiểu bài qua 3 câu hỏi trắc nghiệm ở cuối bài học | | |
-| **Tác nhân kích hoạt (Trigger)** | Caregiver chọn “Learning Path” trên bảng điều khiển bệnh nhân. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | 1. Caregiver đã đăng nhập.<br>2. Caregiver đã liên kết với Kế hoạch chăm sóc đang hoạt động của bệnh nhân. | | |
-| **Điều kiện sau (Post-conditions)** | 1. Nội dung hướng dẫn được hiển thị đầy đủ.<br>2. Tiến trình học tập và kết quả trả lời 3 câu hỏi kiểm tra được ghi nhận vào hệ thống. | | |
+| **Mã Use Case (Use Case ID)** | **UC-003** | | |
+| **Tên Use Case (Use Case Name)** | Quét Mã QR Bàn Giao Liên Kết Hồ Sơ Bệnh Nhân (Caregiver-Patient Linking) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-001 (Caregiver) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-003 (Điều dưỡng), ACT-006 (Bệnh nhân) | | |
+| **Tính năng liên quan (Features)** | F-004, F-021 | | |
+| **Mô tả tóm tắt (Brief Description)** | Caregiver sử dụng camera điện thoại quét mã QR in trên Phiếu xuất viện do Điều dưỡng bàn giao để gắn tài khoản chăm sóc vào bệnh nhân. | | |
+| **Mục tiêu (Goal)** | Giải mã QR token từ phiếu xuất viện và thiết lập liên kết điện tử bảo mật giữa Caregiver và Kế hoạch chăm sóc bệnh nhân; hỗ trợ tối đa 3 Caregiver. | | |
+| **Tác nhân kích hoạt (Trigger)** | Caregiver nhấn nút 'Quét mã QR' trên ứng dụng RemiCare. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | 1. Caregiver đã đăng nhập ứng dụng.<br>2. Phiếu xuất viện có in mã QR hợp lệ đã được Điều dưỡng kích hoạt.<br>3. Trình duyệt được cấp quyền truy cập camera. | | |
+| **Điều kiện sau (Post-conditions)** | 1. Bản ghi liên kết được tạo trong `caregiver_patient_links`.<br>2. Caregiver được phân quyền xem lịch thuốc, cẩm nang và nộp Recovery Check của bệnh nhân.<br>3. Đồng bộ dữ liệu chăm sóc. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Caregiver nhấn vào mục “Learning Path” | Hệ thống hiển thị danh sách các chủ đề/giai đoạn (phase) bài học theo cấu hình phẫu thuật của bệnh nhân |
-| | 2 | Caregiver chọn một chủ đề cần xem (ví dụ: “Nên làm gì 24h đầu”) | Hệ thống hiển thị chi tiết bài học bao gồm các phase video, hình ảnh minh họa, infographic và văn bản hướng dẫn do Bác sĩ thiết lập |
-| | 3 | Caregiver xem tuần tự hết các phase video hoặc hình ảnh của bài học | Hệ thống chuyển đến phần cuối bài học và tự động hiển thị 3 câu hỏi trắc nghiệm kiểm tra nhanh phù hợp với bài học |
-| | 4 | Caregiver chọn đáp án cho 3 câu hỏi và nhấn “Nộp bài” | Hệ thống chấm điểm tự động, hiển thị số câu đúng/sai, chỉ ra đáp án đúng kèm lời giải thích y khoa ngắn gọn, và ghi nhận trạng thái đã hoàn thành bài học cho Caregiver |
+| | 1 | Caregiver nhấn nút 'Quét mã QR' trên màn hình chính | Ứng dụng kích hoạt camera và hiển thị khung quét mã QR. |
+| | 2 | Caregiver hướng camera vào mã QR trên Phiếu xuất viện | Hệ thống quét, giải mã token bảo mật và truy vấn dữ liệu Care Plan tương ứng (BR4). |
+| | 3 | Caregiver kiểm tra thông tin tóm tắt bệnh nhân (Họ tên viết tắt, Năm sinh, Mắt phẫu thuật, Bác sĩ mổ) và nhấn 'Xác nhận liên kết' | Hệ thống kiểm tra số lượng Caregiver đã liên kết (BR5). Nếu ≤3, lưu bản ghi liên kết, thông báo thành công và chuyển vào Trang chủ bệnh nhân. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **A1: Làm lại câu hỏi kiểm tra kiến thức** | 1 | Caregiver nhấn nút “Làm lại” tại màn hình kết quả bài kiểm tra | Hệ thống làm mới các câu trả lời và cho phép Caregiver chọn lại đáp án từ đầu |
+| **A1: Caregiver thứ 2 hoặc thứ 3 quét mã** | 1 | Thành viên khác trong gia đình quét cùng mã QR | Hệ thống ghi nhận thêm liên kết người chăm sóc đồng hành, đồng bộ dữ liệu cữ thuốc theo thời gian thực. |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Lỗi tải video / hình ảnh** | 1 | Mạng yếu làm gián đoạn tải video hướng dẫn | Hệ thống tự động chuyển sang hiển thị văn bản mô tả dự phòng và hiển thị nút “Thử tải lại” |
-| **E2: Chưa chọn hết 3 câu hỏi kiểm tra** | 1 | Caregiver nhấn “Nộp bài” khi chưa trả lời đủ 3 câu hỏi | Hệ thống chặn nộp bài, làm nổi bật các câu hỏi còn thiếu và hiển thị: “Vui lòng trả lời đầy đủ cả 3 câu hỏi kiểm tra trước khi hoàn tất bài học.” |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR6, BR7, BR8 | | |
-
-#### Quy tắc nghiệp vụ (Business Rules)
-| Mã BR | Tên Quy tắc Nghiệp vụ | Mô tả Quy tắc Nghiệp vụ |
-|---|---|---|
-| BR6 | Phạm vi nội dung được cấp quyền | Caregiver chỉ được truy cập các nội dung Learning Path và hướng dẫn thuốc thuộc Kế hoạch chăm sóc của bệnh nhân đã được liên kết với mình. |
-| BR7 | Nguồn gốc nội dung y khoa | Mọi hướng dẫn chuyên môn, liều lượng thuốc và thời gian sử dụng phải xuất phát từ cấu hình của Bác sĩ/Bệnh viện. Hệ thống tuyệt đối không tự động suy diễn hoặc điều chỉnh khuyến nghị y tế. |
-| BR8 | Hoàn thành bài kiểm tra không gây chặn chức năng | Kết quả trả lời 3 câu hỏi kiểm tra được ghi nhận nhằm mục đích theo dõi tiến độ học tập; kết quả kiểm tra không làm khóa hay hạn chế quyền truy cập của Caregiver đối với các tính năng chăm sóc bệnh nhân khác. |
+| **E1: Mã QR hết hạn hoặc bị thu hồi** | 1 | Quét mã QR cũ đã bị cấp lại | Hệ thống báo lỗi 'Mã QR không hợp lệ hoặc đã bị thu hồi' và hướng dẫn liên hệ Điều dưỡng (BR4). |
+| **E2: Đã vượt quá 3 Caregiver** | 1 | Có người thứ 4 cố gắng quét mã liên kết | Hệ thống từ chối liên kết và hiển thị thông báo đã đủ giới hạn tối đa 3 người chăm sóc (BR5). |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR4 (Tính hợp lệ của mã QR), BR5 (Giới hạn tối đa 3 Caregiver liên kết) | | |
 
 ---
 
-### 1.5 UC-05: Xem hướng dẫn Nên làm & Cần tránh (Do & Don't)
+### UC-004: Quản lý Hồ sơ Định danh Bệnh Nhân (Post-Op Patient Profile)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-05 | | |
-| **Tên Use Case (Use Case Name)** | Xem hướng dẫn Nên làm & Cần tránh (View Do & Don't Guidance) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Người chăm sóc (Caregiver) | | |
-| **Mô tả tóm tắt (Brief Description)** | Use case này mô tả cách Caregiver tra cứu danh mục các việc ĐƯỢC PHÉP LÀM (Do) và các việc BỊ CẤM / CẦN TRÁNH (Don't) trong sinh hoạt hàng ngày được Bác sĩ thiết lập riêng cho loại phẫu thuật của bệnh nhân. | | |
-| **Mục tiêu (Goal)** | Giúp Caregiver nhận biết rõ các hành vi an toàn và các hành vi gây nguy cơ tổn thương vết mổ của bệnh nhân | | |
-| **Tác nhân kích hoạt (Trigger)** | Caregiver nhấn vào mục “Nên làm & Cần tránh” (Do & Don't) trên bảng điều khiển bệnh nhân. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | 1. Caregiver đã đăng nhập.<br>2. Bệnh nhân đã được liên kết Kế hoạch chăm sóc có cấu hình Do & Don't. | | |
-| **Điều kiện sau (Post-conditions)** | Danh mục các việc Nên làm và Cần tránh được hiển thị trực quan, phân loại rõ ràng cho Caregiver. | | |
+| **Mã Use Case (Use Case ID)** | **UC-004** | | |
+| **Tên Use Case (Use Case Name)** | Quản lý Hồ sơ Định danh Bệnh Nhân (Post-Op Patient Profile) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-003 (Điều dưỡng xuất viện), ACT-002 (Bác sĩ điều trị) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-006 (Bệnh nhân), ACT-010 (HIS) | | |
+| **Tính năng liên quan (Features)** | F-005 | | |
+| **Mô tả tóm tắt (Brief Description)** | Điều dưỡng hoặc Bác sĩ nhập và quản lý thông tin bệnh nhân trước khi xuất viện: Mã BN, Họ tên viết tắt, Năm sinh, Mắt can thiệp (MP/MT), Loại phẫu thuật (Phaco/SILK), Bác sĩ mổ và Cơ sở điều trị. | | |
+| **Mục tiêu (Goal)** | Tạo mới, tra cứu và quản lý thông tin lâm sàng tối thiểu của bệnh nhân mổ mắt trong <30 giây, tuân thủ bảo mật Nghị định 13/2023/NĐ-CP. | | |
+| **Tác nhân kích hoạt (Trigger)** | Điều dưỡng tiếp nhận bệnh nhân tại phòng lưu viện sau khi hoàn thành ca phẫu thuật mắt. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | 1. Điều dưỡng đã đăng nhập vào hệ thống bệnh trạm.<br>2. Bệnh nhân đã hoàn thành ca mổ mắt tại phòng phẫu thuật. | | |
+| **Điều kiện sau (Post-conditions)** | 1. Bản ghi bệnh nhân được lưu vào bảng `patients`.<br>2. Sẵn sàng cho bước áp dụng Master Template (UC-010). | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Caregiver nhấn chọn mục “Nên làm & Cần tránh” | Hệ thống tải cấu hình Do & Don't từ Kế hoạch chăm sóc của bệnh nhân |
-| | 2 | Caregiver xem màn hình chia 2 cột rõ rệt: Cột xanh (Việc NÊN LÀM - Do) và Cột đỏ (Việc CẦN TRÁNH - Don't) | Hệ thống hiển thị chi tiết từng mục gồm: Tiêu đề, Mô tả giải thích lý do y khoa, và thời gian áp dụng (ví dụ: kiêng gội đầu úp mặt trong 7 ngày đầu) |
-| | 3 | Caregiver nhấn vào một mục để xem chi tiết hướng dẫn minh họa | Hệ thống hiển thị hình ảnh/lưu ý chi tiết của hành vi đó |
+| | 1 | Điều dưỡng mở form 'Tạo hồ sơ bệnh nhân mới' (SCR-DOC-04) | Hệ thống hiển thị form nhập liệu tinh gọn với các trường tối thiểu. |
+| | 2 | Điều dưỡng nhập Mã bệnh nhân HIS, Họ tên, Năm sinh, chọn Mắt mổ (MP/MT/2M), Loại phẫu thuật (Phaco/SILK), Bác sĩ phẫu thuật | Hệ thống kiểm tra định dạng và tính hợp lệ dữ liệu (BR16). Tự động lưu họ tên dưới dạng viết tắt bảo mật theo NĐ 13 (ví dụ 'Trần V. B.'). |
+| | 3 | Điều dưỡng nhấn 'Lưu hồ sơ' | Hệ thống lưu bản ghi bệnh nhân, tự động gắn mã cơ sở bệnh viện và chuyển sang màn hình Khởi tạo Care Plan. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **A1: Lọc theo nhóm sinh hoạt** | 1 | Caregiver chọn bộ lọc nhóm sinh hoạt (Vệ sinh cá nhân, Vận động / Thể thao, Ăn uống, Giấc ngủ) | Hệ thống cập nhật danh sách hiển thị tương ứng với nhóm sinh hoạt được chọn |
+| **A1: Đồng bộ từ HIS (Phase 2 - ACT-010)** | 1 | Hệ thống nhận thông tin ca mổ qua API HIS | Tự động điền trước thông tin hành chính, Điều dưỡng chỉ cần kiểm tra xác nhận trong 5 giây. |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Chưa có cấu hình Do & Don't** | 1 | Kế hoạch chăm sóc chưa có nội dung Do & Don't được duyệt | Hệ thống hiển thị thông báo: “Danh mục hướng dẫn đang được Bác sĩ cập nhật. Vui lòng liên hệ Bác sĩ nếu cần hỗ trợ.” |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR7, BR22 | | |
-
-#### Quy tắc nghiệp vụ (Business Rules)
-| Mã BR | Tên Quy tắc Nghiệp vụ | Mô tả Quy tắc Nghiệp vụ |
-|---|---|---|
-| BR22 | Tính hiển thị trực quan danh mục Do & Don't | Danh mục Do & Don't phải được phân định rõ ràng bằng màu sắc quy chuẩn (Xanh lá cho việc Nên làm, Đỏ cảnh báo cho việc Cần tránh) và gắn liền với mốc thời gian kiêng cữ cụ thể sau phẫu thuật. |
+| **E1: Trùng mã bệnh nhân** | 1 | Nhập mã bệnh nhân đã tồn tại trong cơ sở | Hệ thống cảnh báo trùng lặp và cho phép chọn mở hồ sơ hiện hữu để cập nhật. |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR16 (Tính toàn vẹn dữ liệu lâm sàng), BR17 (Quy tắc bảo mật định danh bệnh nhân NĐ 13) | | |
 
 ---
 
-### 1.6 UC-06: Xem lịch dùng thuốc và nhận thông báo nhắc thuốc
+### UC-005: Quản lý Danh mục Mẫu Kế Hoạch Chăm Sóc (Care Plan Master Templates)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-06 | | |
-| **Tên Use Case (Use Case Name)** | Xem lịch dùng thuốc và nhận thông báo nhắc thuốc (View Medication Schedule & Reminders) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Tác nhân chính: Caregiver<br>Tác nhân phụ: Hệ thống thông báo (Notification Service) | | |
-| **Mô tả tóm tắt (Brief Description)** | Use case này mô tả cách Caregiver theo dõi lịch dùng thuốc (uống thuốc và nhỏ mắt) trong ngày của bệnh nhân, đánh dấu đã uống, và nhận thông báo nhắc nhở tự động theo từng cữ dùng thuốc. | | |
-| **Mục tiêu (Goal)** | Đảm bảo bệnh nhân dùng đúng loại thuốc, đúng liều, đúng cữ thời gian và đúng khoảng cách an toàn | | |
-| **Tác nhân kích hoạt (Trigger)** | 1. Đến giờ cữ thuốc theo lịch (Hệ thống tự động kích hoạt thông báo).<br>2. Caregiver mở mục “Lịch dùng thuốc” trên ứng dụng. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | 1. Kế hoạch chăm sóc của bệnh nhân đã có đơn thuốc được Bác sĩ kích hoạt.<br>2. Thiết bị Caregiver đã bật quyền nhận thông báo ứng dụng [ASSUMPTION]. | | |
-| **Điều kiện sau (Post-conditions)** | Lịch sử uống/nhỏ thuốc được ghi nhận; thông báo nhắc nhở được gửi đúng giờ. | | |
+| **Mã Use Case (Use Case ID)** | **UC-005** | | |
+| **Tên Use Case (Use Case Name)** | Quản lý Danh mục Mẫu Kế Hoạch Chăm Sóc (Care Plan Master Templates) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-002 (Bác sĩ điều trị) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-005 (Clinical Approver / GCMO) | | |
+| **Tính năng liên quan (Features)** | F-006 | | |
+| **Mô tả tóm tắt (Brief Description)** | Bác sĩ chuyên khoa thiết lập khung phác đồ mẫu gồm các cấu phần chuyên môn chuẩn hóa dùng chung toàn chuỗi 5 bệnh viện VISI. | | |
+| **Mục tiêu (Goal)** | Thiết lập, cập nhật và quản lý các gói phác đồ chuẩn hóa theo loại phẫu thuật (Phaco tiêu chuẩn, Laser SILK/ELITA), quản lý phiên bản (v1.0, v1.1). | | |
+| **Tác nhân kích hoạt (Trigger)** | Bác sĩ mở menu Quản lý Care Plan Template trên portal. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | 1. Bác sĩ có thẩm quyền chuyên môn đã đăng nhập.<br>2. Có phác đồ chuẩn được Hội đồng Chuyên môn VISI phê chuẩn. | | |
+| **Điều kiện sau (Post-conditions)** | 1. Bản ghi Master Template được tạo ở trạng thái `DRAFT` hoặc `PENDING_APPROVAL`.<br>2. Sẵn sàng cấu hình các tab con (UC-007, UC-008, UC-009). | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Đến giờ dùng thuốc đã định (ví dụ: 08:00 Sáng) | Hệ thống tự động gửi thông báo đẩy (Push Notification) đến máy Caregiver: “Đến giờ nhỏ thuốc [Tên thuốc] cho bệnh nhân [Tên bệnh nhân]” |
-| | 2 | Caregiver nhấn vào thông báo hoặc truy cập mục “Lịch dùng thuốc” | Hệ thống hiển thị danh sách các cữ thuốc trong ngày: Sáng, Trưa, Chiều, Tối kèm chỉ dẫn (uống trước/sau ăn, số giọt nhỏ mắt, thứ tự nhỏ) |
-| | 3 | Caregiver thực hiện cho bệnh nhân dùng thuốc và nhấn “Đánh dấu đã dùng thuốc” | Hệ thống ghi nhận trạng thái đã hoàn thành cữ thuốc kèm mốc thời gian thực tế, chuyển trạng thái hiển thị sang màu xanh |
-| **Luồng thay thế (Alternative Flow)** | Không áp dụng | Không có luồng thay thế | |
-| **Luồng ngoại lệ (Exception Flow)** | Không áp dụng | Không có luồng ngoại lệ | |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR7, BR23 | | |
-
-#### Quy tắc nghiệp vụ (Business Rules)
-| Mã BR | Tên Quy tắc Nghiệp vụ | Mô tả Quy tắc Nghiệp vụ |
-|---|---|---|
-| BR23 | Ràng buộc khoảng cách thời gian nhỏ mắt | Nếu bệnh nhân được kê đơn từ 2 loại thuốc nhỏ mắt trở lên trong cùng một cữ, hệ thống phải kích hoạt bộ đếm thời gian giãn cách bắt buộc tối thiểu 5 phút giữa các lần nhỏ để tránh rửa trôi thuốc. |
-
----
-
-### 1.7 UC-07: Xem lịch tái khám và nhận thông báo tái khám
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-07 | | |
-| **Tên Use Case (Use Case Name)** | Xem lịch tái khám và nhận thông báo tái khám (View Follow-up Schedule & Reminders) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Tác nhân chính: Caregiver<br>Tác nhân phụ: Hệ thống thông báo (Notification Service), Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Use case này mô tả cách Caregiver xem thông tin các buổi hẹn tái khám (ngày giờ, địa điểm, bác sĩ phụ trách, lưu ý trước khám) và tự động nhận thông báo nhắc nhở trước ngày tái khám. | | |
-| **Mục tiêu (Goal)** | Nhắc nhở và đảm bảo bệnh nhân đến tái khám đúng hẹn theo chỉ định của Bác sĩ | | |
-| **Tác nhân kích hoạt (Trigger)** | 1. Hệ thống tự động gửi thông báo trước ngày hẹn tái khám (trước 1 ngày hoặc 2 ngày).<br>2. Caregiver truy cập mục “Lịch tái khám” trên ứng dụng. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Bác sĩ đã thiết lập lịch hẹn tái khám trong Kế hoạch chăm sóc của bệnh nhân. | | |
-| **Điều kiện sau (Post-conditions)** | Thông tin lịch hẹn tái khám được hiển thị chi tiết cho Caregiver; thông báo nhắc hẹn được gửi thành công đến thiết bị. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Đến mốc thời gian quy định trước ngày tái khám (ví dụ: trước 24 giờ) | Hệ thống gửi thông báo đẩy và tin nhắn nhắc hẹn tới Caregiver: “Nhắc hẹn: Bệnh nhân [Tên] có lịch tái khám vào ngày [Ngày] lúc [Giờ] tại [Địa điểm]” |
-| | 2 | Caregiver nhấn vào thông báo hoặc chọn mục “Lịch tái khám” trên ứng dụng | Hệ thống hiển thị chi tiết phiếu hẹn tái khám: Ngày khám, Khung giờ, Phòng khám, Bác sĩ phụ trách, Các giấy tờ và thuốc cần mang theo, Các lưu ý nhịn ăn/nhỏ mắt trước khám |
-| **Luồng thay thế (Alternative Flow)** | Không áp dụng | Không có luồng thay thế | |
-| **Luồng ngoại lệ (Exception Flow)** | Không áp dụng | Không có luồng ngoại lệ | |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR24 | | |
-
-#### Quy tắc nghiệp vụ (Business Rules)
-| Mã BR | Tên Quy tắc Nghiệp vụ | Mô tả Quy tắc Nghiệp vụ |
-|---|---|---|
-| BR24 | Thời gian kích hoạt nhắc hẹn tái khám | Hệ thống phải tự động kích hoạt thông báo nhắc hẹn tái khám tối thiểu trước 24 giờ và trước 2 giờ tính đến thời điểm hẹn của buổi khám. |
-
----
-
-### 1.8 UC-08: Nộp bảng kiểm phục hồi Recovery Check (Submit Recovery Check)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-08 | | |
-| **Tên Use Case (Use Case Name)** | Nộp bảng kiểm phục hồi Recovery Check (Submit Recovery Check) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Tác nhân chính: Caregiver<br>Tác nhân phụ: Bác sĩ (Doctor), Hệ thống Bệnh viện | | |
-| **Mô tả tóm tắt (Brief Description)** | Use case này mô tả cách Caregiver nhận thông báo định kỳ và bắt buộc trả lời 3–5 câu hỏi khảo sát về tình trạng phục hồi của bệnh nhân, để hệ thống đối chiếu tiêu chí (Bình thường / Cần chú ý / Red Flag) và gửi kết quả cho Bác sĩ theo dõi. | | |
-| **Mục tiêu (Goal)** | Thu thập dữ liệu phục hồi hậu phẫu của bệnh nhân từ người chăm sóc một cách có cấu trúc nhằm sớm phát hiện các biến chứng bất thường | | |
-| **Tác nhân kích hoạt (Trigger)** | Hệ thống gửi thông báo đến hạn Recovery Check hoặc Caregiver bấm vào banner nhắc nhở trên trang chủ. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | 1. Caregiver đã đăng nhập và liên kết với Kế hoạch chăm sóc đang hoạt động.<br>2. Đã đến mốc thời gian làm Recovery Check (ví dụ: Ngày 1, Ngày 3, Ngày 7...) do Bác sĩ thiết lập. | | |
-| **Điều kiện sau (Post-conditions)** | 1. Toàn bộ câu trả lời, thời gian nộp và phân loại trạng thái được lưu vào hệ thống.<br>2. Bảng theo dõi hồi phục của Bác sĩ được cập nhật.<br>3. Nếu có dấu hiệu bất thường/Red Flag, hệ thống gắn cờ cảnh báo và kích hoạt luồng khẩn cấp (UC-09). | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Caregiver mở thông báo hoặc nhấn vào banner nhắc nhở Recovery Check | Hệ thống hiển thị bảng câu hỏi bắt buộc (3–5 câu hỏi về mức độ đau, đỏ mắt, tuân thủ dùng thuốc) của mốc phục hồi hiện tại (ví dụ: Ngày 3) |
-| | 2 | Caregiver trả lời đầy đủ các câu hỏi dựa trên tình trạng thực tế của bệnh nhân và nhấn “Gửi kết quả” | Hệ thống kiểm tra tính đầy đủ, đối chiếu câu trả lời với tiêu chí đã cấu hình, và phân loại trạng thái là “Bình thường” (Normal) |
-| | 3 | Hệ thống lưu kết quả với thời gian và ID Caregiver | Hệ thống hiển thị thông báo xác nhận: “Đã ghi nhận thông tin phục hồi. Bệnh nhân đang hồi phục tốt theo tiến độ.” và cập nhật Bảng điều khiển của Bác sĩ |
+| | 1 | Bác sĩ chọn 'Tạo Master Template mới' (SCR-DOC-08) | Hệ thống mở giao diện không gian cấu hình 5 tab. |
+| | 2 | Bác sĩ nhập Tên template, Loại phẫu thuật, Mô tả lâm sàng, Số phiên bản (ví dụ: v1.0) | Hệ thống khởi tạo thực thể `care_plan_templates` ở trạng thái `DRAFT` (BR19). |
+| | 3 | Bác sĩ cấu hình các thành phần con và nhấn 'Lưu phác đồ mẫu' | Hệ thống lưu toàn diện gói template và hiển thị trạng thái hiện tại. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **A1: Trạng thái kích hoạt “Cần chú ý”** | 1 | Tại Bước 2 của Luồng chính, hệ thống phát hiện câu trả lời vượt ngưỡng lưu ý nhẹ (ví dụ: đau nhẹ kéo dài, khô mắt) | Hệ thống phân loại trạng thái “Cần chú ý”, đánh dấu màu vàng trên Bảng điều khiển Bác sĩ, và hiển thị lời khuyên trấn an, nhắc Caregiver theo dõi sát và nhỏ thuốc đúng giờ |
-| **A2: Trạng thái kích hoạt “Red Flag”** | 1 | Tại Bước 2 của Luồng chính, câu trả lời thỏa mãn điều kiện dấu hiệu khẩn cấp Red Flag (ví dụ: đau dữ dội đột ngột, giảm thị lực, chảy máu/chảy dịch nhiều) | Hệ thống lập tức phân loại “Red Flag”, đánh dấu màu đỏ khẩn cấp trên màn hình Bác sĩ và tự động chuyển tiếp Caregiver sang màn hình Hành động Khẩn cấp (UC-09) |
+| **A1: Nhân bản từ phiên bản cũ** | 1 | Bác sĩ chọn nhân bản Template v1.0 để nâng cấp v1.1 | Hệ thống sao chép toàn bộ cấu hình con sang bản ghi mới, cho phép chỉnh sửa nhanh. |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Bỏ sót câu hỏi bắt buộc** | 1 | Caregiver nhấn “Gửi kết quả” khi còn câu hỏi để trống | Hệ thống chặn gửi, viền đỏ các câu hỏi còn thiếu và hiển thị: “Đây là bảng kiểm bắt buộc. Vui lòng trả lời toàn bộ câu hỏi trước khi gửi.” (BR9) |
-| **E2: Lỗi kết nối mạng khi gửi dữ liệu** | 1 | Mất mạng khi đang tải câu trả lời lên máy chủ | Hệ thống lưu tạm các câu trả lời vào bộ nhớ cục bộ, hiển thị: “Không thể gửi dữ liệu do mất kết nối mạng. Dữ liệu đã được lưu tạm. Vui lòng kiểm tra mạng và nhấn Thử lại.” |
-| **E3: Quá hạn nộp bảng kiểm (Overdue Recovery Check)** | 1 | Caregiver quên nộp hoặc bận không mở ứng dụng, quá hạn mốc kiểm tra quy định | Hệ thống kích hoạt cơ chế leo thang cảnh báo theo 3 tầng bảo vệ (BR12):<br>- **Sau 2 giờ:** Gửi lại Push Notification lần 2 với mức ưu tiên cao (âm báo khẩn).<br>- **Sau 4–6 giờ:** Kích hoạt kênh dự phòng gửi tin nhắn SMS / Zalo ZNS đến Caregiver; đồng thời tự động kích hoạt nguyên lý an toàn y khoa "Default to Unsafe", gắn cờ cảnh báo quá hạn màu cam 🟠 lên Dashboard Bác sĩ ("Bệnh nhân [Tên] đã quá hạn kiểm tra Day X 4 tiếng chưa phản hồi").<br>- **Tại Bác sĩ:** Hiển thị nút gọi nhanh "Gọi nhắc Caregiver" trên màn hình giám sát để Bác sĩ/Điều dưỡng can thiệp chủ động. |
-| **Mức độ ưu tiên (Priority)** | Cao (High - Trọng yếu về an toàn điều trị) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR9, BR10, BR12 | | |
-
-#### Quy tắc nghiệp vụ (Business Rules)
-| Mã BR | Tên Quy tắc Nghiệp vụ | Mô tả Quy tắc Nghiệp vụ |
-|---|---|---|
-| BR9 | Bắt buộc hoàn thành bảng kiểm Recovery Check | Caregiver bắt buộc phải trả lời đầy đủ toàn bộ 3–5 câu hỏi trong bảng kiểm Recovery Check mới có thể nộp kết quả lên hệ thống. |
-| BR10 | Giới hạn chẩn đoán và phân loại trạng thái | Hệ thống chỉ đối chiếu câu trả lời với tiêu chí Bác sĩ đã cấu hình để phân nhóm (Bình thường, Cần chú ý, Red Flag) nhằm hỗ trợ nhân viên y tế theo dõi. Hệ thống tuyệt đối không tự đưa ra kết luận chẩn đoán y khoa. |
-| BR12 | Cơ chế xử lý quá hạn và cảnh báo leo thang Recovery Check (Default to Unsafe) | Khi Caregiver không nộp bảng kiểm trong khung giờ quy định, hệ thống tự động kích hoạt cơ chế cảnh báo đa kênh (Push lần 2, SMS/ZNS) và áp dụng nguyên tắc an toàn y khoa "Default to Unsafe" (tiềm ẩn nguy cơ biến chứng mất kiểm soát), đẩy cờ cảnh báo quá hạn 🟠 lên Dashboard Bác sĩ và mở nút gọi điện can thiệp trực tiếp. |
+| **E1: Thiếu cấu phần bắt buộc** | 1 | Template chưa có thuốc hoặc chưa có Do/Don't | Hệ thống cảnh báo không thể gửi phê duyệt cho đến khi hoàn tất đủ 5 cấu phần. |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR18 (Tính độc lập dữ liệu phác đồ), BR19 (Quy trình vòng đời Master Template) | | |
 
 ---
 
-### 1.9 UC-09: Xem hướng dẫn xử lý khẩn cấp khi gặp Red Flag
+### UC-006: Phê Duyệt Lâm Sàng Master Template (Clinical Approval Workflow)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-09 | | |
-| **Tên Use Case (Use Case Name)** | Xem hướng dẫn xử lý khẩn cấp khi gặp Red Flag (View Emergency Action for Red Flag) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Tác nhân chính: Caregiver<br>Tác nhân phụ: Khoa Cấp cứu Bệnh viện / Bác sĩ | | |
-| **Mô tả tóm tắt (Brief Description)** | Use case này mô tả cách hệ thống lập tức hiển thị quy trình xử lý khẩn cấp, số điện thoại hotline cấp cứu của bệnh viện và hướng dẫn sơ cứu tức thì khi phát hiện dấu hiệu Red Flag từ Recovery Check hoặc khi Caregiver chủ động bấm yêu cầu hỗ trợ. | | |
-| **Mục tiêu (Goal)** | Cung cấp tức thời các chỉ dẫn hành động khẩn cấp và kênh kết nối trực tiếp với bệnh viện khi xuất hiện triệu chứng nguy hiểm | | |
-| **Tác nhân kích hoạt (Trigger)** | Recovery Check kích hoạt dấu hiệu Red Flag (UC-08 Luồng A2) HOẶC Caregiver bấm nút “Báo cáo dấu hiệu bất thường / Khẩn cấp” trên màn hình chính. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Kế hoạch chăm sóc của bệnh nhân đã được cấu hình số điện thoại khẩn cấp và quy trình xử lý của bệnh viện. | | |
-| **Điều kiện sau (Post-conditions)** | 1. Hướng dẫn khẩn cấp và nút gọi trực tiếp được hiển thị cho Caregiver.<br>2. Sự kiện khẩn cấp được ghi lại trong nhật ký sự kiện y tế của bệnh nhân kèm thời gian. | | |
+| **Mã Use Case (Use Case ID)** | **UC-006** | | |
+| **Tên Use Case (Use Case Name)** | Phê Duyệt Lâm Sàng Master Template (Clinical Approval Workflow) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-005 (Clinical Approver / GCMO) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-002 (Bác sĩ điều trị) | | |
+| **Tính năng liên quan (Features)** | F-007 | | |
+| **Mô tả tóm tắt (Brief Description)** | Giám đốc Chuyên môn Tập đoàn (BS.CKII Trần Bá Kiền) thẩm định các nội dung dược lý, tiêu chí Red Flag và ký duyệt điện tử trước khi ban hành. | | |
+| **Mục tiêu (Goal)** | Thẩm định chuyên môn y khoa và ban hành chính thức các phiên bản Master Template áp dụng thống nhất cho toàn chuỗi 5 bệnh viện VISI. | | |
+| **Tác nhân kích hoạt (Trigger)** | Bác sĩ gửi yêu cầu phê duyệt template sang trạng thái `PENDING_APPROVAL`. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | 1. Template đã hoàn tất cấu hình đủ 5 thành phần và ở trạng thái chờ duyệt.<br>2. GCMO đã đăng nhập tài khoản có thẩm quyền phê duyệt. | | |
+| **Điều kiện sau (Post-conditions)** | 1. Template chuyển trạng thái `ACTIVE` (đã ban hành) hoặc `REJECTED` (trả về chỉnh sửa).<br>2. Thông báo tự động đến Bác sĩ soạn thảo. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Hệ thống phát hiện sự kiện Red Flag | Hệ thống hiển thị ngay màn hình Xử lý Khẩn cấp với banner cảnh báo nổi bật màu đỏ chỉ rõ triệu chứng nguy hiểm cần chú ý |
-| | 2 | Hệ thống hiển thị các hành động khẩn cấp ưu tiên: Nút gọi hotline cấp cứu bệnh viện / Bác sĩ điều trị, Địa chỉ bệnh viện kèm chỉ đường, Các việc cần làm ngay (không dụi mắt, đeo khiên bảo vệ, không tự nhỏ thêm thuốc), Kênh hỗ trợ VISI [TBD] | Caregiver đọc các chỉ dẫn khẩn cấp |
-| | 3 | Caregiver nhấn nút “Gọi cấp cứu / Gọi bệnh viện” | Thiết bị khởi chạy ứng dụng gọi điện với số hotline đã được cấu hình; hệ thống ghi nhận thời điểm gọi và sự kiện Red Flag vào hồ sơ bệnh nhân |
+| | 1 | GCMO mở danh sách Template chờ duyệt (SCR-DOC-09) | Hệ thống hiển thị chi tiết phác đồ: danh mục thuốc, liều, khoảng cách đệm, bảng kiểm phục hồi. |
+| | 2 | GCMO thẩm định tính an toàn và chuẩn mực chuyên môn nhãn khoa | GCMO đánh giá các chỉ số dược lý và câu hỏi sàng lọc biến chứng. |
+| | 3 | GCMO nhấn 'Ký duyệt & Ban hành' | Hệ thống lưu chữ ký số, chuyển template sang trạng thái `ACTIVE` và kích hoạt áp dụng trên toàn chuỗi (BR19). |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **A1: Xác nhận đang di chuyển đến bệnh viện** | 1 | Caregiver đọc hướng dẫn và nhấn “Đã hiểu và đang di chuyển đến bệnh viện” | Hệ thống ghi nhận mốc thời gian xác nhận và duy trì một banner cảnh báo khẩn cấp màu đỏ trên đầu màn hình ứng dụng cho đến khi nhân viên y tế xử lý [ASSUMPTION] |
+| **A1: Yêu cầu chỉnh sửa** | 1 | GCMO phát hiện liều thuốc hoặc thời gian đệm chưa tối ưu | GCMO nhập ghi chú yêu cầu và nhấn 'Trả về chỉnh sửa'; template chuyển trạng thái `DRAFT` kèm lý do. |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Thiết bị không hỗ trợ gọi điện** | 1 | Caregiver sử dụng máy tính bảng hoặc máy tính không có chức năng gọi điện thoại trực tiếp | Hệ thống hiển thị số điện thoại cỡ lớn in đậm kèm nút “Sao chép số điện thoại” và các kênh liên hệ thay thế (nhắn tin/chat) |
-| **Mức độ ưu tiên (Priority)** | Cao (High - Đặc biệt khẩn cấp) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR11 | | |
-
-#### Quy tắc nghiệp vụ (Business Rules)
-| Mã BR | Tên Quy tắc Nghiệp vụ | Mô tả Quy tắc Nghiệp vụ |
-|---|---|---|
-| BR11 | Ưu tiên quy trình hành động khẩn cấp | Khi xuất hiện dấu hiệu Red Flag, hệ thống phải ưu tiên hiển thị thông tin liên hệ khẩn cấp và hướng dẫn xử lý tức thì của bệnh viện. Việc liên hệ y tế khẩn cấp được ưu tiên tuyệt đối so với các tính năng tự chăm sóc trên ứng dụng. |
+| **E1: Xung đột phiên bản** | 1 | Đã có template cùng loại đang active | Hệ thống nhắc nhở việc ban hành phiên bản mới sẽ tự động lưu trữ (archive) phiên bản cũ. |
+| **Mức độ ưu tiên (Priority)** | **P1** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR19 (Vòng đời Master Template: DRAFT -> PENDING_APPROVAL -> ACTIVE -> ARCHIVED) | | |
 
 ---
 
-## PHÂN HỆ 2: BÁC SĨ (DOCTOR)
-
-> **Ghi chú quản trị:** Tài khoản Bác sĩ (Doctor Account) được Quản trị viên Bệnh viện (Admin) khởi tạo và phân quyền sẵn trong hệ thống. Bác sĩ sử dụng tài khoản được cấp để đăng nhập trực tiếp tại UC-11.
-
----
-
-### 1.11 UC-11: Đăng nhập hệ thống phía Bác sĩ (Doctor Login System)
+### UC-007: Cấu Hình Danh Mục Thuốc Mẫu Trong Template (Template Medication Configuration)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-11 | | |
-| **Tên Use Case (Use Case Name)** | Đăng nhập hệ thống phía Bác sĩ (Doctor Login System) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Use case này mô tả cách Bác sĩ đăng nhập vào hệ thống bằng tài khoản do Quản trị viên cấp và mật khẩu để truy cập Bảng điều khiển Bác sĩ, quản lý hồ sơ bệnh nhân, cấu hình Care Plan Template và theo dõi tiến trình hồi phục của bệnh nhân. | | |
-| **Mục tiêu (Goal)** | Xác thực danh tính Bác sĩ và cấp quyền truy cập các tính năng chuyên môn y tế | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhập thông tin và nhấn “Đăng nhập” trên Cổng thông tin Bác sĩ. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | 1. Bác sĩ đã được Quản trị viên (Admin) tạo sẵn tài khoản công vụ với vai trò DOCTOR.<br>2. Tài khoản đang hoạt động (không bị khóa hay vô hiệu hóa). | | |
-| **Điều kiện sau (Post-conditions)** | 1. Bác sĩ được chứng thực và phiên làm việc bảo mật được thiết lập.<br>2. Bác sĩ được chuyển hướng đến Bảng điều khiển Bác sĩ (Doctor Dashboard). | | |
+| **Mã Use Case (Use Case ID)** | **UC-007** | | |
+| **Tên Use Case (Use Case Name)** | Cấu Hình Danh Mục Thuốc Mẫu Trong Template (Template Medication Configuration) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-002 (Bác sĩ điều trị) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-005 (GCMO) | | |
+| **Tính năng liên quan (Features)** | F-006, F-009, F-010 | | |
+| **Mô tả tóm tắt (Brief Description)** | Bác sĩ thiết lập danh mục thuốc trong Master Template (Tab 2) bao gồm tên biệt dược, số giọt, các cữ Sáng/Trưa/Chiều/Tối, hình ảnh vỏ lọ và thông số đệm buffer timer. | | |
+| **Mục tiêu (Goal)** | Cài đặt danh mục biệt dược mẫu, liều dùng, cữ dùng và khoảng cách giãn cách đệm mặc định (5–10 phút) giữa các thuốc nhỏ mắt. | | |
+| **Tác nhân kích hoạt (Trigger)** | Bác sĩ chọn Tab 2: Danh mục thuốc trong không gian cấu hình template. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | 1. Master Template đang ở trạng thái DRAFT.<br>2. Bác sĩ nắm rõ đơn thuốc chuẩn theo loại phẫu thuật. | | |
+| **Điều kiện sau (Post-conditions)** | 1. Các bản ghi thuốc được lưu vào `template_medications`.<br>2. Sẵn sàng nhân bản khi bệnh nhân xuất viện. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ truy cập trang Đăng nhập Bác sĩ | Hệ thống hiển thị biểu mẫu đăng nhập (Email/SĐT/Tên đăng nhập và Mật khẩu) |
-| | 2 | Bác sĩ nhập thông tin và nhấn “Đăng nhập” | Hệ thống kiểm tra định dạng, đối chiếu thông tin trong cơ sở dữ liệu, kiểm tra trạng thái hoạt động và xác nhận vai trò DOCTOR |
-| | 3 | Hệ thống thiết lập phiên làm việc bảo mật | Hệ thống tạo token phiên đăng nhập và chuyển hướng Bác sĩ đến Bảng điều khiển Bác sĩ (hiển thị Danh sách bệnh nhân, Care Plan Templates và Cảnh báo Recovery Check) |
+| | 1 | Bác sĩ bấm 'Thêm thuốc mới vào mẫu' (SCR-DOC-08 Tab 2) | Hệ thống mở form nhập thông tin thuốc. |
+| | 2 | Bác sĩ nhập: Tên biệt dược (ví dụ: Cravit 0.5%), Số giọt (1 giọt), Cữ dùng (Sáng, Chiều), Mắt áp dụng mặc định, Khoảng cách đếm ngược giãn cách (10 phút hoặc 5 phút), Tải ảnh vỏ lọ nhận diện | Hệ thống xác thực dữ liệu và thêm thuốc vào danh sách hiển thị của template (BR20, BR23). |
+| | 3 | Bác sĩ nhấn 'Lưu danh mục thuốc' | Hệ thống cập nhật các bản ghi trong `template_medications`. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **A1: Bác sĩ Đăng xuất** | 1 | Bác sĩ nhấn “Đăng xuất” trên thanh điều hướng | Hệ thống hủy phiên làm việc hiện tại, vô hiệu hóa token và đưa người dùng về trang Đăng nhập |
+| **A1: Cấu hình thuốc mỡ / gel tra mắt** | 1 | Bác sĩ cấu hình thuốc dạng gel (tra mắt cuối cùng) | Hệ thống gán thứ tự ưu tiên tra thuốc: Dung dịch nước -> Hỗn dịch -> Gel/Mỡ tra mắt. |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Sai thông tin đăng nhập** | 1 | Bác sĩ nhập sai tên đăng nhập hoặc mật khẩu | Hệ thống ghi nhận số lần thử sai và hiển thị thông báo lỗi: “Thông tin đăng nhập không chính xác.” |
-| **E2: Tài khoản bị khóa hoặc vô hiệu hóa** | 1 | Bác sĩ cố gắng đăng nhập vào tài khoản đã bị khóa | Hệ thống từ chối đăng nhập và hiển thị: “Tài khoản của bạn đã bị vô hiệu hóa hoặc tạm khóa. Vui lòng liên hệ Quản trị viên.” |
-| **E3: Không đúng quyền hạn vai trò** | 1 | Người dùng không có vai trò DOCTOR (ví dụ Caregiver) cố đăng nhập qua Cổng Bác sĩ | Hệ thống chặn truy cập và thông báo: “Tài khoản không có quyền truy cập vào cổng thông tin Bác sĩ.” |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR14 | | |
-
-#### Quy tắc nghiệp vụ (Business Rules)
-| Mã BR | Tên Quy tắc Nghiệp vụ | Mô tả Quy tắc Nghiệp vụ |
-|---|---|---|
-| BR14 | Kiểm soát quyền truy cập của Bác sĩ | Chỉ các tài khoản đã được xác thực có vai trò DOCTOR đang hoạt động mới được quyền truy cập hồ sơ bệnh án, mẫu kế hoạch chăm sóc và bảng theo dõi y khoa. |
+| **E1: Thời gian giãn cách không hợp lệ** | 1 | Nhập thời gian đệm <5 phút hoặc >30 phút | Hệ thống cảnh báo tham số giãn cách chuẩn nhãn khoa phải từ 5 đến 10 phút. |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR20 (Quy tắc định danh thuốc), BR23 (Ràng buộc thời gian giãn cách đệm 5-10 phút) | | |
 
 ---
 
-### 1.12 NHÓM UC-12: QUẢN LÝ HỒ SƠ BỆNH NHÂN (CRUD PATIENT RECORDS)
-
----
-
-#### 1.12.1 UC-12.1: Tạo mới hồ sơ bệnh nhân (Create Patient Record)
+### UC-008: Cấu Hình Bộ Câu Hỏi Recovery Check & Red Flag (Template Recovery & Alert Rules)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-12.1 | | |
-| **Tên Use Case (Use Case Name)** | Tạo mới hồ sơ bệnh nhân (Create Patient Record) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ nhập thông tin định danh và thông tin điều trị ban đầu để tạo mới một hồ sơ bệnh nhân vào hệ thống. | | |
-| **Mục tiêu (Goal)** | Tiếp nhận và khởi tạo hồ sơ bệnh nhân mới phục vụ việc thiết lập Kế hoạch chăm sóc | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn nút “Thêm bệnh nhân mới” trên trang danh sách bệnh nhân. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Bác sĩ đã đăng nhập với vai trò DOCTOR. | | |
-| **Điều kiện sau (Post-conditions)** | Hồ sơ bệnh nhân mới được lưu với mã Patient ID duy nhất; sẵn sàng tạo Care Plan. | | |
+| **Mã Use Case (Use Case ID)** | **UC-008** | | |
+| **Tên Use Case (Use Case Name)** | Cấu Hình Bộ Câu Hỏi Recovery Check & Red Flag (Template Recovery & Alert Rules) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-002 (Bác sĩ điều trị) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-005 (GCMO) | | |
+| **Tính năng liên quan (Features)** | F-006, F-016, F-017 | | |
+| **Mô tả tóm tắt (Brief Description)** | Bác sĩ cấu hình bộ câu hỏi ngắn (3-5 câu) xuất hiện vào các mốc thời gian (mỗi sáng trong 7 ngày đầu, Day 14, Day 30) và thiết lập ngưỡng báo động đỏ khẩn cấp. | | |
+| **Mục tiêu (Goal)** | Thiết lập các câu hỏi khảo sát phục hồi định kỳ 3 mức (Xanh/Vàng/Đỏ) và điều kiện kích hoạt cảnh báo nguy cấp Red Flag kèm số hotline 0395 151 151. | | |
+| **Tác nhân kích hoạt (Trigger)** | Bác sĩ chọn Tab 3 (Recovery Check) và Tab 4 (Red Flag) trong không gian cấu hình template. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | 1. Template đang mở ở chế độ chỉnh sửa.<br>2. Bộ tiêu chí lâm sàng đã được Hội đồng Y khoa phê duyệt. | | |
+| **Điều kiện sau (Post-conditions)** | 1. Các mốc và câu hỏi được lưu vào `template_recovery_milestones`, `template_recovery_questions`, `template_red_flags`. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn nút “Thêm bệnh nhân mới” | Hệ thống hiển thị biểu mẫu nhập thông tin bệnh nhân |
-| | 2 | Bác sĩ nhập thông tin cơ bản (Họ tên, Ngày sinh/Tuổi, Giới tính, Số điện thoại) và chọn Loại phẫu thuật (Phaco, Lác, LASIK/ICL, Cắt dịch kính...) | Hệ thống tự động kích hoạt và hiển thị động các trường dữ liệu lâm sàng tùy chỉnh phù hợp theo loại ca phẫu thuật đã chọn (ví dụ: Mắt phẫu thuật, Công suất IOL, Độ lác trước mổ, Độ khúc xạ, Vết mổ...). Bác sĩ nhập các trường thông tin chuyên môn tùy biến này và ghi chú điều trị. Hệ thống kiểm tra tính hợp lệ dữ liệu và các trường bắt buộc |
-| | 3 | Bác sĩ nhấn “Lưu hồ sơ” | Hệ thống cấp mã Patient ID tự động, lưu bản ghi vào CSDL, hiển thị: “Tạo hồ sơ bệnh nhân thành công.” và gợi ý chuyển sang tạo Care Plan |
+| | 1 | Bác sĩ thiết lập các mốc thời gian khảo sát (Day 1 đến Day 7, Day 14, Day 30) | Hệ thống tạo các mốc theo dõi trong template. |
+| | 2 | Bác sĩ nhập 3–5 câu hỏi khảo sát kèm các lựa chọn đáp án và gắn cờ phân loại (Xanh: bình thường, Vàng: chú ý, Đỏ: Red Flag) | Hệ thống lưu cấu trúc câu hỏi và điều kiện phân loại tự động (BR9, BR10). |
+| | 3 | Bác sĩ cấu hình thông điệp hướng dẫn khẩn cấp và đường dây nóng VISI 0395 151 151 | Hệ thống lưu cấu hình hành động cấp cứu Red Flag. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **A1: Hủy tạo hồ sơ** | 1 | Bác sĩ nhấn “Hủy bỏ” khi đang nhập dữ liệu | Hệ thống xác nhận và đóng biểu mẫu, đưa về danh sách bệnh nhân |
+| **A1: Tùy biến câu hỏi theo loại phẫu thuật** | 1 | Ca mổ SILK/Laser cần khảo sát cộm xốn cọ xát vạt; ca Phaco khảo sát áp lực nhãn cầu | Hệ thống cho phép gắn bộ câu hỏi chuyên biệt theo từng loại mổ. |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Thiếu trường bắt buộc** | 1 | Bác sĩ để trống các trường: Họ tên, Ngày sinh, Giới tính, Chẩn đoán, Loại phẫu thuật | Hệ thống chặn lưu và viền đỏ các trường thiếu: “Vui lòng nhập đầy đủ các trường bắt buộc (*)” |
-| **E2: Ngày sinh không hợp lệ** | 1 | Bác sĩ nhập ngày sinh trong tương lai | Hệ thống báo lỗi: “Ngày sinh không thể lớn hơn ngày hiện tại.” |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR15 | | |
+| **E1: Thiếu phương án cảnh báo Đỏ** | 1 | Bộ câu hỏi không có bất kỳ tiêu chí kích hoạt Red Flag nào | Hệ thống từ chối lưu và yêu cầu phải có ít nhất 1 tiêu chí phát hiện biến chứng nguy cấp. |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR9 (Bắt buộc hoàn thành khảo sát), BR10 (Phân loại 3 mức Xanh/Vàng/Đỏ), BR11 (Kích hoạt cấp cứu khẩn cấp) | | |
 
 ---
 
-#### 1.12.2 UC-12.2: Xem danh sách và tìm kiếm hồ sơ bệnh nhân (View & Search Patient List)
+### UC-009: Cấu Hình Cẩm Nang Hướng Dẫn và Quy Tắc Sinh Hoạt trong Master Template (Guidelines & FAQ Config)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-12.2 | | |
-| **Tên Use Case (Use Case Name)** | Xem danh sách và tìm kiếm hồ sơ bệnh nhân (View & Search Patient List) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ xem danh sách các bệnh nhân đang quản lý, tìm kiếm theo tên/mã và lọc theo loại phẫu thuật hoặc trạng thái. | | |
-| **Mục tiêu (Goal)** | Cung cấp cái nhìn tổng quan và tra cứu nhanh hồ sơ bệnh nhân của Bác sĩ | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ chọn mục “Danh sách bệnh nhân” trên menu điều hướng. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Bác sĩ đã đăng nhập với vai trò DOCTOR. | | |
-| **Điều kiện sau (Post-conditions)** | Danh sách bệnh nhân được kết xuất kèm thông tin tóm tắt và trạng thái Care Plan. | | |
+| **Mã Use Case (Use Case ID)** | **UC-009** | | |
+| **Tên Use Case (Use Case Name)** | Cấu Hình Cẩm Nang Hướng Dẫn và Quy Tắc Sinh Hoạt trong Master Template (Guidelines & FAQ Config) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-002 (Bác sĩ điều trị) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-005 (Clinical Approver / GCMO) | | |
+| **Tính năng liên quan (Features)** | F-006, F-012, F-013, F-028 | | |
+| **Mô tả tóm tắt (Brief Description)** | Ca sử dụng mới được bổ sung hoàn chỉnh trong US_US_V1 nhằm giúp Bác sĩ cấu hình toàn bộ nội dung giáo dục bệnh nhân, cẩm nang 24h sống còn, bảng 2 cột Nên làm & Cần tránh, và menu câu hỏi FAQ giải đáp thắc mắc thường gặp tại nhà. | | |
+| **Mục tiêu (Goal)** | Thiết lập cẩm nang 24h đầu, quy tắc nên làm/cần tránh (Do/Don't) và ngân hàng tình huống FAQ lâm sàng gắn liền với từng loại phẫu thuật mắt. | | |
+| **Tác nhân kích hoạt (Trigger)** | Bác sĩ chọn Tab 5: Cẩm nang & Quy tắc sinh hoạt trên giao diện cấu hình template. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | 1. Master Template đang ở trạng thái DRAFT.<br>2. Nội dung hướng dẫn đã qua rà soát y khoa. | | |
+| **Điều kiện sau (Post-conditions)** | 1. Các mục Do & Don't được lưu vào `template_do_dont_items`.<br>2. Ngân hàng cẩm nang 24h và FAQ được liên kết với template. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ chọn mục “Danh sách bệnh nhân” | Hệ thống truy xuất và hiển thị bảng danh sách bệnh nhân: Mã BN, Họ tên, Tuổi, Loại phẫu thuật, Ngày mổ, Trạng thái Care Plan, Tên Caregiver đã liên kết |
-| | 2 | Bác sĩ nhập từ khóa (Tên/Mã BN) vào ô tìm kiếm hoặc chọn lọc theo Loại phẫu thuật | Hệ thống lọc danh sách theo thời gian thực và hiển thị các bản ghi khớp với điều kiện lọc |
+| | 1 | Bác sĩ cấu hình Cẩm nang 24 giờ đầu: danh mục việc cấp thiết (đeo kính bảo hộ, tư thế nằm, dán khiên mắt khi ngủ, kiêng cúi đầu) | Hệ thống lưu các chỉ dẫn sống còn 24h đầu. |
+| | 2 | Bác sĩ nhập danh mục Nên làm (Cột Xanh) và Cần tránh (Cột Đỏ): phân loại theo vệ sinh, vận động, ăn uống, giấc ngủ kèm lý do y khoa | Hệ thống lưu vào `template_do_dont_items` và hiển thị xem trước trực quan 2 cột (BR22). |
+| | 3 | Bác sĩ cấu hình ngân hàng tình huống FAQ lâm sàng (Dính nước vào mắt, Quên nhỏ thuốc, Cộm xốn mắt, Ngứa mắt) kèm lời khuyên xử lý chuẩn VISI | Hệ thống lưu ngân hàng FAQ gắn với loại phẫu thuật (F-028). |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **A1: Phân trang danh sách** | 1 | Bác sĩ chuyển sang trang tiếp theo khi danh sách vượt quá 20 bệnh nhân | Hệ thống hiển thị nhóm 20 bệnh nhân tiếp theo |
+| **A1: Tải nội dung từ thư viện chuẩn VISI** | 1 | Bác sĩ chọn nạp sẵn bộ quy tắc Do/Don't chuẩn của Bệnh viện Mắt VISI | Hệ thống tự động điền đầy đủ danh mục, Bác sĩ chỉ cần kiểm tra nhanh. |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Không tìm thấy kết quả** | 1 | Từ khóa tìm kiếm không khớp với bất kỳ bệnh nhân nào | Hệ thống hiển thị thông báo: “Không tìm thấy hồ sơ bệnh nhân phù hợp.” |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR14 | | |
+| **E1: Nội dung hướng dẫn chứa thuật ngữ cấm** | 1 | Nhập khuyến nghị tự mua thuốc ngoài | Hệ thống cảnh báo và yêu cầu sửa đổi tuân thủ phác đồ VISI. |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR7 (Nguồn gốc nội dung y khoa), BR22 (Hiển thị trực quan 2 cột màu Do & Don't) | | |
 
 ---
 
-#### 1.12.3 UC-12.3: Xem chi tiết hồ sơ bệnh nhân (View Patient Record Detail)
+### UC-010: Khởi Tạo và Cá Nhân Hóa Care Plan Bệnh Nhân (Patient Care Plan Instantiation)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-12.3 | | |
-| **Tên Use Case (Use Case Name)** | Xem chi tiết hồ sơ bệnh nhân (View Patient Record Detail) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ xem toàn bộ thông tin chi tiết của một bệnh nhân, bao gồm lý lịch y tế, Kế hoạch chăm sóc hiện tại, danh sách người chăm sóc đã liên kết và lịch sử phục hồi. | | |
-| **Mục tiêu (Goal)** | Xem xét toàn diện tình trạng lâm sàng và tiến trình điều trị của bệnh nhân | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn vào một dòng bệnh nhân trong Danh sách bệnh nhân. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Bệnh nhân được chọn có tồn tại trong hệ thống. | | |
-| **Điều kiện sau (Post-conditions)** | Toàn bộ dữ liệu chi tiết hồ sơ bệnh nhân được hiển thị. | | |
+| **Mã Use Case (Use Case ID)** | **UC-010** | | |
+| **Tên Use Case (Use Case Name)** | Khởi Tạo và Cá Nhân Hóa Care Plan Bệnh Nhân (Patient Care Plan Instantiation) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-003 (Điều dưỡng xuất viện) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-002 (Bác sĩ điều trị) | | |
+| **Tính năng liên quan (Features)** | F-008 | | |
+| **Mô tả tóm tắt (Brief Description)** | Điều dưỡng tại quầy lưu viện chọn hồ sơ bệnh nhân và áp dụng Master Template tương ứng với loại mổ để sinh ra Kế hoạch chăm sóc độc lập cho bệnh nhân. | | |
+| **Mục tiêu (Goal)** | Nhân bản Master Template thành Care Plan thực tế cho bệnh nhân trong <30 giây (Clinical Setup 3 bước); cho phép Bác sĩ điều chỉnh liều nếu cần. | | |
+| **Tác nhân kích hoạt (Trigger)** | Điều dưỡng mở màn hình Khởi tạo Care Plan (SCR-DOC-10) sau khi bệnh nhân hoàn thành ca mổ. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | 1. Hồ sơ bệnh nhân đã được tạo (UC-004).<br>2. Có Master Template đang ở trạng thái ACTIVE tương ứng với loại mổ. | | |
+| **Điều kiện sau (Post-conditions)** | 1. Bản ghi `patient_care_plans` được tạo ở trạng thái `ACTIVE`.<br>2. Nhân bản dữ liệu thuốc vào `patient_medication_schedules`.<br>3. Chuyển tiếp sang bước in phiếu QR (UC-012). | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn vào tên bệnh nhân trong danh sách | Hệ thống mở trang Chi tiết hồ sơ bệnh nhân với các phần: Thông tin cá nhân, Chi tiết phẫu thuật, Thông tin Kế hoạch chăm sóc, Thông tin Caregiver liên kết, và Lịch sử Recovery Check |
-| | 2 | Bác sĩ chuyển giữa các tab để xem dữ liệu chi tiết tương ứng | Hệ thống hiển thị đầy đủ thông tin của từng tab chức năng |
-| **Luồng thay thế (Alternative Flow)** | Không áp dụng | Không có luồng thay thế | |
-| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Hồ sơ đã bị xóa/vô hiệu hóa** | 1 | Bác sĩ truy cập bằng liên kết cũ của hồ sơ đã vô hiệu hóa | Hệ thống thông báo: “Hồ sơ bệnh nhân không khả dụng hoặc đã bị lưu trữ.” |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR14 | | |
-
----
-
-#### 1.12.4 UC-12.4: Chỉnh sửa hồ sơ bệnh nhân (Edit Patient Record)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-12.4 | | |
-| **Tên Use Case (Use Case Name)** | Chỉnh sửa hồ sơ bệnh nhân (Edit Patient Record) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ cập nhật thông tin cá nhân, số điện thoại liên hệ, thông tin chẩn đoán hoặc ghi chú y tế của bệnh nhân. | | |
-| **Mục tiêu (Goal)** | Cập nhật chính xác các thông tin thay đổi của bệnh nhân trong quá trình theo dõi | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn nút “Chỉnh sửa hồ sơ” trên trang chi tiết bệnh nhân. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Bác sĩ có quyền chỉnh sửa hồ sơ của bệnh nhân này. | | |
-| **Điều kiện sau (Post-conditions)** | Dữ liệu cập nhật được lưu vào hệ thống kèm lịch sử chỉnh sửa (audit log). | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Chỉnh sửa hồ sơ” | Hệ thống hiển thị biểu mẫu chỉnh sửa với các trường dữ liệu hiện tại của bệnh nhân |
-| | 2 | Bác sĩ thay đổi các thông tin cần thiết (Số điện thoại, địa chỉ, ghi chú y tế, mắt điều trị...) | Hệ thống kiểm tra tính hợp lệ dữ liệu nhập |
-| | 3 | Bác sĩ nhấn “Cập nhật” | Hệ thống lưu thay đổi, ghi nhận người sửa và mốc thời gian, hiển thị thông báo: “Cập nhật hồ sơ bệnh nhân thành công.” |
+| | 1 | Điều dưỡng chọn bệnh nhân từ danh sách mổ trong ngày | Hệ thống tải thông tin loại phẫu thuật và mắt can thiệp. |
+| | 2 | Điều dưỡng chọn Master Template phù hợp (ví dụ: 'Phaco Tiêu Chuẩn v1.0') | Hệ thống tự động nạp cấu hình thuốc, lịch tái khám và câu hỏi phục hồi. |
+| | 3 | Điều dưỡng kiểm tra thông tin và nhấn nút 'Kích hoạt Care Plan & Sinh QR' | Hệ thống nhân bản toàn bộ phác đồ, sinh mã token QR (UC-011), chuyển Care Plan sang trạng thái `ACTIVE` trong <1 giây (BR18). |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **A1: Hủy bỏ thay đổi** | 1 | Bác sĩ nhấn “Hủy bỏ” khi chưa lưu | Hệ thống hủy các thay đổi và giữ nguyên dữ liệu cũ |
+| **A1: Bác sĩ tùy biến liều thuốc cá nhân hóa** | 1 | Bác sĩ phẫu thuật điều chỉnh tăng/giảm liều lượng thuốc trước khi kích hoạt | Hệ thống cập nhật riêng cho bệnh nhân mà không làm biến đổi Master Template gốc (BR18). |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Xóa trắng trường bắt buộc** | 1 | Bác sĩ xóa trắng trường Họ tên hoặc Ngày sinh và nhấn Cập nhật | Hệ thống chặn lưu và hiển thị thông báo: “Không thể để trống các thông tin bắt buộc.” |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR15 | | |
+| **E1: Bệnh nhân đã có Care Plan đang hoạt động** | 1 | Hồ sơ bệnh nhân đã được kích hoạt Care Plan trước đó | Hệ thống hiển thị tùy chọn 'Xem Care Plan hiện tại' hoặc 'Thay thế Care Plan mới'. |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR18 (Tính độc lập dữ liệu Care Plan cá nhân hóa) | | |
 
 ---
 
-#### 1.12.5 UC-12.5: Xóa / Vô hiệu hóa hồ sơ bệnh nhân (Delete / Deactivate Patient Record)
+### UC-010b: Thực Hiện Bàn Giao Xuất Viện Tại Phòng Lưu Viện (Discharge Clinical Handoff)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-12.5 | | |
-| **Tên Use Case (Use Case Name)** | Xóa / Vô hiệu hóa hồ sơ bệnh nhân (Delete / Deactivate Patient Record) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor), Quản trị viên | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ xóa (nếu tạo nhầm và chưa phát sinh Care Plan) hoặc vô hiệu hóa/lưu trữ hồ sơ bệnh nhân khi đã kết thúc đợt điều trị. | | |
-| **Mục tiêu (Goal)** | Quản lý vòng đời hồ sơ bệnh nhân, đảm bảo dữ liệu sạch và an toàn thông tin y tế | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ chọn “Xóa hồ sơ” hoặc “Lưu trữ hồ sơ” trên màn hình quản lý. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Bác sĩ có thẩm quyền đối với hồ sơ bệnh nhân này. | | |
-| **Điều kiện sau (Post-conditions)** | Hồ sơ được chuyển trạng thái Lưu trữ (Archived) hoặc xóa mềm khỏi danh sách hiển thị hoạt động. | | |
+| **Mã Use Case (Use Case ID)** | **UC-010b** | | |
+| **Tên Use Case (Use Case Name)** | Thực Hiện Bàn Giao Xuất Viện Tại Phòng Lưu Viện (Discharge Clinical Handoff) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-003 (Điều dưỡng xuất viện) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-001 (Caregiver), ACT-006 (Bệnh nhân) | | |
+| **Tính năng liên quan (Features)** | F-008, F-022 | | |
+| **Mô tả tóm tắt (Brief Description)** | Ca mở rộng vận hành mô tả các bước tương tác lâm sàng trực tiếp giữa Điều dưỡng và Caregiver tại phòng lưu viện nhằm bảo đảm an toàn trước khi về nhà. | | |
+| **Mục tiêu (Goal)** | Điều dưỡng trực tiếp kiểm tra mắt, dán khiên bảo hộ, trao phiếu xuất viện kèm mã QR và hướng dẫn người nhà quét mã trước khi rời viện. | | |
+| **Tác nhân kích hoạt (Trigger)** | Bệnh nhân hoàn thành thời gian theo dõi hậu phẫu 30–60 phút tại phòng lưu viện và đủ điều kiện xuất viện. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | 1. Care Plan đã được kích hoạt và Phiếu xuất viện kèm QR đã in xong.<br>2. Người nhà (Caregiver) có mặt tại quầy lưu viện. | | |
+| **Điều kiện sau (Post-conditions)** | 1. Bệnh nhân được trang bị khiên mắt bảo hộ an toàn.<br>2. Người nhà nắm rõ cách truy cập ứng dụng RemiCare. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ chọn chức năng “Lưu trữ / Vô hiệu hóa hồ sơ” | Hệ thống hiển thị hộp thoại xác nhận cảnh báo: “Hồ sơ này sẽ được lưu trữ và ngừng nhận các cập nhật mới. Bạn có chắc chắn muốn tiếp tục?” |
-| | 2 | Bác sĩ chọn lý do (Kết thúc điều trị / Chuyển viện / Tạo nhầm) và nhấn “Xác nhận” | Hệ thống cập nhật trạng thái hồ sơ sang `Archived`, vô hiệu hóa mã QR liên kết, hiển thị thông báo: “Đã lưu trữ hồ sơ bệnh nhân thành công.” |
-| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Hồ sơ đang có Care Plan hoạt động** | 1 | Bác sĩ cố xóa hẳn hồ sơ đang có Care Plan Active và có Caregiver đang theo dõi | Hệ thống chặn thao tác xóa cứng và thông báo: “Không thể xóa hồ sơ đang có Kế hoạch chăm sóc hoạt động. Vui lòng kết thúc Kế hoạch chăm sóc trước khi lưu trữ.” |
-| **Mức độ ưu tiên (Priority)** | Trung bình (Medium) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR25 | | |
-
-#### Quy tắc nghiệp vụ (Business Rules - Áp dụng cho nhóm UC-12)
-| Mã BR | Tên Quy tắc Nghiệp vụ | Mô tả Quy tắc Nghiệp vụ |
-|---|---|---|
-| BR15 | Thông tin bệnh nhân bắt buộc | Hồ sơ bệnh nhân bắt buộc phải có đầy đủ Họ và tên, Ngày sinh hoặc Tuổi, Giới tính, Chẩn đoán bệnh và Loại phẫu thuật trước khi được lưu vào cơ sở dữ liệu. |
-| BR25 | Ràng buộc xóa và lưu trữ hồ sơ bệnh nhân | Hệ thống áp dụng cơ chế xóa mềm (Soft Delete / Archive) đối với hồ sơ bệnh nhân đã phát sinh dữ liệu y tế; chỉ cho phép xóa cứng nếu hồ sơ vừa tạo nhầm và chưa phát sinh Care Plan hay liên kết QR nào. |
-
----
-
-### 1.13 NHÓM UC-13: QUẢN LÝ CARE PLAN TEMPLATE TỔNG THỂ (MASTER TEMPLATE CRUD)
-
----
-
-#### 1.13.1 UC-13.1: Tạo mới Care Plan Template (Create Care Plan Template)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-13.1 | | |
-| **Tên Use Case (Use Case Name)** | Tạo mới Care Plan Template (Create Care Plan Template) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor), Quản trị viên chuyên môn | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ tạo mới một Care Plan Template master gắn với loại phẫu thuật cụ thể (Phaco, Lác, LASIK...), nhập thông tin chung, mở không gian làm việc để cấu hình lần lượt 5 thành phần con (Learning Path, Medication, Recovery Check, Red Flag, Do & Don't) và chỉ lưu toàn bộ template khi đã hoàn tất cấu hình. | | |
-| **Mục tiêu (Goal)** | Khởi tạo gói mẫu chăm sóc chuẩn hóa hoàn chỉnh để tái sử dụng cho nhiều bệnh nhân | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn “Tạo Template mới” trong trang Quản lý Template. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Bác sĩ có vai trò DOCTOR được cấp quyền quản lý chuyên môn. | | |
-| **Điều kiện sau (Post-conditions)** | Bản ghi Care Plan Template mới cùng cấu hình 5 thành phần con được lưu vào hệ thống ở trạng thái Bản nháp (Draft). | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Tạo Template mới” | Hệ thống hiển thị giao diện khởi tạo template gồm khu vực nhập Thông tin chung và Không gian làm việc với 5 tab thành phần con (Learning Path, Medication, Recovery Check, Red Flag, Do & Don't) |
-| | 2 | Bác sĩ nhập Thông tin chung: Tên Template, Chọn Loại phẫu thuật áp dụng (Phaco, Lác, LASIK...), Nhập Mô tả mục tiêu lâm sàng | Hệ thống kiểm tra tính duy nhất của tên template theo loại phẫu thuật |
-| | 3 | Bác sĩ chuyển qua lại giữa 5 tab chức năng để cấu hình chi tiết các thành phần con:<br>- **Tab Learning Path**: Thiết lập lộ trình bài học và câu hỏi Mini Quiz.<br>- **Tab Medication**: Thiết lập danh mục đơn thuốc mẫu.<br>- **Tab Recovery Check**: Thiết lập các mốc và câu hỏi kiểm tra phục hồi.<br>- **Tab Red Flag**: Thiết lập các dấu hiệu cảnh báo khẩn cấp.<br>- **Tab Do & Don't**: Thiết lập danh mục Nên làm & Cần tránh | Hệ thống kiểm tra và hiển thị trực quan dữ liệu cấu hình đã nhập trên từng tab |
-| | 4 | Sau khi hoàn tất thiết lập thông tin chung và 5 thành phần con, Bác sĩ nhấn nút “Lưu Template” | Hệ thống kiểm tra tính toàn vẹn của dữ liệu, lưu gói Care Plan Template vào CSDL ở trạng thái `Draft` và hiển thị thông báo: “Tạo mới Care Plan Template thành công.” |
-| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Trùng tên Template cho loại phẫu thuật** | 1 | Bác sĩ đặt tên trùng với template đã có của cùng loại phẫu thuật | Hệ thống báo lỗi: “Tên Template đã tồn tại cho loại phẫu thuật này.” |
-| **E2: Rời khỏi trang khi chưa bấm lưu** | 1 | Bác sĩ đóng trình duyệt hoặc điều hướng sang trang khác khi chưa nhấn “Lưu Template” | Hệ thống hiển thị hộp thoại cảnh báo: “Dữ liệu cấu hình chưa được lưu. Bạn có chắc chắn muốn rời khỏi không?” |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR16 | | |
-
----
-
-#### 1.13.2 UC-13.2: Xem danh sách Care Plan Template (View Care Plan Template List)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-13.2 | | |
-| **Tên Use Case (Use Case Name)** | Xem danh sách Care Plan Template (View Care Plan Template List) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ xem danh mục các Care Plan Template trong hệ thống kèm trạng thái (Draft / Active / Inactive) và số bệnh nhân đang áp dụng. | | |
-| **Mục tiêu (Goal)** | Cung cấp danh sách các mẫu quy trình chăm sóc hiện có trong bệnh viện | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ chọn mục “Quản lý Care Plan Template” trên thanh menu. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Bác sĩ đã đăng nhập vào hệ thống. | | |
-| **Điều kiện sau (Post-conditions)** | Toàn bộ danh sách template được tải và hiển thị. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ vào mục “Quản lý Care Plan Template” | Hệ thống hiển thị bảng danh sách gồm: Tên Template, Loại phẫu thuật, Trạng thái (Hoạt động / Bản nháp / Vô hiệu hóa), Ngày cập nhật, Bác sĩ tạo |
-| | 2 | Bác sĩ lọc theo Loại phẫu thuật (Phaco, Lác, LASIK...) hoặc trạng thái | Hệ thống lọc danh sách theo bộ lọc được chọn |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR14 | | |
-
----
-
-#### 1.13.3 UC-13.3: Xem chi tiết Care Plan Template (View Care Plan Template Detail)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-13.3 | | |
-| **Tên Use Case (Use Case Name)** | Xem chi tiết Care Plan Template (View Care Plan Template Detail) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ xem chi tiết toàn bộ các thành phần của một Template (Learning Path, Đơn thuốc mẫu, Bộ câu hỏi Recovery Check, Dấu hiệu Red Flag, Danh mục Do & Don't). | | |
-| **Mục tiêu (Goal)** | Kiểm tra toàn diện nội dung chuyên môn của một gói template trước khi quyết định kích hoạt hoặc áp dụng | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn vào một template trong danh sách. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Template tồn tại trong hệ thống. | | |
-| **Điều kiện sau (Post-conditions)** | Toàn bộ nội dung của các cấu phần được kết xuất chi tiết. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn vào một template trong danh sách | Hệ thống mở màn hình chi tiết template với 5 tab thành phần con |
-| | 2 | Bác sĩ xem xét nội dung chi tiết qua các tab | Hệ thống hiển thị cấu hình cụ thể của từng tab (danh mục bài học, danh mục thuốc, lịch recovery check, red flag, do/don't) |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR14 | | |
-
----
-
-#### 1.13.4 UC-13.4: Chỉnh sửa Care Plan Template (Edit Care Plan Template)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-13.4 | | |
-| **Tên Use Case (Use Case Name)** | Chỉnh sửa Care Plan Template (Edit Care Plan Template) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ chỉnh sửa thông tin chung (tên, mô tả) VÀ trực tiếp điều chỉnh nội dung trên 5 tab thành phần con (Learning Path, Medication, Recovery Check, Red Flag, Do & Don't) của Care Plan Template, sau khi hoàn tất chỉnh sửa toàn bộ mới nhấn lưu thay đổi. | | |
-| **Mục tiêu (Goal)** | Cho phép Bác sĩ cập nhật đồng bộ thông tin chung và cấu hình chuyên môn trên 5 tab thành phần con của Care Plan Template | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn nút “Chỉnh sửa Template” trên giao diện chi tiết template. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Template đang ở trạng thái cho phép chỉnh sửa (Draft hoặc Active). | | |
-| **Điều kiện sau (Post-conditions)** | Toàn bộ các thay đổi ở thông tin chung và 5 tab thành phần con được lưu vào hệ thống. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Chỉnh sửa Template” | Hệ thống mở giao diện chỉnh sửa toàn diện template với Thông tin chung và 5 tab thành phần con tải sẵn dữ liệu hiện tại |
-| | 2 | Bác sĩ điều chỉnh Thông tin chung (Tên template, Mô tả) nếu cần | Hệ thống kiểm tra tính hợp lệ dữ liệu |
-| | 3 | Bác sĩ chuyển qua lại giữa 5 tab thành phần con (Learning Path, Medication, Recovery Check, Red Flag, Do & Don't) để thêm, sửa, xóa hoặc sắp xếp lại các nội dung chuyên môn tương ứng | Hệ thống hiển thị trực quan các thay đổi trên từng tab tương ứng |
-| | 4 | Sau khi hoàn tất việc chỉnh sửa toàn bộ các cấu phần, Bác sĩ nhấn “Lưu thay đổi” | Hệ thống kiểm tra tính toàn vẹn của dữ liệu, lưu toàn bộ cập nhật vào CSDL, ghi nhật ký kiểm toán và hiển thị thông báo: “Cập nhật Care Plan Template thành công.” |
+| | 1 | Điều dưỡng kiểm tra vết mổ, dán khiên bảo vệ mắt hoặc kính bảo hộ cho bệnh nhân | Bảo đảm mắt mổ được bảo vệ cơ học tuyệt đối. |
+| | 2 | Điều dưỡng trao Phiếu xuất viện có in mã QR sắc nét cho Caregiver | Giải thích rõ: mã QR này chứa toàn bộ lịch uống thuốc, hướng dẫn chăm sóc và nút gọi cấp cứu. |
+| | 3 | Điều dưỡng hướng dẫn Caregiver mở camera quét mã QR và đăng nhập số điện thoại | Caregiver thực hiện quét mã và xác nhận hồ sơ thành công. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **A1: Hủy bỏ chỉnh sửa** | 1 | Bác sĩ nhấn nút “Hủy bỏ” khi chưa lưu | Hệ thống hiển thị hộp thoại xác nhận hủy, khôi phục lại dữ liệu ban đầu và đóng giao diện chỉnh sửa |
+| **A1: Người nhà không mang smartphone** | 1 | Caregiver sử dụng điện thoại cơ bản | Điều dưỡng hướng dẫn dặn dò trên phiếu in giấy truyền thống và ghi chú vào hệ thống. |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Thiếu thông tin bắt buộc tại tab con** | 1 | Bác sĩ để trống trường bắt buộc tại một trong 5 tab con khi nhấn lưu | Hệ thống chặn lưu, đánh dấu đỏ tab bị lỗi và hiển thị: “Vui lòng kiểm tra và nhập đủ thông tin bắt buộc tại tab [Tên tab].” |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR16, BR17 | | |
+| **E1: Camera người nhà không quét được mã** | 1 | Thiết bị cũ hoặc camera mờ | Điều dưỡng hướng dẫn nhập thủ công đường link rút gọn in trên phiếu: `remicare.visi.vn/p/{token}`. |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR4 (Xác thực mã QR), BR7 (Dặn dò lâm sàng chuẩn y khoa) | | |
 
 ---
 
-#### 1.13.5 UC-13.5: Kích hoạt / Vô hiệu hóa Care Plan Template (Activate / Deactivate Template)
+### UC-010c: Xác Nhận Hoàn Tất Bàn Giao Lâm Sàng (Clinical Handoff Confirmation)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-13.5 | | |
-| **Tên Use Case (Use Case Name)** | Kích hoạt / Vô hiệu hóa Care Plan Template (Activate / Deactivate Template) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor), Quản trị viên | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ kích hoạt (Active) template để đưa vào áp dụng cho bệnh nhân, hoặc vô hiệu hóa (Inactive) khi phác đồ không còn sử dụng. | | |
-| **Mục tiêu (Goal)** | Kiểm soát vòng đời và tính khả dụng của các mẫu chăm sóc trong bệnh viện | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn nút “Kích hoạt” hoặc “Vô hiệu hóa” trên giao diện template. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Để kích hoạt, template phải được cấu hình đầy đủ cả 5 thành phần con. | | |
-| **Điều kiện sau (Post-conditions)** | Trạng thái template chuyển sang Active hoặc Inactive tương ứng. | | |
+| **Mã Use Case (Use Case ID)** | **UC-010c** | | |
+| **Tên Use Case (Use Case Name)** | Xác Nhận Hoàn Tất Bàn Giao Lâm Sàng (Clinical Handoff Confirmation) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-003 (Điều dưỡng xuất viện) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-001 (Caregiver) | | |
+| **Tính năng liên quan (Features)** | F-004, F-008 | | |
+| **Mô tả tóm tắt (Brief Description)** | Ca mở rộng ghi nhận mốc kết thúc quy trình xuất viện tại bệnh trạm; chuyển giao hoàn toàn trách nhiệm theo dõi từ phòng lưu viện sang Dashboard giám sát từ xa của CSKH. | | |
+| **Mục tiêu (Goal)** | Hệ thống ghi nhận trạng thái Care Plan chuyển sang `ACTIVE` toàn diện và Caregiver đã liên kết thành công, đánh dấu hoàn thành xuất viện. | | |
+| **Tác nhân kích hoạt (Trigger)** | Caregiver quét mã QR và xác nhận liên kết hồ sơ bệnh nhân thành công trên điện thoại. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | 1. Caregiver đã quét QR và đăng nhập OTP thành công.<br>2. Care Plan đã được gán mã định danh Caregiver. | | |
+| **Điều kiện sau (Post-conditions)** | 1. Trạng thái bàn giao chuyển sang `HANDOFF_COMPLETED`.<br>2. Kích hoạt lịch trình thông báo tự động (F-027).<br>3. Bệnh nhân xuất hiện trên Dashboard CSKH (F-018). | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Kích hoạt Template” | Hệ thống kiểm tra điều kiện tiên quyết (xác thực có đủ thuốc, recovery check, red flag...) |
-| | 2 | Bác sĩ xác nhận kích hoạt | Hệ thống cập nhật trạng thái sang `Active`, hiển thị thông báo: “Template đã được kích hoạt và sẵn sàng áp dụng cho bệnh nhân.” |
+| | 1 | Hệ thống nhận tín hiệu liên kết thành công từ ứng dụng Caregiver | Cập nhật bản ghi `caregiver_patient_links` với cờ `handoff_verified = TRUE`. |
+| | 2 | Màn hình trạm điều dưỡng tự động cập nhật biểu tượng xanh 'Đã bàn giao thành công' | Điều dưỡng hoàn tất thủ tục xuất viện cho ca bệnh trong <30 giây. |
+| | 3 | Hệ thống bắt đầu kích hoạt bộ hẹn giờ gửi thông báo nhắc cữ thuốc và lịch tái khám | Dữ liệu được chuyển tiếp sang hàng đợi giám sát của CSKH chi nhánh. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **A1: Vô hiệu hóa Template** | 1 | Bác sĩ nhấn “Vô hiệu hóa” trên template Active | Hệ thống cảnh báo: “Template này sẽ không thể chọn cho bệnh nhân mới. Các bệnh nhân đang dùng không bị ảnh hưởng. Tiếp tục?” |
-| | 2 | Bác sĩ xác nhận | Hệ thống đổi trạng thái sang `Inactive` |
+| Không có | - | Luồng thực hiện tuần tự không rẽ nhánh | - |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Thiếu cấu hình thành phần khi kích hoạt** | 1 | Template thiếu danh mục thuốc hoặc câu hỏi Recovery Check | Hệ thống chặn kích hoạt và cảnh báo: “Template phải có đầy đủ cấu hình Recovery Check và Thuốc trước khi kích hoạt.” |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR16, BR17 | | |
-
-#### Quy tắc nghiệp vụ (Business Rules - Áp dụng cho nhóm UC-13)
-| Mã BR | Tên Quy tắc Nghiệp vụ | Mô tả Quy tắc Nghiệp vụ |
-|---|---|---|
-| BR16 | Ràng buộc loại phẫu thuật của Template | Mỗi Care Plan Template phải được liên kết rõ ràng với duy nhất một loại phẫu thuật chuyên khoa (ví dụ: Phaco, Lác, LASIK/ICL, Võng mạc). |
-| BR17 | Tính độc lập và nguyên khối của Template | Care Plan Template là một gói cấu hình chuẩn gồm Caregiver 101, Learning Path, Thuốc, Recovery Check và Red Flag. Việc chỉnh sửa master template không làm thay đổi các Care Plan của bệnh nhân đã được tạo trước đó. |
+| **E1: Quá 2 giờ chưa thấy quét mã QR** | 1 | Bệnh nhân đã rời viện nhưng người nhà chưa quét mã | Hệ thống đánh dấu cờ vàng trên Dashboard CSKH để nhân viên chủ động gọi điện nhắc nhở. |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR5 (Tính toàn vẹn liên kết bàn giao) | | |
 
 ---
 
-### 1.14 NHÓM UC-14: QUẢN LÝ CẤU HÌNH LEARNING PATH TEMPLATE (US-20 CRUD)
-
----
-
-#### 1.14.1 UC-14.1: Thêm bài học và câu hỏi trắc nghiệm kiểm tra (Create Learning Module & Mini Quiz)
+### UC-011: Tạo và Phát Hành Mã QR Xuất Viện (QR Lifecycle Generation)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-14.1 | | |
-| **Tên Use Case (Use Case Name)** | Thêm bài học và câu hỏi trắc nghiệm kiểm tra (Create Learning Module & Mini Quiz) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ thêm một bài học mới vào Learning Path của Template (gồm tiêu đề, phân loại, văn bản mô tả, tệp video/ảnh) VÀ tạo bộ 3 câu hỏi trắc nghiệm (Mini Quiz) kiểm tra kiến thức phù hợp cho loại bệnh, tự nhập câu hỏi, các phương án lựa chọn, chỉ định đáp án đúng kèm lời giải thích y khoa. | | |
-| **Mục tiêu (Goal)** | Xây dựng bài học chuẩn y khoa và đính kèm bộ câu hỏi trắc nghiệm phù hợp với bệnh lý để kiểm tra kiến thức của người chăm sóc ở cuối bài | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn nút “Thêm bài học mới” trong tab Learning Path của Template. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Bác sĩ đang trong giao diện chỉnh sửa Care Plan Template. | | |
-| **Điều kiện sau (Post-conditions)** | Bài học mới cùng bộ câu hỏi trắc nghiệm Mini Quiz được lưu vào danh mục Learning Path của Template. | | |
+| **Mã Use Case (Use Case ID)** | **UC-011** | | |
+| **Tên Use Case (Use Case Name)** | Tạo và Phát Hành Mã QR Xuất Viện (QR Lifecycle Generation) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-003 (Điều dưỡng xuất viện) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-001 (Caregiver), ACT-006 (Bệnh nhân) | | |
+| **Tính năng liên quan (Features)** | F-021 | | |
+| **Mô tả tóm tắt (Brief Description)** | Tự động tạo mã QR bảo mật cao, không lộ thông tin y tế thô ra ngoài, quản lý trạng thái: Created -> Issued -> Active -> Revoked/Expired. | | |
+| **Mục tiêu (Goal)** | Hệ thống sinh mã token mã hóa ngẫu nhiên an toàn (UUIDv4/JWT có chữ ký số) gắn với Care Plan đã ban hành, quản lý trạng thái vòng đời QR. | | |
+| **Tác nhân kích hoạt (Trigger)** | Điều dưỡng nhấn nút kích hoạt Care Plan cho bệnh nhân. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | Care Plan đã được thiết lập đầy đủ thông tin. | | |
+| **Điều kiện sau (Post-conditions)** | Chuỗi token QR bảo mật được lưu trữ và gán với `plan_id`. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Thêm bài học mới” | Hệ thống hiển thị biểu mẫu tạo bài học gồm phần thông tin bài học và phần cấu hình bộ câu hỏi trắc nghiệm Mini Quiz |
-| | 2 | Bác sĩ nhập thông tin bài học: Tiêu đề bài học, Phân loại chủ đề, Nội dung văn bản hướng dẫn; Đính kèm video/hình ảnh/infographic | Hệ thống tải lên và kiểm tra dung lượng/định dạng tệp đính kèm |
-| | 3 | Bác sĩ thiết lập câu hỏi kiểm tra: Nhập nội dung 3 câu hỏi trắc nghiệm phù hợp cho loại bệnh, nhập các phương án trả lời (A, B, C, D), tích chọn đáp án đúng và nhập lời giải thích y khoa cho từng câu | Hệ thống kiểm tra tính đầy đủ của bộ câu hỏi trắc nghiệm (phải có đủ câu hỏi, các lựa chọn và chỉ định ít nhất 1 đáp án đúng) |
-| | 4 | Bác sĩ nhấn “Lưu bài học” | Hệ thống ghi nhận bài học kèm bộ 3 câu hỏi trắc nghiệm Mini Quiz vào danh mục Learning Path của Template và cấp số thứ tự hiển thị |
-| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Tệp đính kèm sai định dạng** | 1 | Bác sĩ tải lên tệp không đúng chuẩn (không phải mp4, png, jpg, pdf) | Hệ thống báo lỗi định dạng và từ chối tải tệp |
-| **E2: Chưa hoàn thiện câu hỏi trắc nghiệm** | 1 | Bác sĩ nhập câu hỏi nhưng chưa nhập đủ các phương án hoặc chưa tích chọn đáp án đúng | Hệ thống cảnh báo: “Vui lòng nhập đầy đủ nội dung câu hỏi, các phương án lựa chọn và tích chọn đáp án đúng cho từng câu hỏi Mini Quiz.” |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR7 | | |
-
----
-
-#### 1.14.2 UC-14.2: Xem danh sách bài học Learning Path (View Learning Modules)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-14.2 | | |
-| **Tên Use Case (Use Case Name)** | Xem danh sách bài học Learning Path (View Learning Modules) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ xem toàn bộ danh mục bài học của Learning Path trong Template theo đúng thứ tự hiển thị, kiểm tra trạng thái bộ câu hỏi Mini Quiz và xem trước nội dung hiển thị. | | |
-| **Mục tiêu (Goal)** | Kiểm tra kết cấu giáo trình chăm sóc và bộ câu hỏi trắc nghiệm của gói template phẫu thuật | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ mở tab “Learning Path” trong template. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Template đang mở trong hệ thống. | | |
-| **Điều kiện sau (Post-conditions)** | Danh sách các bài học, hình thức media, trạng thái câu hỏi trắc nghiệm và thứ tự hiển thị được kết xuất. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ mở tab “Learning Path” | Hệ thống hiển thị danh sách bài học theo dạng thẻ hoặc bảng gồm: Thứ tự, Tiêu đề bài học, Loại media (Video/Hình ảnh/Text), Số lượng câu hỏi trắc nghiệm Mini Quiz (3 câu), và nút Xem trước |
-| | 2 | Bác sĩ nhấn nút “Xem trước” tại một bài học | Hệ thống hiển thị giao diện xem trước bài học bao gồm các video/hình ảnh minh họa và bộ câu hỏi trắc nghiệm như hiển thị cho người chăm sóc |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR7 | | |
-
----
-
-#### 1.14.3 UC-14.3: Chỉnh sửa nội dung bài học và câu hỏi trắc nghiệm (Edit Learning Module & Mini Quiz)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-14.3 | | |
-| **Tên Use Case (Use Case Name)** | Chỉnh sửa nội dung bài học và câu hỏi trắc nghiệm (Edit Learning Module & Mini Quiz) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ cập nhật tiêu đề, nội dung hướng dẫn, thay đổi video/hình ảnh minh họa HOẶC chỉnh sửa nội dung/đáp án của 3 câu hỏi trắc nghiệm Mini Quiz của bài học. | | |
-| **Mục tiêu (Goal)** | Đảm bảo kiến thức đào tạo và câu hỏi kiểm tra luôn chuẩn xác theo hướng dẫn y khoa cập nhật | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn nút “Sửa” tại một bài học trong tab Learning Path. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Bài học tồn tại trong Learning Path của template. | | |
-| **Điều kiện sau (Post-conditions)** | Nội dung cập nhật của bài học và bộ câu hỏi trắc nghiệm được lưu vào hệ thống. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Sửa bài học” | Hệ thống mở biểu mẫu chỉnh sửa bài học với nội dung bài học và bộ câu hỏi trắc nghiệm hiện có |
-| | 2 | Bác sĩ cập nhật nội dung văn bản, tệp video/ảnh HOẶC sửa đổi nội dung câu hỏi trắc nghiệm, các phương án lựa chọn, đáp án đúng và lời giải thích y khoa | Hệ thống kiểm tra tính hợp lệ dữ liệu |
-| | 3 | Bác sĩ nhấn “Lưu thay đổi” | Hệ thống ghi nhận nội dung và câu hỏi cập nhật vào Template và thông báo thành công |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR7 | | |
-
----
-
-#### 1.14.4 UC-14.4: Xóa nội dung bài học khỏi Learning Path (Delete Learning Module)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-14.4 | | |
-| **Tên Use Case (Use Case Name)** | Xóa nội dung bài học khỏi Learning Path (Delete Learning Module) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ xóa bỏ một bài học không còn phù hợp khỏi danh mục Learning Path của Template (bao gồm cả bộ câu hỏi trắc nghiệm đi kèm). | | |
-| **Mục tiêu (Goal)** | Tinh gọn và loại bỏ các nội dung hướng dẫn thừa hoặc lỗi thời | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn biểu tượng “Xóa” tại một bài học. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Bài học có trong danh sách Learning Path. | | |
-| **Điều kiện sau (Post-conditions)** | Bài học và toàn bộ câu hỏi trắc nghiệm đi kèm bị loại bỏ khỏi cấu hình Learning Path của Template. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Xóa” tại bài học | Hệ thống hiển thị thông báo xác nhận: “Bạn có chắc chắn muốn xóa bài học này khỏi Learning Path? Thao tác này sẽ xóa đồng thời toàn bộ câu hỏi trắc nghiệm Mini Quiz gắn liền với bài học.” |
-| | 2 | Bác sĩ nhấn “Xác nhận xóa” | Hệ thống xóa bài học cùng bộ câu hỏi trắc nghiệm, tự động cập nhật lại thứ tự hiển thị của các bài học còn lại và thông báo thành công |
-| **Mức độ ưu tiên (Priority)** | Trung bình (Medium) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR7 | | |
-
----
-
-#### 1.14.5 UC-14.5: Thay đổi thứ tự bài học trong Learning Path (Reorder Learning Modules)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-14.5 | | |
-| **Tên Use Case (Use Case Name)** | Thay đổi thứ tự bài học trong Learning Path (Reorder Learning Modules) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ kéo thả hoặc sắp xếp lại trình tự xuất hiện của các bài học trong lộ trình học tập của người chăm sóc. | | |
-| **Mục tiêu (Goal)** | Sắp xếp lộ trình học tập theo trình tự diễn tiến hồi phục hợp lý (ví dụ: 24h đầu -> Chăm sóc tuần 1 -> Dinh dưỡng...) | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ thao tác kéo thả hoặc nhấn nút mũi tên lên/xuống trên danh sách bài học. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Learning Path có từ 2 bài học trở lên. | | |
-| **Điều kiện sau (Post-conditions)** | Thứ tự bài học mới được lưu trữ và áp dụng ngay lập tức (bài học và câu hỏi trắc nghiệm đi kèm di chuyển đồng bộ). | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ kéo thả một bài học đến vị trí mới trong danh sách | Hệ thống cập nhật vị trí trực quan trên giao diện (bộ câu hỏi trắc nghiệm tương ứng đi liền với bài học) |
-| | 2 | Bác sĩ nhấn “Lưu thứ tự” | Hệ thống cập nhật chỉ số thứ tự (index) của toàn bộ danh mục bài học và lưu vào CSDL |
-| **Mức độ ưu tiên (Priority)** | Trung bình (Medium) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR7 | | |
-
----
-
-### 1.15 NHÓM UC-15: QUẢN LÝ CẤU HÌNH MEDICATION TEMPLATE (US-21 CRUD)
-
----
-
-#### 1.15.1 UC-15.1: Thêm thuốc vào Medication Template (Create Medication Item)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-15.1 | | |
-| **Tên Use Case (Use Case Name)** | Thêm thuốc vào Medication Template (Create Medication Item) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ thêm một loại thuốc chuẩn vào mẫu đơn thuốc của loại phẫu thuật, thiết lập liều dùng, số lần, thời điểm, cách dùng mặc định, mô tả nhận diện trực quan và các lưu ý lâm sàng đặc thù của thuốc. Bác sĩ có thể lưu và tiếp tục thêm nhiều loại thuốc liên tiếp vào template. | | |
-| **Mục tiêu (Goal)** | Xây dựng danh mục thuốc chuẩn hóa đầy đủ nhận diện và lưu ý an toàn cho từng loại phẫu thuật để áp dụng nhanh khi kê đơn | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn “Thêm thuốc” trong tab Medication Template. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Bác sĩ đang cấu hình Care Plan Template. | | |
-| **Điều kiện sau (Post-conditions)** | Loại thuốc mới được bổ sung vào danh mục thuốc của Template. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Thêm thuốc” | Hệ thống hiển thị biểu mẫu cấu hình thuốc |
-| | 2 | Bác sĩ chọn/nhập các trường thông tin chi tiết:<br>- **Loại phẫu thuật**: Chọn loại phẫu thuật áp dụng (Phaco, Lác, LASIK/ICL, Cắt dịch kính...)<br>- **Tên thuốc**: Tên biệt dược/hoạt chất, hàm lượng<br>- **Dạng bào chế**: Thuốc nhỏ mắt / Thuốc uống<br>- **Liều lượng**: Số giọt hoặc số viên; **Tần suất**: Số lần/ngày<br>- **Thời điểm dùng trong ngày**: Sáng, Trưa, Chiều, Tối<br>- **Quan hệ bữa ăn**: Trước/Sau ăn; **Số ngày sử dụng**; **Thứ tự dùng**<br>- **Mô tả nhận diện về thuốc**: Mô tả màu sắc, hình dáng bao bì, màu nắp lọ/vỏ hộp (ví dụ: Lọ nắp trắng dung dịch đục, viên nang màu vàng-đỏ...) để người chăm sóc dễ phân biệt trực quan<br>- **Lưu ý về loại thuốc**: Hướng dẫn thao tác đặc thù (ví dụ: Lắc kỹ trước khi nhỏ, bảo quản ngăn mát tủ lạnh, cách xa cữ thuốc khác tối thiểu 5 phút...) | Hệ thống kiểm tra tính đầy đủ và hợp lệ của thông tin thuốc |
-| | 3 | Bác sĩ nhấn “Lưu thuốc” | Hệ thống lưu thuốc vào danh mục Medication Template, cập nhật bảng hiển thị và đóng biểu mẫu thêm thuốc |
+| | 1 | Hệ thống tiếp nhận lệnh kích hoạt Care Plan | Sinh chuỗi token bảo mật ngẫu nhiên mã hóa HMAC-SHA256 kết hợp UUIDv4. |
+| | 2 | Hệ thống tạo bản ghi mã QR với trạng thái `ISSUED` | Tạo file ảnh mã QR vector (SVG/PNG 300 DPI) sẵn sàng cho lệnh in phiếu xuất viện. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **A1: Thêm liên tiếp nhiều loại thuốc vào Medication Template** | 1 | Sau khi nhập đầy đủ thông tin một loại thuốc tại Bước 2, Bác sĩ nhấn nút “Lưu và tiếp tục thêm” thay vì đóng form | Hệ thống lưu loại thuốc vừa nhập vào danh mục Medication Template, tự động tăng chỉ số thứ tự dùng, làm mới biểu mẫu để Bác sĩ tiếp tục nhập loại thuốc tiếp theo vào template mà không phải thoát ra ngoài |
+| Không có | - | Luồng thực hiện tuần tự không rẽ nhánh | - |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Thiếu thông tin liều hoặc tên thuốc** | 1 | Bác sĩ để trống Tên thuốc hoặc Liều lượng | Hệ thống cảnh báo: “Tên thuốc và Liều lượng không được để trống.” |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR7, BR23 | | |
+| **E1: Lỗi sinh token mã hóa** | 1 | Lỗi dịch vụ tạo mã | Hệ thống thử lại tự động và thông báo nếu có sự cố máy chủ. |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR4 (Tính hợp lệ và bảo mật mã QR) | | |
 
 ---
 
-#### 1.15.2 UC-15.2: Xem danh sách thuốc trong Medication Template (View Medication List)
+### UC-012: In Phiếu Hướng Dẫn Xuất Viện Kèm Mã QR (Discharge Slip Print)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-15.2 | | |
-| **Tên Use Case (Use Case Name)** | Xem danh sách thuốc trong Medication Template (View Medication List) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ xem toàn bộ danh mục thuốc mẫu được kê cho loại phẫu thuật này, bao gồm cả thuốc uống và thuốc nhỏ mắt kèm thứ tự sử dụng. | | |
-| **Mục tiêu (Goal)** | Kiểm tra tính chính xác của phác đồ thuốc mẫu | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ chọn tab “Medication Template”. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Template đang mở trong hệ thống. | | |
-| **Điều kiện sau (Post-conditions)** | Bảng danh sách thuốc và thông số chi tiết được hiển thị. | | |
+| **Mã Use Case (Use Case ID)** | **UC-012** | | |
+| **Tên Use Case (Use Case Name)** | In Phiếu Hướng Dẫn Xuất Viện Kèm Mã QR (Discharge Slip Print) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-003 (Điều dưỡng xuất viện) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-001 (Caregiver) | | |
+| **Tính năng liên quan (Features)** | F-022 | | |
+| **Mô tả tóm tắt (Brief Description)** | Điều dưỡng xuất lệnh in phiếu xuất viện chứa logo VISI, tóm tắt lâm sàng, mã QR lớn và số hotline cấp cứu 0395 151 151. | | |
+| **Mục tiêu (Goal)** | Xuất lệnh in trực tiếp Phiếu xuất viện khổ chuẩn (A5/A4/decal) có chứa mã QR sắc nét để bàn giao tận tay người nhà trong <3 giây. | | |
+| **Tác nhân kích hoạt (Trigger)** | Điều dưỡng nhấn nút 'In Phiếu Xuất Viện' trên màn hình SCR-DOC-11. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | Mã QR đã được sinh thành công (UC-011) và máy in tại quầy đã sẵn sàng. | | |
+| **Điều kiện sau (Post-conditions)** | Phiếu xuất viện vật lý được in ra hoàn chỉnh để trao cho Caregiver. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ chọn tab “Medication Template” | Hệ thống hiển thị bảng danh mục thuốc gồm: STT dùng, Tên thuốc, Dạng thuốc, Liều dùng, Tần suất, Số ngày dùng, Mô tả nhận diện thuốc, Lưu ý sử dụng, Ghi chú cách dùng |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR7 | | |
-
----
-
-#### 1.15.3 UC-15.3: Chỉnh sửa thông tin thuốc trong Medication Template (Edit Medication Item)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-15.3 | | |
-| **Tên Use Case (Use Case Name)** | Chỉnh sửa thông tin thuốc trong Medication Template (Edit Medication Item) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ điều chỉnh liều lượng, số lần dùng, thời điểm uống, mô tả nhận diện trực quan hoặc lưu ý đặc thù của một loại thuốc mẫu. | | |
-| **Mục tiêu (Goal)** | Tinh chỉnh phác đồ thuốc mẫu khi có thay đổi trong quy chuẩn y khoa | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn nút “Sửa” tại dòng thuốc trong danh sách. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Thuốc tồn tại trong danh mục Medication Template. | | |
-| **Điều kiện sau (Post-conditions)** | Dữ liệu thuốc mẫu được cập nhật mới. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Sửa” tại một loại thuốc | Hệ thống mở biểu mẫu chỉnh sửa thông số thuốc với đầy đủ dữ liệu hiện có |
-| | 2 | Bác sĩ điều chỉnh: Liều dùng, Tần suất, Thời gian dùng, Thứ tự dùng, Mô tả nhận diện thuốc hoặc Lưu ý về loại thuốc | Hệ thống kiểm tra tính hợp lệ dữ liệu |
-| | 3 | Bác sĩ nhấn “Cập nhật” | Hệ thống lưu thông số mới và hiển thị thông báo thành công |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR7 | | |
-
----
-
-#### 1.15.4 UC-15.4: Xóa thuốc khỏi Medication Template (Delete Medication Item)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-15.4 | | |
-| **Tên Use Case (Use Case Name)** | Xóa thuốc khỏi Medication Template (Delete Medication Item) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ loại bỏ một loại thuốc khỏi mẫu đơn thuốc của loại phẫu thuật. | | |
-| **Mục tiêu (Goal)** | Loại bỏ các loại thuốc không còn được khuyến nghị trong phác đồ chuẩn | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn biểu tượng “Xóa” tại dòng thuốc. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Thuốc có trong danh mục Medication Template. | | |
-| **Điều kiện sau (Post-conditions)** | Thuốc được loại bỏ khỏi danh mục của Template. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Xóa” tại dòng thuốc | Hệ thống hiển thị cảnh báo: “Bạn có chắc muốn xóa loại thuốc này khỏi danh mục mẫu?” |
-| | 2 | Bác sĩ nhấn “Xác nhận xóa” | Hệ thống xóa loại thuốc khỏi cấu hình template và sắp xếp lại thứ tự các thuốc còn lại |
-| **Mức độ ưu tiên (Priority)** | Trung bình (Medium) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR7 | | |
-
----
-
-### 1.16 NHÓM UC-16: QUẢN LÝ CẤU HÌNH RECOVERY CHECK TEMPLATE (US-22 CRUD)
-
----
-
-#### 1.16.1 UC-16.1: Tạo mốc thời gian và câu hỏi Recovery Check (Create Milestone & Questions)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-16.1 | | |
-| **Tên Use Case (Use Case Name)** | Tạo mốc thời gian và câu hỏi Recovery Check (Create Milestone & Questions) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ tạo mới một mốc khảo sát phục hồi (ví dụ: Day 1, Day 3, Day 7) và thiết lập từ 3–5 câu hỏi khảo sát kèm đáp án và điều kiện cảnh báo. | | |
-| **Mục tiêu (Goal)** | Thiết lập lịch trình và nội dung theo dõi triệu chứng phục hồi chuẩn hóa theo tiến trình lâm sàng | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn “Thêm mốc Recovery Check” trong tab Recovery Check của Template. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Bác sĩ đang cấu hình Care Plan Template. | | |
-| **Điều kiện sau (Post-conditions)** | Mốc kiểm tra và bộ câu hỏi được lưu vào cấu hình Recovery Check của Template. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Thêm mốc Recovery Check” | Hệ thống hiển thị biểu mẫu tạo mốc kiểm tra |
-| | 2 | Bác sĩ chọn Loại phẫu thuật áp dụng (Phaco, Lác, LASIK/ICL, Cắt dịch kính...) và nhập Mốc thời gian theo dõi (ví dụ: Ngày 1, Ngày 3, Ngày 7, Ngày 14 sau phẫu thuật) | Hệ thống xác nhận loại phẫu thuật và mốc thời gian |
-| | 3 | Bác sĩ thêm 3–5 câu hỏi: Nhập nội dung câu hỏi (ví dụ: “Bệnh nhân có cảm thấy đau buốt không?”), Chọn loại đáp án (Có/Không, Nhiều lựa chọn), Thiết lập đáp án nào là “Bình thường”, đáp án nào là “Cần chú ý”, và đáp án nào kích hoạt “Red Flag” | Hệ thống liên kết câu hỏi với tiêu chí đánh giá cảnh báo |
-| | 4 | Bác sĩ nhấn “Lưu mốc Recovery Check” | Hệ thống lưu mốc kiểm tra cùng bộ câu hỏi vào Template |
-| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Trùng lặp mốc thời gian** | 1 | Bác sĩ tạo mốc Ngày 3 khi đã có mốc Ngày 3 | Hệ thống báo lỗi: “Mốc thời gian Ngày 3 đã tồn tại trong template.” |
-| **E2: Số lượng câu hỏi không nằm trong khoảng 3–5** | 1 | Bác sĩ nhập dưới 3 câu hỏi | Hệ thống nhắc nhở: “Mỗi lần Recovery Check nên có từ 3 đến 5 câu hỏi để đảm bảo hiệu quả theo dõi.” |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR9, BR10 | | |
-
----
-
-#### 1.16.2 UC-16.2: Xem danh sách mốc và câu hỏi Recovery Check (View Milestones & Questions)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-16.2 | | |
-| **Tên Use Case (Use Case Name)** | Xem danh sách mốc và câu hỏi Recovery Check (View Milestones & Questions) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ xem toàn bộ lịch trình các mốc Recovery Check và nội dung câu hỏi của từng mốc trong Template. | | |
-| **Mục tiêu (Goal)** | Kiểm tra tính logic và liên tục của lộ trình theo dõi phục hồi | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ mở tab “Recovery Check Template”. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Template đang mở trong hệ thống. | | |
-| **Điều kiện sau (Post-conditions)** | Bảng tổng hợp các mốc và câu hỏi được hiển thị trực quan. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ mở tab “Recovery Check Template” | Hệ thống hiển thị danh sách các mốc: Day 1 (3 câu), Day 3 (5 câu), Day 7 (5 câu)... |
-| | 2 | Bác sĩ nhấn mở rộng một mốc để xem chi tiết câu hỏi và tiêu chí cảnh báo | Hệ thống mở rộng danh sách chi tiết các câu hỏi và quy tắc gắn cờ cảnh báo tương ứng |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR10 | | |
-
----
-
-#### 1.16.3 UC-16.3: Chỉnh sửa mốc thời gian và câu hỏi Recovery Check (Edit Milestone & Questions)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-16.3 | | |
-| **Tên Use Case (Use Case Name)** | Chỉnh sửa mốc thời gian và câu hỏi Recovery Check (Edit Milestone & Questions) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ điều chỉnh nội dung câu hỏi, đổi mốc ngày hoặc cấu hình lại ngưỡng cảnh báo của một mốc Recovery Check. | | |
-| **Mục tiêu (Goal)** | Tinh chỉnh bộ câu hỏi khảo sát phục hồi chính xác theo thực tế lâm sàng | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn nút “Sửa” tại một mốc kiểm tra. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Mốc kiểm tra tồn tại trong Recovery Check Template. | | |
-| **Điều kiện sau (Post-conditions)** | Các câu hỏi và tiêu chí cảnh báo mới được cập nhật. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Sửa” tại một mốc kiểm tra | Hệ thống hiển thị biểu mẫu chỉnh sửa của mốc đó |
-| | 2 | Bác sĩ chỉnh sửa câu từ câu hỏi, thay đổi đáp án hoặc đổi điều kiện kích hoạt cảnh báo Red Flag | Hệ thống kiểm tra tính hợp lệ |
-| | 3 | Bác sĩ nhấn “Lưu cập nhật” | Hệ thống lưu thông tin mới và thông báo thành công |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR10 | | |
-
----
-
-#### 1.16.4 UC-16.4: Xóa mốc thời gian hoặc câu hỏi Recovery Check (Delete Milestone / Question)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-16.4 | | |
-| **Tên Use Case (Use Case Name)** | Xóa mốc thời gian hoặc câu hỏi Recovery Check (Delete Milestone / Question) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ xóa bỏ một mốc kiểm tra không cần thiết hoặc xóa một câu hỏi đơn lẻ trong mốc. | | |
-| **Mục tiêu (Goal)** | Tinh gọn quy trình theo dõi phục hồi, tránh gây phiền hà cho người chăm sóc | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn nút “Xóa” tại mốc hoặc câu hỏi. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Mốc hoặc câu hỏi có tồn tại trong cấu hình. | | |
-| **Điều kiện sau (Post-conditions)** | Mốc kiểm tra hoặc câu hỏi bị loại bỏ khỏi Template. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Xóa” tại mốc hoặc câu hỏi | Hệ thống hỏi xác nhận xóa |
-| | 2 | Bác sĩ xác nhận | Hệ thống xóa mục được chọn và cập nhật lại giao diện hiển thị |
-| **Mức độ ưu tiên (Priority)** | Trung bình (Medium) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR10 | | |
-
----
-
-### 1.17 NHÓM UC-17: QUẢN LÝ CẤU HÌNH RED FLAG TEMPLATE (US-23 CRUD)
-
----
-
-#### 1.17.1 UC-17.1: Thêm dấu hiệu cảnh báo Red Flag (Create Red Flag Sign)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-17.1 | | |
-| **Tên Use Case (Use Case Name)** | Thêm dấu hiệu cảnh báo Red Flag (Create Red Flag Sign) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ thêm một dấu hiệu nguy hiểm (Red Flag) cho loại phẫu thuật, thiết lập mức độ cảnh báo, điều kiện kích hoạt, chỉ dẫn xử lý khẩn cấp và số điện thoại hotline. | | |
-| **Mục tiêu (Goal)** | Xác lập các tiêu chí nhận diện biến chứng nguy hiểm để bảo vệ an toàn cho bệnh nhân | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn “Thêm dấu hiệu Red Flag” trong tab Red Flag của Template. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Bác sĩ đang cấu hình Care Plan Template. | | |
-| **Điều kiện sau (Post-conditions)** | Dấu hiệu cảnh báo Red Flag mới được lưu vào cấu hình Template. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Thêm dấu hiệu Red Flag” | Hệ thống hiển thị biểu mẫu cấu hình dấu hiệu nguy hiểm |
-| | 2 | Bác sĩ chọn/nhập các thông tin cảnh báo:<br>- **Loại phẫu thuật**: Chọn loại phẫu thuật áp dụng (Phaco, Lác, LASIK/ICL, Cắt dịch kính...)<br>- **Tên dấu hiệu nguy hiểm**: Đau nhức dữ dội, Đột ngột mờ mắt, Chảy máu vết mổ...<br>- **Mức độ cảnh báo**: Cấp cứu khẩn cấp / Khám trong ngày<br>- **Điều kiện kích hoạt**: Từ câu trả lời Recovery Check bất thường hoặc do Caregiver tự báo cáo<br>- **Hướng dẫn xử lý ban đầu**: Các bước sơ cứu/hành động khẩn cấp cần thực hiện ngay<br>- **Số điện thoại hotline cấp cứu**: Đường dây nóng trực 24/7 của bệnh viện | Hệ thống kiểm tra tính đầy đủ và hợp lệ của thông tin cảnh báo |
-| | 3 | Bác sĩ nhấn “Lưu dấu hiệu Red Flag” | Hệ thống lưu cấu hình vào Template và hiển thị thông báo thành công |
-| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Thiếu số hotline cấp cứu** | 1 | Bác sĩ để trống số điện thoại khẩn cấp | Hệ thống báo lỗi: “Bắt buộc phải cấu hình số điện thoại khẩn cấp cho dấu hiệu Red Flag.” |
-| **Mức độ ưu tiên (Priority)** | Cao (High - Đặc biệt quan trọng) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR11 | | |
-
----
-
-#### 1.17.2 UC-17.2: Xem danh sách dấu hiệu cảnh báo Red Flag (View Red Flag Signs)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-17.2 | | |
-| **Tên Use Case (Use Case Name)** | Xem danh sách dấu hiệu cảnh báo Red Flag (View Red Flag Signs) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ xem danh mục toàn bộ các dấu hiệu cảnh báo Red Flag đã thiết lập cho loại phẫu thuật. | | |
-| **Mục tiêu (Goal)** | Kiểm tra và rà soát các dấu hiệu biến chứng được giám sát trong gói template | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ mở tab “Red Flag Template”. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Template đang mở trong hệ thống. | | |
-| **Điều kiện sau (Post-conditions)** | Bảng danh sách dấu hiệu Red Flag và hành động khẩn cấp được hiển thị. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ mở tab “Red Flag Template” | Hệ thống hiển thị bảng danh sách gồm: Tên dấu hiệu nguy hiểm, Mức độ cảnh báo, Điều kiện kích hoạt, Chỉ dẫn xử lý, Số hotline liên hệ |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR11 | | |
-
----
-
-#### 1.17.3 UC-17.3: Chỉnh sửa dấu hiệu cảnh báo Red Flag (Edit Red Flag Sign)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-17.3 | | |
-| **Tên Use Case (Use Case Name)** | Chỉnh sửa dấu hiệu cảnh báo Red Flag (Edit Red Flag Sign) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ cập nhật mô tả dấu hiệu, điều chỉnh hướng dẫn xử lý hoặc cập nhật số hotline cấp cứu của bệnh viện. | | |
-| **Mục tiêu (Goal)** | Đảm bảo thông tin cấp cứu và hướng dẫn xử lý luôn chính xác và cập nhật | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn nút “Sửa” tại dòng dấu hiệu Red Flag. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Dấu hiệu Red Flag tồn tại trong Template. | | |
-| **Điều kiện sau (Post-conditions)** | Thông số cập nhật của Red Flag được lưu vào hệ thống. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Sửa” tại dấu hiệu Red Flag | Hệ thống mở biểu mẫu chỉnh sửa thông số Red Flag |
-| | 2 | Bác sĩ cập nhật nội dung chỉ dẫn, số điện thoại hotline hoặc mức độ cảnh báo | Hệ thống kiểm tra tính hợp lệ dữ liệu |
-| | 3 | Bác sĩ nhấn “Lưu thay đổi” | Hệ thống lưu thông tin mới và thông báo cập nhật thành công |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR11 | | |
-
----
-
-#### 1.17.4 UC-17.4: Xóa dấu hiệu cảnh báo Red Flag (Delete Red Flag Sign)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-17.4 | | |
-| **Tên Use Case (Use Case Name)** | Xóa dấu hiệu cảnh báo Red Flag (Delete Red Flag Sign) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ xóa bỏ một tiêu chí Red Flag khỏi cấu hình của Template. | | |
-| **Mục tiêu (Goal)** | Điều chỉnh danh mục cảnh báo phù hợp với quy định chuyên môn | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn biểu tượng “Xóa” tại dòng dấu hiệu Red Flag. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Dấu hiệu Red Flag có trong danh sách. | | |
-| **Điều kiện sau (Post-conditions)** | Dấu hiệu bị loại bỏ khỏi cấu hình Red Flag của Template. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Xóa” tại dòng Red Flag | Hệ thống hiển thị hộp thoại xác nhận xóa |
-| | 2 | Bác sĩ nhấn “Xác nhận xóa” | Hệ thống xóa tiêu chí cảnh báo khỏi Template và thông báo thành công |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR11 | | |
-
----
-
-### 1.18 NHÓM UC-18: QUẢN LÝ CẤU HÌNH DO & DON'T TEMPLATE (CRUD)
-
----
-
-#### 1.18.1 UC-18.1: Thêm nội dung Nên làm / Cần tránh (Create Do & Don't Item)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-18.1 | | |
-| **Tên Use Case (Use Case Name)** | Thêm nội dung Nên làm / Cần tránh (Create Do & Don't Item) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ thêm một chỉ dẫn sinh hoạt vào danh mục NÊN LÀM (Do) hoặc CẦN TRÁNH (Don't) cho loại phẫu thuật, thiết lập mốc thời gian áp dụng và giải thích y khoa. | | |
-| **Mục tiêu (Goal)** | Thiết lập danh mục hướng dẫn sinh hoạt an toàn chuẩn hóa cho người chăm sóc | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn “Thêm việc Nên làm / Cần tránh” trong tab Do & Don't. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Bác sĩ đang cấu hình Care Plan Template. | | |
-| **Điều kiện sau (Post-conditions)** | Mục chỉ dẫn mới được bổ sung vào danh mục Do & Don't của Template. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Thêm chỉ dẫn Do/Don't” | Hệ thống hiển thị biểu mẫu tạo nội dung |
-| | 2 | Bác sĩ chọn/nhập các thông tin chỉ dẫn:<br>- **Loại phẫu thuật**: Chọn loại phẫu thuật áp dụng (Phaco, Lác, LASIK/ICL, Cắt dịch kính...)<br>- **Phân loại**: NÊN LÀM (Do) hoặc CẦN TRÁNH (Don't)<br>- **Nhóm sinh hoạt**: Vệ sinh, Vận động, Ăn uống, Giấc ngủ<br>- **Tiêu đề hành vi**: Ví dụ: “Đeo kính bảo vệ mắt khi ngủ”, “Không để nước dính vào mắt”...<br>- **Giải thích y tế**: Lý do và cơ sở lâm sàng<br>- **Thời gian áp dụng**: Ví dụ: 7 ngày đầu, 1 tháng đầu sau phẫu thuật | Hệ thống kiểm tra tính đầy đủ và hợp lệ của dữ liệu chỉ dẫn |
-| | 3 | Bác sĩ nhấn “Lưu chỉ dẫn” | Hệ thống lưu chỉ dẫn vào danh mục Do & Don't của Template |
-| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Thiếu phân loại Do hoặc Don't** | 1 | Bác sĩ không chọn loại hành vi là Do hay Don't | Hệ thống nhắc nhở chọn phân loại rõ ràng |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR22 | | |
-
----
-
-#### 1.18.2 UC-18.2: Xem danh sách nội dung Nên làm / Cần tránh (View Do & Don't Items)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-18.2 | | |
-| **Tên Use Case (Use Case Name)** | Xem danh sách nội dung Nên làm / Cần tránh (View Do & Don't Items) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ xem toàn bộ danh mục các việc Nên làm và Cần tránh đã thiết lập cho Template, phân loại theo nhóm sinh hoạt. | | |
-| **Mục tiêu (Goal)** | Kiểm tra tính đầy đủ của các khuyến cáo sinh hoạt hậu phẫu | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ mở tab “Do & Don't Template”. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Template đang mở trong hệ thống. | | |
-| **Điều kiện sau (Post-conditions)** | Danh sách các chỉ dẫn Do & Don't được kết xuất trực quan theo 2 nhóm màu Xanh / Đỏ. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ mở tab “Do & Don't Template” | Hệ thống hiển thị bảng danh sách phân thành 2 cột: Cột Xanh (Do - Việc nên làm) và Cột Đỏ (Don't - Việc cần tránh) kèm nhóm sinh hoạt và thời gian áp dụng |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR22 | | |
-
----
-
-#### 1.18.3 UC-18.3: Chỉnh sửa nội dung Nên làm / Cần tránh (Edit Do & Don't Item)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-18.3 | | |
-| **Tên Use Case (Use Case Name)** | Chỉnh sửa nội dung Nên làm / Cần tránh (Edit Do & Don't Item) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ chỉnh sửa câu từ, giải thích y khoa hoặc thời gian áp dụng của một việc Nên làm hoặc Cần tránh. | | |
-| **Mục tiêu (Goal)** | Cập nhật hướng dẫn sinh hoạt chính xác theo tiêu chuẩn điều trị mới | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn nút “Sửa” tại một mục Do hoặc Don't. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Mục chỉ dẫn tồn tại trong cấu hình. | | |
-| **Điều kiện sau (Post-conditions)** | Nội dung cập nhật được lưu vào Template. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Sửa” tại một mục Do/Don't | Hệ thống mở biểu mẫu chỉnh sửa nội dung |
-| | 2 | Bác sĩ cập nhật mô tả hướng dẫn hoặc thời gian áp dụng | Hệ thống kiểm tra dữ liệu |
-| | 3 | Bác sĩ nhấn “Lưu cập nhật” | Hệ thống lưu thay đổi và thông báo thành công |
-| **Mức độ ưu tiên (Priority)** | Trung bình (Medium) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR22 | | |
-
----
-
-#### 1.18.4 UC-18.4: Xóa nội dung Nên làm / Cần tránh (Delete Do & Don't Item)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-18.4 | | |
-| **Tên Use Case (Use Case Name)** | Xóa nội dung Nên làm / Cần tránh (Delete Do & Don't Item) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ loại bỏ một mục chỉ dẫn Do hoặc Don't khỏi danh mục của Template. | | |
-| **Mục tiêu (Goal)** | Tinh giản các chỉ dẫn không còn phù hợp với phác đồ điều trị | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn nút “Xóa” tại một mục Do hoặc Don't. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Mục chỉ dẫn có trong danh sách. | | |
-| **Điều kiện sau (Post-conditions)** | Mục chỉ dẫn bị loại bỏ khỏi Template. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Xóa” tại mục Do/Don't | Hệ thống hỏi xác nhận xóa |
-| | 2 | Bác sĩ xác nhận | Hệ thống xóa mục và cập nhật lại giao diện |
-| **Mức độ ưu tiên (Priority)** | Trung bình (Medium) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR22 | | |
-
----
-
-### 1.19 UC-19: Tạo và tùy biến Care Plan cho bệnh nhân (Create & Tailor Patient Care Plan)
-
-| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
-|---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-19 | | |
-| **Tên Use Case (Use Case Name)** | Tạo và tùy biến Care Plan cho bệnh nhân (Create & Tailor Patient Care Plan) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ khởi tạo Kế hoạch chăm sóc thực tế cho bệnh nhân bằng cách nhân bản từ Care Plan Template tương ứng với loại phẫu thuật, tùy chỉnh liều thuốc, lịch tái khám, và kích hoạt độc lập cho bệnh nhân. | | |
-| **Mục tiêu (Goal)** | Thiết lập kế hoạch chăm sóc cá nhân hóa, chính xác theo đơn thuốc thực tế của bệnh nhân mà không ảnh hưởng đến template gốc | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn “Tạo Care Plan” từ hồ sơ bệnh nhân. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | 1. Bác sĩ đã đăng nhập với vai trò DOCTOR.<br>2. Hồ sơ bệnh nhân đã tồn tại.<br>3. Có ít nhất một Care Plan Template đang Hoạt động (Active) cho loại phẫu thuật của bệnh nhân. | | |
-| **Điều kiện sau (Post-conditions)** | 1. Kế hoạch chăm sóc riêng của bệnh nhân được lưu với trạng thái `Active`.<br>2. Sẵn sàng tạo mã QR (UC-20).<br>3. Template gốc hoàn toàn không bị biến đổi. | | |
-| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Tạo Care Plan” trên hồ sơ bệnh nhân | Hệ thống lấy loại phẫu thuật của bệnh nhân (ví dụ: Phaco) và gợi ý Template đang hoạt động tương ứng |
-| | 2 | Bác sĩ chọn template được gợi ý | Hệ thống sao chép toàn bộ 5 thành phần con của template (Learning Path, Đơn thuốc, Recovery Check, Red Flag, Do & Don't) sang giao diện Kế hoạch chăm sóc riêng của bệnh nhân |
-| | 3 | Bác sĩ tùy chỉnh đơn thuốc theo đơn thực tế (thêm/bớt thuốc, chỉnh liều, thời điểm), thiết lập Lịch hẹn tái khám cụ thể (Ngày, giờ, bác sĩ phụ trách) | Hệ thống kiểm tra tính hợp lệ của các thông số tùy chỉnh |
-| | 4 | Bác sĩ nhấn “Kích hoạt Care Plan” | Hệ thống lưu Kế hoạch chăm sóc với trạng thái `Active`, thông báo thành công và hiển thị nút “Tạo mã QR cho bệnh nhân” |
+| | 1 | Điều dưỡng nhấn 'In Phiếu Xuất Viện' (SCR-DOC-11) | Hệ thống mở hộp thoại in với định dạng tối ưu khổ A5 ngang hoặc A4. |
+| | 2 | Điều dưỡng kiểm tra bản in mẫu và nhấn 'In ngay' | Máy in tại quầy in ra phiếu xuất viện sắc nét chứa mã QR ≥3x3 cm, thông tin bệnh nhân viết tắt, hướng dẫn quét và Hotline 0395 151 151 trong <3 giây. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **A1: Lưu bản nháp (Save as Draft)** | 1 | Bác sĩ chọn “Lưu bản nháp” thay vì Kích hoạt | Hệ thống lưu Care Plan với trạng thái `Draft` để hoàn thiện sau |
+| **A1: In thêm tem decal dán sổ khám bệnh** | 1 | Điều dưỡng chọn in tem decal QR | Hệ thống xuất lệnh in ra máy in tem dán trực tiếp lên sổ khám bệnh của bệnh nhân. |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Bệnh nhân đã có Care Plan Active** | 1 | Bệnh nhân đã có một Care Plan đang hoạt động cho đợt điều trị này | Hệ thống cảnh báo: “Bệnh nhân đã có một Care Plan đang hoạt động. Bạn có muốn lưu trữ kế hoạch cũ để kích hoạt kế hoạch mới không?” |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR18, BR19 | | |
-
-#### Quy tắc nghiệp vụ (Business Rules)
-| Mã BR | Tên Quy tắc Nghiệp vụ | Mô tả Quy tắc Nghiệp vụ |
-|---|---|---|
-| BR18 | Tính cô lập của Care Plan bệnh nhân | Mọi thay đổi và tùy chỉnh trên Care Plan của một bệnh nhân chỉ áp dụng riêng cho bệnh nhân đó, tuyệt đối không làm thay đổi Template gốc hoặc Care Plan của bệnh nhân khác. |
-| BR19 | Quy tắc duy nhất một Care Plan hoạt động | Trong một đợt điều trị, một bệnh nhân chỉ có tối đa một Kế hoạch chăm sóc ở trạng thái Hoạt động (Active) tại một thời điểm. |
+| **E1: Máy in mất kết nối hoặc kẹt giấy** | 1 | Lỗi phần cứng máy in | Hệ thống hiển thị nút 'In lại' và cho phép tải file PDF dự phòng. |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR4 (Quy chuẩn kích thước và độ phân giải in mã QR) | | |
 
 ---
 
-### 1.20 UC-20: Tạo mã QR cho bệnh nhân (Generate QR Code for Patient Care Plan)
+### UC-013: Cấp Lại hoặc Thu Hồi Mã QR Bàn Giao (QR Reissue & Revoke)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-20 | | |
-| **Tên Use Case (Use Case Name)** | Tạo mã QR cho bệnh nhân (Generate QR Code for Patient Care Plan) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Tác nhân chính: Bác sĩ (Doctor)<br>Tác nhân phụ: Caregiver, Bệnh nhân (Patient) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ sinh mã QR định danh bảo mật gắn với Kế hoạch chăm sóc đã kích hoạt của bệnh nhân để in hoặc tải file bàn giao cho người chăm sóc khi xuất viện. | | |
-| **Mục tiêu (Goal)** | Cung cấp phương thức liên kết vật lý - kỹ thuật số an toàn giúp Caregiver truy cập đúng Care Plan của bệnh nhân | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ nhấn nút “Tạo mã QR” trên Kế hoạch chăm sóc đã kích hoạt. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Kế hoạch chăm sóc của bệnh nhân đang ở trạng thái Hoạt động (Active). | | |
-| **Điều kiện sau (Post-conditions)** | Mã QR được tạo, lưu vào CSDL và kết xuất thành Phiếu hướng dẫn xuất viện có thể in ấn. | | |
+| **Mã Use Case (Use Case ID)** | **UC-013** | | |
+| **Tên Use Case (Use Case Name)** | Cấp Lại hoặc Thu Hồi Mã QR Bàn Giao (QR Reissue & Revoke) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-003 (Điều dưỡng), ACT-002 (Bác sĩ) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-001 (Caregiver) | | |
+| **Tính năng liên quan (Features)** | F-021, F-022 | | |
+| **Mô tả tóm tắt (Brief Description)** | Cho phép Điều dưỡng cấp lại mã QR mới, chuyển mã cũ sang trạng thái `REVOKED`, bảo đảm bệnh nhân luôn tuân thủ đúng đơn thuốc mới nhất. | | |
+| **Mục tiêu (Goal)** | Tạo mã QR mới thay thế khi bị mất phiếu hoặc khi Bác sĩ đổi phác đồ thuốc; tự động vô hiệu hóa mã cũ để ngăn ngừa sai sót. | | |
+| **Tác nhân kích hoạt (Trigger)** | Người nhà báo mất phiếu hoặc Bác sĩ điều chỉnh đơn thuốc hậu phẫu. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | Hồ sơ bệnh nhân đang có mã QR đang hoạt động. | | |
+| **Điều kiện sau (Post-conditions)** | 1. Mã QR cũ bị vô hiệu hóa (`REVOKED`).<br>2. Mã QR mới được sinh và in ra phiếu mới.<br>3. Caregiver đã liên kết nhận thông báo tự động. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ nhấn “Tạo mã QR” trên Care Plan Active | Hệ thống kiểm tra trạng thái Active, tạo chuỗi token mã hóa bảo mật gắn liền với ID Care Plan và lưu vào CSDL |
-| | 2 | Hệ thống hiển thị mẫu Phiếu hướng dẫn xuất viện có mã QR: Hình ảnh mã QR, Thông tin bệnh nhân, Bác sĩ điều trị, và 3 bước hướng dẫn Caregiver quét mã | Bác sĩ kiểm tra thông tin trên phiếu |
-| | 3 | Bác sĩ nhấn “In phiếu QR” hoặc “Tải file PDF/ảnh” | Hệ thống xuất lệnh in ra máy in hoặc tải file về máy; Bác sĩ bàn giao cho bệnh nhân/người chăm sóc |
+| | 1 | Điều dưỡng chọn hồ sơ bệnh nhân và nhấn 'Cấp lại mã QR' (SCR-DOC-11) | Hệ thống yêu cầu nhập lý do cấp lại (Mất phiếu / Đổi đơn thuốc / Lý do khác). |
+| | 2 | Điều dưỡng xác nhận thao tác | Hệ thống chuyển mã QR cũ sang `REVOKED`, sinh mã QR mới (UC-011), in phiếu mới (UC-012) và ghi nhật ký kiểm toán (F-024). |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **A1: Tạo lại mã QR khi bị mất** | 1 | Phiếu QR bị mất, Bác sĩ nhấn “Tạo lại mã QR” | Hệ thống thu hồi mã token QR cũ, cấp token mới và in lại phiếu mới |
+| Không có | - | Luồng thực hiện tuần tự không rẽ nhánh | - |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **E1: Care Plan chưa kích hoạt** | 1 | Cố tạo mã QR khi Care Plan còn ở trạng thái Draft | Hệ thống chặn tạo mã và thông báo: “Chỉ có thể tạo mã QR cho Kế hoạch chăm sóc đã được Kích hoạt (Active).” |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR20 | | |
-
-#### Quy tắc nghiệp vụ (Business Rules)
-| Mã BR | Tên Quy tắc Nghiệp vụ | Mô tả Quy tắc Nghiệp vụ |
-|---|---|---|
-| BR20 | Bảo mật và gắn kết mã QR | Mã QR chỉ được sinh cho các Kế hoạch chăm sóc ở trạng thái Active, phải chứa token mã hóa an toàn chống làm giả và duy trì nhật ký kiểm toán về bác sĩ phát hành cùng thời gian tạo. |
+| **E1: Quét lại mã cũ đã thu hồi** | 1 | Caregiver quét nhầm phiếu cũ bị hủy | Hệ thống từ chối truy cập và báo lỗi mã đã bị thu hồi do cấp mới (BR4). |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR4 (Tính duy nhất và thu hồi mã QR) | | |
 
 ---
 
-### 1.21 UC-21: Theo dõi Recovery Check của bệnh nhân (Monitor Patient Recovery Check)
+### UC-014: Xem Lịch Dùng Thuốc và Hướng Dẫn Nhỏ Mắt (Medication Schedule & Guide)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
-| **Mã Use Case (Use Case ID)** | UC-21 | | |
-| **Tên Use Case (Use Case Name)** | Theo dõi Recovery Check của bệnh nhân (Monitor Patient Recovery Check) | | |
-| **Người tạo (Created by)** | Đội ngũ BA | **Người cập nhật (Last updated by)** | Đội ngũ BA |
-| **Ngày tạo (Date Created)** | 11/09/2026 | **Ngày cập nhật (Date last updated)** | 11/09/2026 |
-| **Tác nhân (Actors)** | Bác sĩ (Doctor) | | |
-| **Mô tả tóm tắt (Brief Description)** | Bác sĩ theo dõi tiến trình hồi phục của các bệnh nhân qua các mốc Recovery Check do Caregiver nộp, xem chi tiết câu trả lời, nhận diện các câu trả lời bị đánh dấu bất thường hoặc Red Flag để can thiệp kịp thời. | | |
-| **Mục tiêu (Goal)** | Giám sát liên tục quá trình hồi phục tại nhà của bệnh nhân và chủ động xử lý biến chứng sớm | | |
-| **Tác nhân kích hoạt (Trigger)** | Bác sĩ truy cập mục “Theo dõi hồi phục” hoặc nhấn vào thông báo cảnh báo Recovery Check. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | Bác sĩ đã đăng nhập với vai trò DOCTOR; có bệnh nhân đã nộp kết quả Recovery Check. | | |
-| **Điều kiện sau (Post-conditions)** | Bác sĩ đã nắm bắt và xem xét chi tiết kết quả kiểm tra phục hồi của bệnh nhân. | | |
+| **Mã Use Case (Use Case ID)** | **UC-014** | | |
+| **Tên Use Case (Use Case Name)** | Xem Lịch Dùng Thuốc và Hướng Dẫn Nhỏ Mắt (Medication Schedule & Guide) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-001 (Caregiver) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-006 (Bệnh nhân) | | |
+| **Tính năng liên quan (Features)** | F-009, F-011 | | |
+| **Mô tả tóm tắt (Brief Description)** | Caregiver tra cứu lịch thuốc hàng ngày, nhận diện chính xác từng lọ thuốc và xem video hướng dẫn kỹ thuật kéo mi dưới không chạm đầu lọ. | | |
+| **Mục tiêu (Goal)** | Hiển thị cữ thuốc trong ngày theo dòng thời gian (Sáng, Trưa, Chiều, Tối), mắt áp dụng, số giọt, ảnh nhận diện và video hướng dẫn tra thuốc. | | |
+| **Tác nhân kích hoạt (Trigger)** | Caregiver mở tab 'Lịch Thuốc' trên ứng dụng di động (SCR-CG-09). | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | Caregiver đã liên kết với Care Plan đang hoạt động của bệnh nhân. | | |
+| **Điều kiện sau (Post-conditions)** | Danh sách thuốc được hiển thị rõ ràng, trực quan. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ vào màn hình Theo dõi phục hồi | Hệ thống hiển thị danh sách bệnh nhân được phân nhóm ưu tiên theo thứ tự an toàn lâm sàng: Cảnh báo Red Flag 🔴, Cần chú ý 🟡, Quá hạn kiểm tra 🟠 (Default to Unsafe - BR12), Bình thường 🟢, và Chưa đến hạn ⚪ |
-| | 2 | Bác sĩ chọn một bệnh nhân và bấm vào mốc kiểm tra (ví dụ: “Ngày 3”) | Hệ thống hiển thị phiếu kết quả gồm: Thời gian nộp, Danh sách câu hỏi và câu trả lời thực tế của Caregiver, và màu sắc đánh dấu các câu trả lời bất thường |
+| | 1 | Caregiver nhấn vào tab 'Lịch Thuốc' (SCR-CG-09) | Hệ thống hiển thị danh sách các cữ thuốc trong ngày phân theo Sáng (07:00), Trưa (11:30), Chiều (16:30), Tối (20:00). |
+| | 2 | Caregiver chạm vào một lọ thuốc để xem chi tiết | Hiển thị ảnh nhận diện vỏ lọ, số giọt cần nhỏ (1 giọt), mắt chỉ định (MP/MT), lưu ý lắc đều hỗn dịch. |
+| | 3 | Caregiver bấm 'Xem kỹ thuật nhỏ mắt' | Hệ thống hiển thị video ngắn (15–30s) minh họa thao tác kéo mi dưới vô trùng (F-011, BR7). |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **A1: Bác sĩ liên hệ Caregiver** | 1 | Khi phát hiện dấu hiệu bất thường hoặc Red Flag, Bác sĩ nhấn “Liên hệ Caregiver” | Hệ thống hiển thị số điện thoại của Caregiver kèm nút bấm gọi điện trực tiếp |
-| **A2: Lọc danh sách bệnh nhân** | 1 | Bác sĩ lọc theo Loại phẫu thuật, Khoảng thời gian hoặc Mức độ cảnh báo (kể cả lọc nhóm Quá hạn 🟠) | Hệ thống cập nhật danh sách hiển thị tương ứng |
-| **A3: Xử lý bệnh nhân quá hạn nộp bảng kiểm (Overdue Action)** | 1 | Với các ca bệnh nhân nằm trong nhóm Quá hạn 🟠 (> 4–6 giờ chưa nộp Recovery Check theo BR12), Bác sĩ bấm nút “Gọi nhắc Caregiver” trực tiếp cạnh tên bệnh nhân | Hệ thống khởi chạy cuộc gọi nhanh tới số điện thoại người chăm sóc, đồng thời ghi nhận mốc thời gian Bác sĩ đã gọi nhắc vào nhật ký theo dõi |
-| **Luồng ngoại lệ (Exception Flow)** | Không áp dụng | Không có luồng ngoại lệ | |
-| **Mức độ ưu tiên (Priority)** | Cao (High) | | |
-| **Quy tắc nghiệp vụ (Business Rule)** | BR12, BR21 | | |
-
-#### Quy tắc nghiệp vụ (Business Rules)
-| Mã BR | Tên Quy tắc Nghiệp vụ | Mô tả Quy tắc Nghiệp vụ |
-|---|---|---|
-| BR12 | Cơ chế xử lý quá hạn và cảnh báo leo thang Recovery Check (Default to Unsafe) | Tự động phân loại các ca quá hạn kiểm tra vào nhóm cảnh báo 🟠 trên Dashboard Bác sĩ, hỗ trợ nút gọi nhanh liên hệ Caregiver để ngăn ngừa tình trạng biến chứng không được phát hiện do quên nộp bảng kiểm. |
-| BR21 | Tự động phát hiện bất thường và phân loại lâm sàng | Hệ thống phải tự động gắn cờ cảnh báo đối với mọi lượt nộp Recovery Check có dấu hiệu bất thường hoặc thỏa mãn tiêu chí Red Flag, ưu tiên hiển thị ở vị trí trên cùng của Bảng điều khiển Bác sĩ. |
+| Không có | - | Luồng thực hiện tuần tự không rẽ nhánh | - |
+| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| **E1: Mạng yếu không tải được video** | 1 | Lỗi tải phương tiện truyền thông | Hệ thống tự động hiển thị ảnh tĩnh và hướng dẫn dạng chữ dự phòng. |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR7 (Nguồn gốc nội dung y khoa), BR20 (Phân định nhận diện thuốc trực quan) | | |
 
 ---
 
-## 2. Bảng Tổng Hợp Danh Mục Quy Tắc Nghiệp Vụ Toàn Hệ Thống (Master Business Rules Catalog)
+### UC-015: Xác Nhận Dùng Thuốc và Kích Hoạt Bộ Đếm Giãn Cách (Medication Confirmation & Buffer Timer)
 
-Bảng tổng hợp toàn bộ các Quy tắc Nghiệp vụ (Business Rules - BR) được thiết kế và thực thi xuyên suốt hai phân hệ Caregiver (Mobile App) và Bác sĩ (Doctor Web Portal), đảm bảo tính an toàn y khoa tuyệt đối, bảo mật dữ liệu và chuẩn hóa quy trình điều trị hậu phẫu nhãn khoa.
+| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
+|---|---|---|---|
+| **Mã Use Case (Use Case ID)** | **UC-015** | | |
+| **Tên Use Case (Use Case Name)** | Xác Nhận Dùng Thuốc và Kích Hoạt Bộ Đếm Giãn Cách (Medication Confirmation & Buffer Timer) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-001 (Caregiver) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-006 (Bệnh nhân) | | |
+| **Tính năng liên quan (Features)** | F-009, F-010 | | |
+| **Mô tả tóm tắt (Brief Description)** | Sau khi nhỏ lọ thứ nhất, Caregiver bấm xác nhận. Hệ thống tự động kích hoạt đồng hồ đếm ngược 10 phút (hoặc 5 phút), tạm khóa lọ thứ hai và báo chuông/rung khi hết giờ. | | |
+| **Mục tiêu (Goal)** | Ghi nhận cữ thuốc hoàn thành kèm timestamp đồng bộ; tự động đếm lùi 5–10 phút giữa 2 loại thuốc nhỏ mắt để chống rửa trôi thuốc. | | |
+| **Tác nhân kích hoạt (Trigger)** | Caregiver bấm nút 'Xác nhận đã nhỏ thuốc' trên thẻ thuốc. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | Cữ thuốc đang mở và chưa được xác nhận. | | |
+| **Điều kiện sau (Post-conditions)** | 1. Ghi nhận bản ghi dùng thuốc vào `patient_medication_logs`.<br>2. Kích hoạt bộ đếm thời gian giãn cách đệm (F-010).<br>3. Đồng bộ lên thiết bị của các Caregiver khác và Dashboard viện. | | |
+| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| | 1 | Caregiver bấm 'Xác nhận đã nhỏ thuốc' cho lọ thuốc thứ nhất | Hệ thống lưu timestamp, chuyển trạng thái thuốc sang `TAKEN` kèm tích xanh. |
+| | 2 | Nếu cữ thuốc có từ 2 lọ trở lên, hệ thống tự động kích hoạt Bộ đếm giãn cách 10 phút (hoặc 5 phút theo cấu hình) | Đồng hồ đếm lùi hiển thị hoạt ảnh trực quan; tạm khóa (disable) nút xác nhận lọ thứ hai kèm cảnh báo chống rửa trôi thuốc (BR23). |
+| | 3 | Khi đồng hồ đếm lùi về 00:00 | Hệ thống phát âm thanh chuông dịu và rung 3 nhịp, mở khóa nút xác nhận lọ thuốc thứ hai và thông báo đã sẵn sàng nhỏ tiếp (US-018). |
+| **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| **A1: Chỉ có 1 loại thuốc trong cữ** | 1 | Cữ dùng chỉ kê 1 loại thuốc đơn lẻ | Hệ thống đánh dấu hoàn tất cữ thuốc ngay mà không cần kích hoạt timer giãn cách. |
+| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| **E1: Người nhà khác đã bấm xác nhận trước đó** | 1 | Caregiver đồng hành đã nhỏ thuốc | Hệ thống hiển thị thông báo cữ thuốc đã được [Tên Caregiver] xác nhận lúc [Thời gian], tránh nhỏ trùng liều. |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR21 (Ghi nhận nhật ký tuân thủ thuốc), BR23 (Ràng buộc bộ đếm thời gian giãn cách đệm) | | |
 
-### 2.1 Bảng Ma Trận Quy Tắc Nghiệp Vụ (Master BR Matrix)
+---
 
-| Mã BR | Tên Quy Tắc Nghiệp Vụ | Phân Nhóm Nghiệp Vụ | Mô Tả Chi Tiết & Ràng Buộc Lâm Sàng / Hệ Thống | Phạm Vi Áp Dụng (Use Cases) | Màn Hình Liên Quan |
-|---|---|---|---|---|---|
-| **BR1** | Kiểm tra tính hợp lệ của số điện thoại | Xác thực & Định danh (Auth) | Xác thực định dạng số điện thoại chuẩn (10 chữ số, đầu số hợp lệ của các nhà mạng Việt Nam) trước khi kích hoạt quy trình sinh và gửi mã xác thực OTP qua SMS. | UC-01 | `SCR-CG-01` |
-| **BR2** | Xác thực mã OTP | Xác thực & Định danh (Auth) | Mã OTP bao gồm 6 chữ số ngẫu nhiên, chỉ có hiệu lực trong khoảng thời gian quy định (60–120 giây). Sau 3 lần nhập sai liên tiếp hoặc quá thời gian, mã OTP tự động vô hiệu hóa. | UC-01 | `SCR-CG-01` |
-| **BR3** | Phân quyền tài khoản Caregiver | Quản lý Người dùng & Phân quyền | Chỉ tài khoản người chăm sóc ở trạng thái Hoạt động (`status = 'ACTIVE'`) mới được xác thực thành công và phân quyền truy cập Kế hoạch chăm sóc (Care Plan) của bệnh nhân. | UC-01 | `SCR-CG-01`, `SCR-CG-02` |
-| **BR4** | Tính hợp lệ của mã QR liên kết | Liên kết Bệnh nhân & Care Plan | Mã QR in trên phiếu xuất viện phải chứa token mã hóa hợp lệ gắn với Kế hoạch chăm sóc đang ở trạng thái Hoạt động (`ACTIVE`). Nếu Care Plan đã đóng (`COMPLETED` hoặc `ARCHIVED`), hệ thống từ chối liên kết. | UC-02 | `SCR-CG-03` |
-| **BR5** | Tính toàn vẹn liên kết Caregiver - Bệnh nhân | Liên kết Bệnh nhân & Care Plan | Một Caregiver có thể chăm sóc nhiều bệnh nhân (ví dụ cả bố và mẹ), nhưng mỗi lượt quét QR phải hiển thị rõ thông tin xác nhận bệnh nhân và lưu nhật ký kiểm toán (Caregiver ID, Patient ID, thời gian liên kết). | UC-02 | `SCR-CG-03`, `SCR-CG-04` |
-| **BR6** | Phạm vi nội dung được cấp quyền | Quản lý Truy cập Nội dung | Caregiver chỉ được xem nội dung đào tạo (Learning Path), đơn thuốc, lịch tái khám và bảng kiểm phục hồi thuộc Kế hoạch chăm sóc của bệnh nhân đã được liên kết với mình; tuyệt đối không rò rỉ dữ liệu chéo giữa các bệnh nhân. | UC-03 | `SCR-CG-04`, `SCR-CG-05`, `SCR-CG-06` |
-| **BR7** | Nguồn gốc nội dung y khoa | Tiêu Chuẩn & An Toàn Y Khoa | Toàn bộ nội dung giáo dục, liều lượng thuốc, khoảng cách nhỏ thuốc và mốc theo dõi đều phải do Bác sĩ/Bệnh viện cấu hình hoặc phê duyệt. Hệ thống công nghệ tuyệt đối không tự động suy diễn, điều chỉnh liều hoặc sửa đổi khuyến nghị chuyên môn. | UC-03, UC-05, UC-06, Nhóm UC-14, Nhóm UC-15 | `SCR-CG-05`, `SCR-CG-08`, `SCR-CG-09`, `SCR-DOC-08` |
-| **BR8** | Hoàn thành bài kiểm tra không gây chặn chức năng | Đào tạo Caregiver (Academy) | Bộ 3 câu hỏi trắc nghiệm Mini Quiz ở cuối bài học Learning Path nhằm mục đích củng cố hiểu biết và đo lường mức độ tiếp thu của người chăm sóc; kết quả làm bài không làm khóa hay giới hạn bất kỳ quyền truy cập nào vào các tính năng chăm sóc bệnh nhân. | UC-03 | `SCR-CG-07` |
-| **BR9** | Bắt buộc hoàn thành bảng kiểm Recovery Check | Giám Sát Phục Hồi Hậu Phẫu | Caregiver bắt buộc phải trả lời đầy đủ 100% số câu hỏi (từ 3–5 câu) trong mốc khảo sát Recovery Check mới được phép bấm nộp kết quả lên hệ thống, đảm bảo không bỏ sót bất kỳ triệu chứng nhạy cảm nào. | UC-08, UC-16.1 | `SCR-CG-11` |
-| **BR10** | Giới hạn chẩn đoán và phân loại trạng thái lâm sàng | Giám Sát Phục Hồi Hậu Phẫu | Hệ thống chỉ đóng vai trò đối chiếu câu trả lời với các tiêu chí do Bác sĩ thiết lập sẵn để phân nhóm trạng thái (Bình thường 🟢, Cần chú ý 🟡, Red Flag 🔴); hệ thống tuyệt đối không tự đưa ra kết luận chẩn đoán bệnh lý thay Bác sĩ. | UC-08, Nhóm UC-16 | `SCR-CG-11`, `SCR-DOC-12` |
-| **BR11** | Ưu tiên quy trình hành động khẩn cấp (Emergency First) | Xử Lý Khẩn Cấp & Red Flag | Khi kích hoạt dấu hiệu Red Flag (từ bảng kiểm hoặc nút khẩn cấp), hệ thống lập tức chuyển thẳng sang màn hình Cấp cứu, hiển thị số hotline trực 24/7 và hướng dẫn xử trí tức thời; ưu tiên kết nối y tế khẩn cấp lên trên mọi tính năng tự chăm sóc khác. | UC-09, Nhóm UC-17 | `SCR-CG-12`, `SCR-DOC-12` |
-| **BR12** | Cơ chế xử lý quá hạn và cảnh báo leo thang Recovery Check (Default to Unsafe) | An Toàn Vận Hành & Fallback | Khi Caregiver không nộp bảng kiểm đúng hạn: Sau 2h gửi Push Notification lần 2 (âm báo ưu tiên cao); Sau 4–6h gửi tin nhắn dự phòng SMS/Zalo ZNS, tự động chuyển ca sang nhóm cảnh báo Quá hạn 🟠 (Default to Unsafe) trên Bảng giám sát Bác sĩ và mở nút "Gọi nhắc Caregiver" để chủ động can thiệp bằng điện thoại. | UC-08, UC-21 | `SCR-CG-11`, `SCR-DOC-12` |
-| **BR14** | Kiểm soát quyền truy cập của Bác sĩ (Doctor RBAC) | Quản trị & Phân quyền Bác sĩ | Chỉ các tài khoản đã được Quản trị viên bệnh viện chứng thực có vai trò `DOCTOR` và ở trạng thái Hoạt động (`status = 'ACTIVE'`) mới có quyền truy cập hồ sơ bệnh án, quản lý Master Template và bảng điều khiển theo dõi lâm sàng. | UC-11, Nhóm UC-12, Nhóm UC-13 | `SCR-DOC-01`, `SCR-DOC-02`, `SCR-DOC-07` |
-| **BR15** | Thông tin bệnh nhân bắt buộc | Quản Lý Hồ Sơ Bệnh Nhân | Hồ sơ bệnh nhân khởi tạo bắt buộc phải có đầy đủ: Họ và tên, Ngày sinh hoặc Tuổi, Giới tính, Số điện thoại, Chẩn đoán y khoa ban đầu và Loại ca phẫu thuật mắt áp dụng. | Nhóm UC-12 (UC-12.1, 12.4) | `SCR-DOC-04`, `SCR-DOC-06` |
-| **BR16** | Ràng buộc loại phẫu thuật của Care Plan Template | Cấu Hình Care Plan Template | Mỗi Care Plan Template chuẩn bắt buộc phải được gắn với duy nhất một loại phẫu thuật mắt chuyên khoa (Phaco, Lác, LASIK/ICL, Cắt dịch kính...), không cho phép tạo template chung chung không định danh phẫu thuật. | Nhóm UC-13 (UC-13.1, 13.4, 13.5) | `SCR-DOC-07`, `SCR-DOC-08` |
-| **BR17** | Tính độc lập và nguyên khối của Template | Cấu Hình Care Plan Template | Care Plan Template là một gói cấu hình chuẩn hóa nguyên khối. Mọi thao tác chỉnh sửa nội dung trên master template chỉ áp dụng cho các Kế hoạch chăm sóc tạo mới sau này; tuyệt đối không làm biến động hay thay đổi các Care Plan đang được áp dụng cho bệnh nhân trước đó. | Nhóm UC-13 (UC-13.4, 13.5) | `SCR-DOC-07`, `SCR-DOC-08` |
-| **BR18** | Tính cô lập của Care Plan bệnh nhân | Cá Nhân Hóa Điều Trị | Khi Bác sĩ tùy chỉnh đơn thuốc, lịch tái khám hay hướng dẫn riêng cho một bệnh nhân cụ thể, các thay đổi này chỉ lưu trong phạm vi Care Plan của bệnh nhân đó, hoàn toàn cô lập và không ảnh hưởng đến template mẫu hoặc bệnh nhân khác. | UC-19 | `SCR-DOC-10` |
-| **BR19** | Quy tắc duy nhất một Care Plan hoạt động | Cá Nhân Hóa Điều Trị | Trong một đợt phẫu thuật điều trị, mỗi bệnh nhân chỉ được phép có duy nhất một Kế hoạch chăm sóc ở trạng thái Hoạt động (`status = 'ACTIVE'`) tại cùng một thời điểm. | UC-19 | `SCR-DOC-10` |
-| **BR20** | Bảo mật và gắn kết mã QR | Liên Kết Kỹ Thuật Số | Mã QR chỉ được hệ thống sinh ra khi Kế hoạch chăm sóc đã được Bác sĩ kích hoạt (`ACTIVE`). Mã QR chứa token ngẫu nhiên mã hóa an toàn, liên kết chặt chẽ với ID Care Plan và được lưu vết kiểm toán đầy đủ. | UC-20 | `SCR-DOC-11` |
-| **BR21** | Tự động phát hiện bất thường và phân loại lâm sàng | Giám Sát Phục Hồi Hậu Phẫu | Mọi lượt nộp Recovery Check có cờ Cảnh báo Red Flag 🔴 hoặc Cần chú ý 🟡 phải được hệ thống tự động đẩy lên vị trí ưu tiên cao nhất trên Bảng giám sát Bác sĩ để Bác sĩ xử lý tức thời. | UC-21 | `SCR-DOC-12` |
-| **BR22** | Tính hiển thị trực quan danh mục Do & Don't | Hướng Dẫn Chăm Sóc | Danh mục hướng dẫn sinh hoạt bắt buộc phải phân tách bằng hai khối màu chuẩn trực quan: Màu Xanh lá cho việc NÊN LÀM (Do) và Màu Đỏ cảnh báo cho việc CẦN TRÁNH (Don't), kèm mốc thời gian kiêng cữ cụ thể. | UC-05, Nhóm UC-18 | `SCR-CG-08`, `SCR-DOC-08` |
-| **BR23** | Ràng buộc khoảng cách thời gian nhỏ mắt | Quản Lý Dùng Thuốc | Khi bệnh nhân có từ 2 loại thuốc nhỏ mắt trở lên trong cùng một cữ dùng, ứng dụng phải tự động kích hoạt bộ đếm thời gian giãn cách tối thiểu 5 phút giữa các lần nhỏ để tránh hiện tượng rửa trôi dược chất. | UC-06, UC-15.1 | `SCR-CG-09`, `SCR-DOC-08` |
-| **BR24** | Thời gian kích hoạt nhắc hẹn tái khám | Quản Lý Tái Khám | Hệ thống tự động gửi thông báo nhắc lịch tái khám đến thiết bị Caregiver theo 2 mốc tiêu chuẩn: Mốc 1 trước thời điểm hẹn 24 giờ và Mốc 2 trước thời điểm hẹn 2 giờ. | UC-07 | `SCR-CG-10` |
-| **BR25** | Ràng buộc xóa và lưu trữ hồ sơ bệnh nhân | Quản Lý Vòng Đời Dữ Liệu | Hồ sơ bệnh nhân đã phát sinh dữ liệu lâm sàng, liên kết Care Plan hoặc lịch sử nộp bảng kiểm chỉ được phép áp dụng cơ chế Xóa mềm / Lưu trữ (`status = 'ARCHIVED'`); nghiêm cấm xóa vĩnh viễn (Hard Delete) khỏi cơ sở dữ liệu y tế. | UC-12.5 | `SCR-DOC-03`, `SCR-DOC-05` |
+### UC-016: Xem Cẩm Nang 24h Đầu và Bảng Nên Làm / Cần Tránh (Critical 24h Guide & Do/Don't)
 
-### 2.2 Phân Loại BR Theo 6 Trụ Cột Nghiệp Vụ Chính
+| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
+|---|---|---|---|
+| **Mã Use Case (Use Case ID)** | **UC-016** | | |
+| **Tên Use Case (Use Case Name)** | Xem Cẩm Nang 24h Đầu và Bảng Nên Làm / Cần Tránh (Critical 24h Guide & Do/Don't) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-001 (Caregiver) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-006 (Bệnh nhân) | | |
+| **Tính năng liên quan (Features)** | F-012, F-013 | | |
+| **Mô tả tóm tắt (Brief Description)** | Caregiver xem cẩm nang sống còn 24h đầu để bảo vệ mép mổ và tra cứu bảng 2 cột màu sinh động hướng dẫn kiêng nước, không dụi mắt, tư thế ngủ. | | |
+| **Mục tiêu (Goal)** | Tra cứu tức thì các hành động cấp thiết trong 24h đầu sau mổ và danh mục sinh hoạt được phép (Nên làm - Xanh) / kiêng cữ (Cần tránh - Đỏ). | | |
+| **Tác nhân kích hoạt (Trigger)** | Caregiver chọn mục 'Cẩm nang 24h' hoặc 'Nên làm & Cần tránh' (SCR-CG-08). | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | Bệnh nhân đã liên kết Care Plan. | | |
+| **Điều kiện sau (Post-conditions)** | Hiển thị đầy đủ hướng dẫn sinh hoạt an toàn. | | |
+| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| | 1 | Caregiver mở mục Cẩm nang chăm sóc (SCR-CG-08) | Hệ thống hiển thị Cẩm nang 24h đầu: đeo kính bảo hộ, tư thế nằm ngửa/nghiêng mắt lành, dán khiên mắt khi ngủ, kiêng cúi đầu. |
+| | 2 | Caregiver chuyển sang tab 'Nên làm & Cần tránh' | Hệ thống hiển thị 2 cột màu trực quan: Cột Xanh (Nên làm) và Cột Đỏ (Tuyệt đối tránh) kèm icon và giải thích y khoa (BR22). |
+| | 3 | Caregiver chọn bộ lọc chủ đề sinh hoạt | Hệ thống lọc danh mục theo Vệ sinh cá nhân, Vận động, Ăn uống, Giấc ngủ. |
+| **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| Không có | - | Luồng thực hiện tuần tự không rẽ nhánh | - |
+| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| Không có | - | Không phát sinh ngoại lệ đặc thù | - |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR7 (Chuẩn y khoa VISI), BR22 (Hiển thị trực quan phân biệt 2 cột màu Do & Don't) | | |
 
-1. **Nhóm Xác thực & Định danh Người dùng:** `BR1`, `BR2`, `BR3`, `BR14`
-2. **Nhóm Liên kết Bệnh nhân & Bảo mật QR:** `BR4`, `BR5`, `BR20`
-3. **Nhóm An toàn Y khoa & Dùng thuốc Chuẩn hóa:** `BR6`, `BR7`, `BR8`, `BR22`, `BR23`, `BR24`
-4. **Nhóm Giám sát Phục hồi, Quá hạn & Khẩn cấp (Recovery & Emergency Core):** `BR9`, `BR10`, `BR11`, `BR12`, `BR21`
-5. **Nhóm Quản lý Master Template & Chuẩn hóa Phẫu thuật:** `BR16`, `BR17`
-6. **Nhóm Hồ sơ Bệnh nhân & Cá nhân hóa Care Plan:** `BR15`, `BR18`, `BR19`, `BR25`
+---
+
+### UC-017: Xem Lộ Trình Học Viện Caregiver - Infographic Tĩnh (Caregiver Micro-Academy)
+
+| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
+|---|---|---|---|
+| **Mã Use Case (Use Case ID)** | **UC-017** | | |
+| **Tên Use Case (Use Case Name)** | Xem Lộ Trình Học Viện Caregiver - Infographic Tĩnh (Caregiver Micro-Academy) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-001 (Caregiver) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-006 (Bệnh nhân) | | |
+| **Tính năng liên quan (Features)** | F-014 | | |
+| **Mô tả tóm tắt (Brief Description)** | Cung cấp thư viện đồ họa thông tin (Infographics) giải thích sinh lý phục hồi mắt mổ, giúp người nhà an tâm đồng hành. | | |
+| **Mục tiêu (Goal)** | Học tập kiến thức chăm sóc mắt qua các infographic trực quan tinh gọn theo tiến trình hồi phục; không bắt buộc làm bài kiểm tra quiz trong MVP. | | |
+| **Tác nhân kích hoạt (Trigger)** | Caregiver chọn mục 'Học Viện Caregiver' (SCR-CG-05, SCR-CG-06). | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | Caregiver đã đăng nhập ứng dụng. | | |
+| **Điều kiện sau (Post-conditions)** | Tiến trình xem bài học được ghi nhận. | | |
+| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| | 1 | Caregiver mở danh mục bài học Học Viện Caregiver (SCR-CG-05) | Hệ thống hiển thị danh sách các chủ đề kiến thức theo giai đoạn phục hồi (Day 1, Tuần 1, Tháng 1). |
+| | 2 | Caregiver chọn một chủ đề cần xem | Hệ thống hiển thị Infographic đồ họa tĩnh trực quan kèm văn bản tóm tắt tinh gọn. |
+| | 3 | Caregiver xem xong và nhấn 'Đã hiểu' | Hệ thống đánh dấu bài học hoàn thành mà không yêu cầu làm quiz trắc nghiệm (F-014). |
+| **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| Không có | - | Luồng thực hiện tuần tự không rẽ nhánh | - |
+| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| Không có | - | Không phát sinh ngoại lệ đặc thù | - |
+| **Mức độ ưu tiên (Priority)** | **P1** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR6 (Phạm vi nội dung được cấp quyền), BR7 (Nội dung chuẩn y khoa) | | |
+
+---
+
+### UC-018: Xem Lịch Tái Khám và Nhận Thông Báo Nhắc Hẹn (Follow-Up Tracker & Notifications)
+
+| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
+|---|---|---|---|
+| **Mã Use Case (Use Case ID)** | **UC-018** | | |
+| **Tên Use Case (Use Case Name)** | Xem Lịch Tái Khám và Nhận Thông Báo Nhắc Hẹn (Follow-Up Tracker & Notifications) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-001 (Caregiver) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-009 (SMS / ZNS Gateway), ACT-004 (CSKH) | | |
+| **Tính năng liên quan (Features)** | F-015, F-027 | | |
+| **Mô tả tóm tắt (Brief Description)** | Hệ thống hiển thị lộ trình tái khám, gửi thông báo nhắc hẹn trước 24h qua Push/SMS/ZNS và hỗ trợ Caregiver xác nhận hẹn khám. | | |
+| **Mục tiêu (Goal)** | Theo dõi 5 mốc tái khám chuẩn VISI (Day 1, 7, Month 1, 3, 6) và nhận thông báo nhắc lịch tự động trước 24 giờ. | | |
+| **Tác nhân kích hoạt (Trigger)** | Hệ thống tự động kích hoạt thông báo trước 24h hoặc Caregiver chủ động mở tab 'Lịch Tái Khám' (SCR-CG-10). | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | Care Plan đã tạo lịch tái khám theo 5 mốc chuẩn VISI. | | |
+| **Điều kiện sau (Post-conditions)** | Caregiver nắm rõ ngày giờ, địa chỉ chi nhánh khám và xác nhận cuộc hẹn. | | |
+| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| | 1 | Caregiver mở tab 'Lịch Tái Khám' (SCR-CG-10) | Hiển thị 5 mốc chuẩn: Ngày 1, Ngày 7, Tháng 1, Tháng 3, Tháng 6 kèm địa chỉ cơ sở VISI đã mổ. |
+| | 2 | Trước ngày khám 24 giờ, hệ thống gửi thông báo nhắc lịch tự động qua Push/SMS/Zalo (BR24) | Caregiver nhận thông báo kèm nút bấm xác nhận hẹn. |
+| | 3 | Caregiver nhấn 'Xác nhận sẽ đến khám' | Hệ thống cập nhật trạng thái hẹn `CONFIRMED` lên Dashboard viện. |
+| **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| **A1: Caregiver yêu cầu đổi giờ khám** | 1 | Caregiver bấm 'Yêu cầu hỗ trợ đổi giờ' | Thông tin chuyển về Dashboard CSKH (UC-021) để nhân viên liên hệ sắp xếp. |
+| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| Không có | - | Không phát sinh ngoại lệ đặc thù | - |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR24 (Thời gian kích hoạt thông báo nhắc hẹn trước 24 giờ) | | |
+
+---
+
+### UC-019: Thực Hiện Khảo Sát Đánh Giá Phục Hồi Định Kỳ (Submit Recovery Check Survey)
+
+| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
+|---|---|---|---|
+| **Mã Use Case (Use Case ID)** | **UC-019** | | |
+| **Tên Use Case (Use Case Name)** | Thực Hiện Khảo Sát Đánh Giá Phục Hồi Định Kỳ (Submit Recovery Check Survey) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-001 (Caregiver) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-006 (Bệnh nhân), ACT-002 (Bác sĩ) | | |
+| **Tính năng liên quan (Features)** | F-016 | | |
+| **Mô tả tóm tắt (Brief Description)** | Caregiver nộp bài kiểm tra ngắn về tình trạng mắt mổ (đau, mờ, đỏ, chảy dịch). Hệ thống phân loại nguy cơ tức thì. | | |
+| **Mục tiêu (Goal)** | Trả lời 3–5 câu hỏi sàng lọc định kỳ mỗi sáng trong 7 ngày đầu để hệ thống tự động phân loại 3 mức: Xanh (Bình thường), Vàng (Chú ý), Đỏ (Nguy hiểm). | | |
+| **Tác nhân kích hoạt (Trigger)** | Hệ thống thông báo lúc 08:00 sáng hoặc Caregiver mở màn hình Recovery Check (SCR-CG-11). | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | Bệnh nhân đang trong mốc theo dõi khảo sát. | | |
+| **Điều kiện sau (Post-conditions)** | 1. Câu trả lời được lưu vào `recovery_check_submissions`.<br>2. Phân loại trạng thái Xanh/Vàng/Đỏ.<br>3. Điều hướng an tâm hoặc kích hoạt cấp cứu Red Flag. | | |
+| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| | 1 | Caregiver mở bảng kiểm Recovery Check (SCR-CG-11) | Hệ thống hiển thị 3–5 câu hỏi trắc nghiệm phù hợp với ngày hồi phục của bệnh nhân (BR9). |
+| | 2 | Caregiver chọn câu trả lời cho từng câu hỏi và nhấn 'Gửi đánh giá' | Hệ thống kiểm tra đã trả lời đủ câu; đối chiếu với ma trận tiêu chí phân loại lâm sàng (BR10). |
+| | 3 | Nếu kết quả bình thường (Mức Xanh) | Hệ thống hiển thị thông điệp phản hồi an tâm (US-025) và cập nhật tiến trình ổn định lên Dashboard. |
+| **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| **A1: Kết quả ở Mức Vàng (Cần chú ý)** | 1 | Phát hiện triệu chứng nhẹ (cộm xốn, mắt hơi đỏ) | Hệ thống đưa ra hướng dẫn theo dõi đặc thù và đánh dấu cờ vàng trên Dashboard để CSKH lưu ý. |
+| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| **E1: Phát hiện dấu hiệu Mức Đỏ (Red Flag)** | 1 | Xuất hiện triệu chứng nguy hiểm (đau dữ dội, mờ đột ngột) | Hệ thống lập tức kích hoạt luồng Cảnh báo Đỏ khẩn cấp (UC-020). |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR9 (Bắt buộc trả lời đủ câu hỏi), BR10 (Phân loại 3 mức Xanh/Vàng/Đỏ) | | |
+
+---
+
+### UC-020: Kích Hoạt Xử Lý Biến Chứng Báo Động Đỏ (Red Flag Emergency Action)
+
+| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
+|---|---|---|---|
+| **Mã Use Case (Use Case ID)** | **UC-020** | | |
+| **Tên Use Case (Use Case Name)** | Kích Hoạt Xử Lý Biến Chứng Báo Động Đỏ (Red Flag Emergency Action) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-001 (Caregiver) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-004 (CSKH), ACT-008 (Cấp cứu ngoại viện) | | |
+| **Tính năng liên quan (Features)** | F-017 | | |
+| **Mô tả tóm tắt (Brief Description)** | Khi phát hiện dấu hiệu nguy cấp từ Recovery Check hoặc Caregiver bấm nút khẩn cấp, hệ thống hướng dẫn sơ cứu tức thì và hỗ trợ gọi cấp cứu trong khung giờ vàng. | | |
+| **Mục tiêu (Goal)** | Chuyển giao diện khẩn cấp toàn màn hình, cung cấp nút gọi 1 chạm đến Hotline VISI 0395 151 151 và đẩy tín hiệu báo động khẩn lên Dashboard viện. | | |
+| **Tác nhân kích hoạt (Trigger)** | Recovery Check phát hiện triệu chứng nguy hiểm hoặc Caregiver nhấn 'Báo động đỏ khẩn cấp'. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | Caregiver đang sử dụng ứng dụng. | | |
+| **Điều kiện sau (Post-conditions)** | 1. Tạo bản ghi sự kiện trong `emergency_alert_events`.<br>2. Bắn tín hiệu WebSocket báo động lên Dashboard viện.<br>3. Màn hình người dùng ở chế độ khẩn cấp. | | |
+| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| | 1 | Hệ thống phát hiện điều kiện Red Flag | Lập tức chuyển giao diện ứng dụng sang màn hình Cảnh báo Đỏ toàn màn hình (SCR-CG-12) (BR11). |
+| | 2 | Màn hình hiển thị nút gọi lớn 1 chạm: 'GỌI NGAY HOTLINE VISI: 0395 151 151' kèm chỉ dẫn sơ cứu (dán khiên mắt, không nhỏ thêm thuốc, đến viện ngay) | Caregiver bấm nút gọi; điện thoại tự động kết nối cuộc gọi cấp cứu tới tổng đài VISI. |
+| | 3 | Hệ thống đồng thời phát chuông báo động đỏ trên Dashboard trạm viện (UC-022) | Khởi động đồng hồ SLA cam kết can thiệp <5 phút của CSKH. |
+| **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| **A1: Ngoài giờ làm việc viện / Bệnh nhân ở xa** | 1 | Bệnh nhân không kịp đến cơ sở VISI | Hệ thống hiển thị thêm địa chỉ cơ sở cấp cứu đa khoa gần nhất (ACT-008). |
+| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| Không có | - | Không phát sinh ngoại lệ đặc thù | - |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR10 (Quy chuẩn kích hoạt Red Flag), BR11 (Ưu tiên quy trình hành động cấp cứu) | | |
+
+---
+
+### UC-021: Giám Sát Dashboard Phục Hồi Bệnh Nhân Tập Trung (Clinical Monitoring Dashboard)
+
+| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
+|---|---|---|---|
+| **Mã Use Case (Use Case ID)** | **UC-021** | | |
+| **Tên Use Case (Use Case Name)** | Giám Sát Dashboard Phục Hồi Bệnh Nhân Tập Trung (Clinical Monitoring Dashboard) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-004 (CSKH / Medical Monitor), ACT-003 (Điều dưỡng) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-002 (Bác sĩ điều trị) | | |
+| **Tính năng liên quan (Features)** | F-018 | | |
+| **Mô tả tóm tắt (Brief Description)** | Giao diện quản lý tập trung cho phép CSKH và Điều dưỡng theo dõi sát sao tình trạng hồi phục, lọc ca nguy cơ và phối hợp xử lý. | | |
+| **Mục tiêu (Goal)** | Theo dõi danh sách toàn bộ bệnh nhân của cơ sở theo trạng thái tuân thủ dùng thuốc và mức độ phục hồi trên Dashboard thời gian thực. | | |
+| **Tác nhân kích hoạt (Trigger)** | Nhân viên CSKH hoặc Điều dưỡng đăng nhập Dashboard quản trị chi nhánh (SCR-DOC-12). | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | Nhân viên đã đăng nhập tài khoản hợp lệ của cơ sở bệnh viện. | | |
+| **Điều kiện sau (Post-conditions)** | Bảng dữ liệu giám sát thời gian thực được kết xuất. | | |
+| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| | 1 | CSKH mở Dashboard Giám sát phục hồi (SCR-DOC-12) | Hệ thống kết xuất danh sách bệnh nhân xuất viện thuộc chi nhánh. |
+| | 2 | Danh sách hiển thị phân tầng: Ca Đỏ (Red Flag) ghim trên cùng -> Ca Vàng (Chú ý) -> Ca Xanh (Ổn định) | Hiển thị tỷ lệ uống thuốc đúng giờ, tình trạng nộp Recovery Check của từng bệnh nhân. |
+| | 3 | Nhân viên sử dụng bộ lọc theo Bác sĩ mổ, Loại phẫu thuật, Ngày xuất viện | Hệ thống lọc và cập nhật danh sách tức thì. |
+| **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| **A1: Bác sĩ tra cứu biểu đồ phục hồi khi tái khám (US-030)** | 1 | Bác sĩ mở hồ sơ bệnh nhân đang ngồi khám | Hệ thống hiển thị dòng thời gian tuân thủ thuốc và các ghi nhận triệu chứng tại nhà. |
+| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| Không có | - | Không phát sinh ngoại lệ đặc thù | - |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR14 (Kiểm soát truy cập nhân viên), BR15 (Phân vùng dữ liệu theo chi nhánh) | | |
+
+---
+
+### UC-022: Tiếp Nhận, Phân Loại và Điều Phối Cảnh Báo Red Flag (Alert Triaging & Status Handling)
+
+| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
+|---|---|---|---|
+| **Mã Use Case (Use Case ID)** | **UC-022** | | |
+| **Tên Use Case (Use Case Name)** | Tiếp Nhận, Phân Loại và Điều Phối Cảnh Báo Red Flag (Alert Triaging & Status Handling) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-004 (CSKH / Medical Monitor) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-002 (Bác sĩ trực), ACT-001 (Caregiver) | | |
+| **Tính năng liên quan (Features)** | F-019 | | |
+| **Mô tả tóm tắt (Brief Description)** | CSKH tiếp nhận sự kiện báo động đỏ phát chuông trên Dashboard, nhận ca, gọi điện thoại hỗ trợ chuyên môn và phối hợp Bác sĩ. | | |
+| **Mục tiêu (Goal)** | Tiếp nhận ca cảnh báo đỏ, chuyển trạng thái xử lý, gọi điện can thiệp khẩn cấp trong cam kết SLA dưới 5 phút. | | |
+| **Tác nhân kích hoạt (Trigger)** | Dashboard nhận tín hiệu Red Flag thời gian thực từ ứng dụng bệnh nhân. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | Dashboard CSKH đang ở chế độ trực. | | |
+| **Điều kiện sau (Post-conditions)** | Ca bệnh chuyển trạng thái `IN_PROGRESS`, thực hiện cuộc gọi can thiệp lâm sàng. | | |
+| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| | 1 | Dashboard phát chuông báo động lớn và ghim ca Red Flag lên đầu danh sách | CSKH bấm nút 'Tiếp nhận ca' trên thẻ bệnh nhân. |
+| | 2 | Hệ thống chuyển trạng thái ca sang `IN_PROGRESS` và dừng chuông báo | Giao diện mở thông tin liên hệ Caregiver, tiền sử mổ và triệu chứng nguy cấp vừa ghi nhận. |
+| | 3 | CSKH gọi điện thoại ngay cho Caregiver trong <5 phút (BR12) | Thực hiện tư vấn y tế, hướng dẫn sơ cứu và kết nối bác sĩ nếu cần thiết. |
+| **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| **A1: Cuộc gọi không có người nhấc máy** | 1 | CSKH gọi lần 1 không liên lạc được | Hệ thống đếm thời gian gọi lại sau 2 phút và gửi tin nhắn SMS khẩn cấp tới số điện thoại dự phòng. |
+| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| **E1: Quá 15 phút chưa được tiếp nhận xử lý** | 1 | Nhân viên trực bận hoặc bỏ lỡ cảnh báo | Hệ thống tự động kích hoạt luồng leo thang cảnh báo (UC-022b). |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR12 (Quy chuẩn thời gian phản hồi SLA Red Flag <5 phút) | | |
+
+---
+
+### UC-022b: Tự Động Leo Thang Cảnh Báo Red Flag Chưa Xử Lý (Automated Alert Escalation)
+
+| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
+|---|---|---|---|
+| **Mã Use Case (Use Case ID)** | **UC-022b** | | |
+| **Tên Use Case (Use Case Name)** | Tự Động Leo Thang Cảnh Báo Red Flag Chưa Xử Lý (Automated Alert Escalation) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-007 (System / Admin) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-004 (CSKH), ACT-002 (Bác sĩ trực) | | |
+| **Tính năng liên quan (Features)** | F-019 | | |
+| **Mô tả tóm tắt (Brief Description)** | Cơ chế bảo vệ an toàn tối thượng chống bỏ sót tai biến y khoa ngoài viện; tự động leo thang khi vi phạm cam kết SLA. | | |
+| **Mục tiêu (Goal)** | Tự động phát chuông cấp độ 2 và gửi tin nhắn khẩn cấp lên Bác sĩ trực/Lãnh đạo cơ sở nếu ca đỏ chưa được xử lý sau 15 phút. | | |
+| **Tác nhân kích hoạt (Trigger)** | Hệ thống kiểm tra định kỳ phát hiện sự kiện Red Flag tồn tại quá 15 phút ở trạng thái `NEW` hoặc chưa có cuộc gọi ghi nhận. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | Sự kiện Red Flag đã phát sinh quá 15 phút. | | |
+| **Điều kiện sau (Post-conditions)** | 1. Trạng thái ca chuyển sang `ESCALATED_OVERDUE`.<br>2. Gửi tin nhắn SMS khẩn cấp đến Bác sĩ trực và Trưởng cơ sở.<br>3. Ghi vết vi phạm vào Audit Log. | | |
+| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| | 1 | Bộ giám sát hệ thống phát hiện ca Red Flag quá hạn 15 phút | Kích hoạt quy trình leo thang cấp độ 2. |
+| | 2 | Hệ thống đổi trạng thái ca bệnh sang `ESCALATED_OVERDUE` và phát chuông cấp độ 2 trên toàn bộ máy trạm chi nhánh | Gọi dịch vụ SMS Gateway gửi tin nhắn khẩn cấp tới Bác sĩ trực cơ sở và Trưởng phòng Chuyên môn. |
+| | 3 | Bác sĩ trực tiếp nhận ca và trực tiếp gọi điện can thiệp cho bệnh nhân | Ghi nhận nhật ký xử lý khẩn cấp. |
+| **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| Không có | - | Luồng thực hiện tuần tự không rẽ nhánh | - |
+| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| Không có | - | Không phát sinh ngoại lệ đặc thù | - |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR12 (Cơ chế leo thang cảnh báo quá hạn 15 phút) | | |
+
+---
+
+### UC-023: Ghi Nhận Nhật Ký Cuộc Gọi và Can Thiệp Lâm Sàng (Call & Clinical Action Logging)
+
+| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
+|---|---|---|---|
+| **Mã Use Case (Use Case ID)** | **UC-023** | | |
+| **Tên Use Case (Use Case Name)** | Ghi Nhận Nhật Ký Cuộc Gọi và Can Thiệp Lâm Sàng (Call & Clinical Action Logging) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-004 (CSKH), ACT-003 (Điều dưỡng) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-002 (Bác sĩ điều trị) | | |
+| **Tính năng liên quan (Features)** | F-020 | | |
+| **Mô tả tóm tắt (Brief Description)** | CSKH hoặc Điều dưỡng ghi nhận nội dung cuộc gọi hỗ trợ: thời gian, người nghe máy, tình trạng thực tế và kết luận can thiệp. | | |
+| **Mục tiêu (Goal)** | Ghi nhận chi tiết kết quả cuộc gọi tư vấn, lời dặn y tế và trạng thái bệnh nhân vào hồ sơ điện tử. | | |
+| **Tác nhân kích hoạt (Trigger)** | CSKH kết thúc cuộc gọi điện thoại hỗ trợ bệnh nhân. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | Ca bệnh đang ở trạng thái `IN_PROGRESS`. | | |
+| **Điều kiện sau (Post-conditions)** | 1. Lưu bản ghi vào `call_intervention_logs`.<br>2. Cập nhật trạng thái ca bệnh sang `RESOLVED` hoặc `TRANSFERRED_TO_DOCTOR`. | | |
+| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| | 1 | CSKH nhấn 'Ghi nhận kết quả cuộc gọi' trên thẻ ca bệnh | Mở form ghi nhật ký cuộc gọi tích hợp. |
+| | 2 | CSKH nhập: Thời lượng gọi, Người tiếp nhận (Caregiver/Bệnh nhân), Tình trạng ghi nhận thực tế, Hướng can thiệp (Đã hướng dẫn kiêng cữ / Đã hẹn khám khẩn cấp / Đã chuyển Bác sĩ) | Hệ thống lưu bản ghi vào `call_intervention_logs`. |
+| | 3 | CSKH chọn trạng thái kết thúc: 'Đã giải quyết an toàn' (RESOLVED) | Hệ thống đóng cảnh báo, cập nhật màu thẻ về trạng thái an toàn và lưu vết kiểm toán. |
+| **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| Không có | - | Luồng thực hiện tuần tự không rẽ nhánh | - |
+| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| Không có | - | Không phát sinh ngoại lệ đặc thù | - |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR12 (Quy định lưu vết can thiệp lâm sàng) | | |
+
+---
+
+### UC-024: Tra Cứu Tình Huống Chăm Sóc Khẩn Cấp - FAQ Lâm Sàng (Contextual Care Quick-Links)
+
+| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
+|---|---|---|---|
+| **Mã Use Case (Use Case ID)** | **UC-024** | | |
+| **Tên Use Case (Use Case Name)** | Tra Cứu Tình Huống Chăm Sóc Khẩn Cấp - FAQ Lâm Sàng (Contextual Care Quick-Links) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-001 (Caregiver) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-006 (Bệnh nhân) | | |
+| **Tính năng liên quan (Features)** | F-028 | | |
+| **Mô tả tóm tắt (Brief Description)** | Menu tra cứu nhanh giúp người nhà tự xử lý đúng cách các tình huống giật mình thường ngày mà không hoảng sợ. | | |
+| **Mục tiêu (Goal)** | Tra cứu nhanh chỉ dẫn chuẩn y khoa theo tình huống thường gặp tại nhà (dính nước, quên nhỏ thuốc, cộm xốn, vô tình dụi mắt). | | |
+| **Tác nhân kích hoạt (Trigger)** | Caregiver chọn menu 'Hỏi đáp khẩn cấp & Tình huống thường gặp' trên ứng dụng. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | Caregiver đã đăng nhập ứng dụng. | | |
+| **Điều kiện sau (Post-conditions)** | Hiển thị câu trả lời y khoa chuẩn do Bác sĩ VISI kiểm duyệt sẵn. | | |
+| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| | 1 | Caregiver mở mục FAQ tình huống khẩn cấp | Hệ thống hiển thị danh sách các tình huống hay gặp nhất: 'Dính nước vào mắt', 'Quên nhỏ thuốc 1 cữ', 'Vô tình chạm tay vào mắt', 'Mắt chảy nước mắt liên tục'. |
+| | 2 | Caregiver chọn một tình huống (ví dụ: 'Dính nước máy vào mắt') | Hệ thống hiển thị chỉ dẫn 3 bước: (1) Nhắm mắt nhẹ nhàng, không dụi; (2) Dùng gạc sạch thấm khô mi; (3) Nhỏ ngay 1 giọt kháng sinh chỉ định và theo dõi. |
+| | 3 | Hiển thị nút 'Vẫn lo lắng? Gọi Hotline VISI 0395 151 151' | Hỗ trợ kết nối nhân viên y tế nếu người nhà vẫn chưa an tâm. |
+| **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| Không có | - | Luồng thực hiện tuần tự không rẽ nhánh | - |
+| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| Không có | - | Không phát sinh ngoại lệ đặc thù | - |
+| **Mức độ ưu tiên (Priority)** | **P1** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR7 (Chuẩn y khoa đã được kiểm duyệt) | | |
+
+---
+
+### UC-025: Kích Hoạt Chế Độ Trợ Năng Nhãn Khoa (Ophthalmic Accessibility Mode)
+
+| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
+|---|---|---|---|
+| **Mã Use Case (Use Case ID)** | **UC-025** | | |
+| **Tên Use Case (Use Case Name)** | Kích Hoạt Chế Độ Trợ Năng Nhãn Khoa (Ophthalmic Accessibility Mode) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-006 (Bệnh nhân), ACT-001 (Caregiver) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| Không có | | |
+| **Tính năng liên quan (Features)** | F-026 | | |
+| **Mô tả tóm tắt (Brief Description)** | Tối ưu trải nghiệm cho bệnh nhân lớn tuổi sau mổ mắt thị lực còn mờ, hỗ trợ tự nghe lịch thuốc qua giọng đọc tiếng Việt. | | |
+| **Mục tiêu (Goal)** | Chuyển giao diện sang chữ lớn (≥18pt), tương phản cao High Contrast và bật tính năng Audio Guide đọc tiếng Việt. | | |
+| **Tác nhân kích hoạt (Trigger)** | Bệnh nhân hoặc Caregiver nhấn biểu tượng 'Trợ Năng Mắt' trên thanh tiêu đề. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | Ứng dụng đang mở trên trình duyệt di động. | | |
+| **Điều kiện sau (Post-conditions)** | Giao diện chuyển đổi sang chế độ trợ năng nhãn khoa. | | |
+| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| | 1 | Người dùng nhấn bật công tắc 'Chế độ Trợ Năng Mắt' | Hệ thống áp dụng bộ CSS trợ năng: cỡ chữ tăng lên ≥18pt, tiêu đề ≥24pt, độ tương phản nền đen chữ vàng đạt chuẩn WCAG AAA, nút bấm mở rộng ≥48px. |
+| | 2 | Người dùng chạm vào một cữ thuốc trong ngày | Hệ thống tự động phát âm thanh Text-to-Speech (TTS) đọc rõ: 'Cữ thuốc sáng: nhỏ 1 giọt Cravit vào mắt phải'. |
+| | 3 | Người dùng có thể tắt chế độ trợ năng bất cứ lúc nào | Giao diện trở về chế độ tiêu chuẩn. |
+| **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| Không có | - | Luồng thực hiện tuần tự không rẽ nhánh | - |
+| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| Không có | - | Không phát sinh ngoại lệ đặc thù | - |
+| **Mức độ ưu tiên (Priority)** | **P1** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR6 (Phân quyền truy cập trợ năng) | | |
+
+---
+
+### UC-026: Quản Lý Tài Khoản Nhân Viên và Phân Quyền Cơ Sở (Multi-Branch Staff RBAC)
+
+| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
+|---|---|---|---|
+| **Mã Use Case (Use Case ID)** | **UC-026** | | |
+| **Tên Use Case (Use Case Name)** | Quản Lý Tài Khoản Nhân Viên và Phân Quyền Cơ Sở (Multi-Branch Staff RBAC) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-007 (Quản trị viên hệ thống) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-002, ACT-003, ACT-004 | | |
+| **Tính năng liên quan (Features)** | F-023 | | |
+| **Mô tả tóm tắt (Brief Description)** | Quản trị viên quản lý danh mục tài khoản nhân viên y tế, gán quyền và đảm bảo phân tách dữ liệu an toàn giữa các bệnh viện trong chuỗi. | | |
+| **Mục tiêu (Goal)** | Khởi tạo tài khoản và phân quyền truy cập nghiêm ngặt theo vai trò và cơ sở trực thuộc chuỗi 5 bệnh viện VISI. | | |
+| **Tác nhân kích hoạt (Trigger)** | Quản trị viên truy cập module Phân quyền & Nhân sự. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | Quản trị viên hệ thống đã xác thực tài khoản cấp cao. | | |
+| **Điều kiện sau (Post-conditions)** | Tài khoản nhân viên được tạo mới, cập nhật hoặc vô hiệu hóa. | | |
+| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| | 1 | Quản trị viên chọn 'Thêm tài khoản nhân viên mới' | Mở form nhập thông tin định danh nhân sự. |
+| | 2 | Quản trị viên nhập thông tin, chọn vai trò (`DOCTOR`, `NURSE`, `CSKH`, `GCMO`) và chọn Chi nhánh bệnh viện (VISI Thủ Đức, VISI Bình Dương, v.v.) | Hệ thống kiểm tra tính duy nhất của email/mã nhân viên. |
+| | 3 | Quản trị viên nhấn 'Kích hoạt tài khoản' | Hệ thống cấp tài khoản, gửi thông tin mật khẩu tạm và kích hoạt chính sách phân quyền cơ sở (BR15). |
+| **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| **A1: Khóa tài khoản nhân viên chuyển công tác** | 1 | Nhân viên nghỉ việc hoặc điều chuyển | Quản trị viên chuyển trạng thái tài khoản sang `DEACTIVATED`, thu hồi toàn bộ quyền truy cập tức thì. |
+| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| Không có | - | Không phát sinh ngoại lệ đặc thù | - |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR14 (Phân quyền RBAC), BR15 (Phân tách phạm vi dữ liệu theo cơ sở bệnh viện) | | |
+
+---
+
+### UC-027: Tra Cứu Nhật Ký Kiểm Toán Hệ Thống (Audit Trail & Compliance Logging)
+
+| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
+|---|---|---|---|
+| **Mã Use Case (Use Case ID)** | **UC-027** | | |
+| **Tên Use Case (Use Case Name)** | Tra Cứu Nhật Ký Kiểm Toán Hệ Thống (Audit Trail & Compliance Logging) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-007 (Quản trị viên hệ thống) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| Ban Giám Đốc (CEO, COO) | | |
+| **Tính năng liên quan (Features)** | F-024 | | |
+| **Mô tả tóm tắt (Brief Description)** | Hệ thống ghi vết bất biến mọi hành vi can thiệp vào Care Plan, in QR, sửa đơn thuốc, nộp khảo sát, tiếp nhận Red Flag. | | |
+| **Mục tiêu (Goal)** | Truy vấn và kết xuất nhật ký thao tác lâm sàng phục vụ kiểm tra an toàn thông tin, bảo mật dữ liệu và pháp lý y khoa. | | |
+| **Tác nhân kích hoạt (Trigger)** | Quản trị viên hoặc Ban Giám Đốc mở module Nhật ký kiểm toán. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | Tài khoản có quyền kiểm toán cấp hệ thống. | | |
+| **Điều kiện sau (Post-conditions)** | Báo cáo kiểm toán được kết xuất phục vụ thanh tra. | | |
+| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| | 1 | Quản trị viên mở màn hình Tra cứu Nhật ký kiểm toán | Hệ thống hiển thị bộ lọc thời gian, tác nhân, loại hành động. |
+| | 2 | Quản trị viên nhập tiêu chí tìm kiếm (ví dụ: các thao tác sửa đơn thuốc trong tuần qua tại cơ sở Thủ Đức) | Hệ thống truy vấn bảng `system_audit_logs` và trả về danh sách bản ghi bất biến kèm IP, timestamp và nội dung thay đổi (Diff). |
+| | 3 | Quản trị viên nhấn 'Xuất báo cáo PDF/Excel' | Hệ thống xuất file báo cáo có chữ ký số xác thực dữ liệu. |
+| **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| Không có | - | Luồng thực hiện tuần tự không rẽ nhánh | - |
+| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| Không có | - | Không phát sinh ngoại lệ đặc thù | - |
+| **Mức độ ưu tiên (Priority)** | **P1** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR5 (Tính toàn vẹn dữ liệu), BR21 (Tính bất biến của nhật ký kiểm toán) | | |
+
+---
+
+### UC-028: Kết Xuất Báo Cáo Vận Hành và Chỉ Số Tuân Thủ KPI (Compliance Analytics & KPIs)
+
+| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
+|---|---|---|---|
+| **Mã Use Case (Use Case ID)** | **UC-028** | | |
+| **Tên Use Case (Use Case Name)** | Kết Xuất Báo Cáo Vận Hành và Chỉ Số Tuân Thủ KPI (Compliance Analytics & KPIs) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | Ban Giám Đốc (CEO, COO) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-007 (System Admin) | | |
+| **Tính năng liên quan (Features)** | F-025 | | |
+| **Mô tả tóm tắt (Brief Description)** | Cung cấp bảng phân tích số liệu vận hành phục vụ Ban Lãnh đạo VISI Medical Group đánh giá hiệu quả áp dụng nền tảng. | | |
+| **Mục tiêu (Goal)** | Tổng hợp các chỉ số KPIs: tỷ lệ kích hoạt QR (mục tiêu ≥85%), tỷ lệ tuân thủ thuốc đúng giờ, tỷ lệ hoàn thành Recovery Check, tỷ lệ tái khám theo từng chi nhánh. | | |
+| **Tác nhân kích hoạt (Trigger)** | Lãnh đạo truy cập phân hệ Báo cáo quản trị định kỳ. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | Tài khoản lãnh đạo có quyền xem báo cáo toàn chuỗi. | | |
+| **Điều kiện sau (Post-conditions)** | Báo cáo phân tích KPI thời gian thực được hiển thị trực quan dạng biểu đồ. | | |
+| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| | 1 | Lãnh đạo mở màn hình Báo cáo vận hành KPI | Hệ thống tổng hợp dữ liệu từ 5 chi nhánh bệnh viện. |
+| | 2 | Xem các chỉ số trọng yếu: Tỷ lệ quét kích hoạt QR (thực tế vs mục tiêu 85%), Tỷ lệ uống thuốc đúng giờ theo loại phẫu thuật, Tỷ lệ phản ứng Red Flag <5 phút của CSKH | Hiển thị biểu đồ so sánh giữa các chi nhánh. |
+| | 3 | Lãnh đạo chọn xuất báo cáo tổng kết tháng | Hệ thống tạo file báo cáo định dạng PDF phục vụ họp giao ban tập đoàn. |
+| **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| Không có | - | Luồng thực hiện tuần tự không rẽ nhánh | - |
+| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| Không có | - | Không phát sinh ngoại lệ đặc thù | - |
+| **Mức độ ưu tiên (Priority)** | **P1** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR15 (Quyền xem dữ liệu tổng hợp liên chi nhánh cho Ban Giám Đốc) | | |
+
+---
+
+## 3. BẢNG TỔNG HỢP DANH MỤC QUY TẮC NGHIỆP VỤ TOÀN HỆ THỐNG (MASTER BUSINESS RULES CATALOG)
+
+### 3.1 Bảng Ma Trận Quy Tắc Nghiệp Vụ (Master BR Matrix)
+
+| Mã BR | Tên Quy tắc Nghiệp vụ | Mô tả Chi tiết Quy tắc Nghiệp vụ | Use Cases áp dụng |
+| :--- | :--- | :--- | :--- |
+| **BR1** | **Kiểm tra tính hợp lệ của số điện thoại** | Hệ thống phải xác thực định dạng số điện thoại của Caregiver (chuẩn di động Việt Nam: 10 chữ số, đầu số hợp lệ) trước khi khởi tạo quy trình gửi mã OTP. | UC-001, UC-002, UC-004, UC-005, UC-006, UC-008, UC-010, UC-019, UC-020, UC-021, UC-022, UC-022b, UC-023, UC-026, UC-028 |
+| **BR2** | **Xác thực mã OTP** | Mã OTP gồm 6 chữ số ngẫu nhiên, có hiệu lực trong 5 phút. Nếu nhập sai quá 5 lần liên tiếp, hệ thống khóa tạm thời yêu cầu gửi OTP trong 15 phút. | UC-001, UC-007, UC-009, UC-014, UC-015, UC-016, UC-018, UC-027 |
+| **BR3** | **Phân quyền tài khoản Caregiver** | Chỉ những tài khoản Caregiver đang ở trạng thái hoạt động (Active) mới được phép xác thực thành công và truy cập các chức năng chăm sóc bệnh nhân. | UC-001 |
+| **BR4** | **Tính hợp lệ và an toàn của mã QR** | Mã QR phải chứa token mã hóa ngẫu nhiên (UUIDv4 kết hợp ký số), không chứa dữ liệu bệnh án dạng thô. Mã QR phải thuộc Kế hoạch chăm sóc đang ở trạng thái ACTIVE mới được phép liên kết. | UC-003, UC-010b, UC-011, UC-012, UC-013 |
+| **BR5** | **Giới hạn tối đa 3 Caregiver liên kết** | Một Caregiver có thể liên kết với nhiều bệnh nhân, nhưng mỗi hồ sơ bệnh nhân chỉ cho phép tối đa 3 Caregiver cùng liên kết để chia sẻ ca chăm sóc. Mọi thao tác đều được lưu vết kiểm toán. | UC-003, UC-010c, UC-027 |
+| **BR6** | **Phạm vi nội dung được cấp quyền** | Caregiver chỉ được truy cập các nội dung Learning Path, lịch thuốc và thông tin chăm sóc của bệnh nhân đã được liên kết hợp lệ với mình. | UC-017, UC-025 |
+| **BR7** | **Nguồn gốc nội dung y khoa** | Mọi hướng dẫn chuyên môn, kỹ thuật nhỏ thuốc, liều lượng và cữ dùng phải xuất phát từ cấu hình của Bác sĩ/Bệnh viện VISI. Hệ thống tuyệt đối không tự động suy diễn hoặc điều chỉnh khuyến nghị y tế. | UC-009, UC-010b, UC-014, UC-016, UC-017, UC-024 |
+| **BR8** | **Chính sách bỏ quiz trong MVP** | Trong phiên bản MVP, Học viện Caregiver tập trung vào Infographics đồ họa tĩnh tinh gọn (F-014). Việc làm bài kiểm tra quiz không phải là điều kiện tiên quyết và được dời sang Phase 2. | Áp dụng toàn hệ thống |
+| **BR9** | **Bắt buộc hoàn thành bảng kiểm Recovery Check** | Caregiver bắt buộc phải trả lời đầy đủ toàn bộ 3–5 câu hỏi khảo sát trước khi được phép nộp kết quả; không cho phép gửi bảng kiểm còn bỏ trống câu hỏi. | UC-008, UC-019 |
+| **BR10** | **Giới hạn chẩn đoán và phân loại trạng thái 3 mức** | Hệ thống chỉ đối chiếu câu trả lời với ma trận tiêu chí lâm sàng đã được Bác sĩ cấu hình sẵn để phân loại 3 mức: Xanh (Bình thường), Vàng (Cần chú ý), Đỏ (Nguy hiểm Red Flag). Hệ thống không đưa ra chẩn đoán bệnh thay thế bác sĩ. | UC-008, UC-019, UC-020 |
+| **BR11** | **Ưu tiên quy trình hành động cấp cứu Red Flag** | Khi xuất hiện dấu hiệu Red Flag, hệ thống lập tức chuyển sang giao diện cảnh báo đỏ toàn màn hình, ưu tiên hiển thị nút bấm gọi 1 chạm đến Hotline VISI 0395 151 151 và đẩy tín hiệu báo động khẩn cấp lên Dashboard viện. | UC-008, UC-020 |
+| **BR12** | **Cam kết SLA phản ứng Red Flag & Leo thang** | Nhân viên CSKH/Điều dưỡng trực phải tiếp nhận và thực hiện cuộc gọi can thiệp cho ca Red Flag trong vòng dưới 5 phút. Nếu sau 15 phút chưa được xử lý, hệ thống tự động leo thang (Escalate) gửi tin nhắn SMS khẩn cấp tới Bác sĩ trực cơ sở. | UC-022, UC-022b, UC-023 |
+| **BR13** | **Quy định lưu vết can thiệp lâm sàng** | Mọi cuộc gọi hỗ trợ của CSKH hoặc can thiệp của Bác sĩ đối với các ca Red Flag/Cờ vàng đều phải được ghi nhận chi tiết (thời gian, người tiếp nhận, hướng xử lý) vào hồ sơ điện tử. | Áp dụng toàn hệ thống |
+| **BR14** | **Kiểm soát quyền truy cập của Nhân viên y tế** | Chỉ các tài khoản nội bộ được cấp phát chính thức có vai trò phù hợp (Admin, Bác sĩ, Điều dưỡng, CSKH, GCMO) mới được đăng nhập vào hệ thống quản trị bệnh trạm kết hợp xác thực 2 bước (2FA). | UC-002, UC-021, UC-026 |
+| **BR15** | **Phân tách dữ liệu theo cơ sở bệnh viện (Multi-Branch Isolation)** | Nhân viên y tế thuộc chi nhánh bệnh viện nào chỉ được phép xem, chỉnh sửa hồ sơ và giám sát bệnh nhân thuộc chi nhánh đó. Chỉ Ban Giám Đốc và GCMO mới có quyền xem dữ liệu tổng hợp toàn chuỗi 5 bệnh viện. | UC-002, UC-021, UC-026, UC-028 |
+| **BR16** | **Tính toàn vẹn dữ liệu lâm sàng khi xuất viện** | Hồ sơ bệnh nhân tạo tại phòng lưu viện phải có tối thiểu: Mã bệnh nhân, Năm sinh, Mắt phẫu thuật (MP/MT/2M), Loại phẫu thuật và Bác sĩ mổ trước khi có thể kích hoạt Care Plan. | UC-004 |
+| **BR17** | **Bảo mật thông tin bệnh nhân theo Nghị định 13/2023/NĐ-CP** | Tên bệnh nhân hiển thị trên ứng dụng của Caregiver và phiếu in xuất viện phải được lưu trữ và hiển thị ở dạng viết tắt bảo mật (ví dụ: 'Trần V. B.') để chống lộ dữ liệu cá nhân nhạy cảm. | UC-004 |
+| **BR18** | **Tính độc lập dữ liệu Care Plan cá nhân hóa (Data Independence)** | Khi Điều dưỡng nhân bản Master Template thành Care Plan bệnh nhân, dữ liệu được sao chép sang bảng thực thi độc lập. Mọi tùy biến liều lượng của Bác sĩ cho bệnh nhân không làm biến đổi Master Template gốc. | UC-005, UC-010 |
+| **BR19** | **Quy trình vòng đời Master Template** | Master Template tuân thủ nghiêm ngặt 4 trạng thái vòng đời: DRAFT (Bản nháp) -> PENDING_APPROVAL (Chờ duyệt) -> ACTIVE (Đã ban hành) -> ARCHIVED (Lưu trữ lịch sử). Chỉ template ACTIVE mới được phép áp dụng cho bệnh nhân. | UC-005, UC-006 |
+| **BR20** | **Nhận diện trực quan danh mục thuốc** | Mỗi loại thuốc nhỏ mắt trong lịch dùng thuốc phải hiển thị rõ tên biệt dược, nồng độ, số giọt chỉ định, mắt áp dụng và hình ảnh màu sắc nắp/thân lọ thuốc để người nhà không nhầm lẫn. | UC-007, UC-014 |
+| **BR21** | **Tính bất biến của nhật ký dùng thuốc** | Lịch sử xác nhận uống/nhỏ thuốc (timestamp, Caregiver thực hiện, tình trạng cữ) được lưu trữ bất biến vào `patient_medication_logs`, không cho phép sửa đổi hoặc xóa sau khi đã ghi nhận. | UC-015, UC-027 |
+| **BR22** | **Hiển thị trực quan danh mục Nên làm & Cần tránh** | Danh mục Do & Don't phải được phân định rõ ràng thành 2 cột màu: Cột Xanh (Nên làm) và Cột Đỏ (Cần tránh), kèm icon minh họa và giải thích lý do y khoa. | UC-009, UC-016 |
+| **BR23** | **Ràng buộc bộ đếm thời gian giãn cách đệm 5–10 phút (Drop Interval Buffer Timer)** | Nếu trong cùng một cữ dùng có từ 2 loại thuốc nhỏ mắt trở lên, sau khi xác nhận lọ thứ nhất, hệ thống tự động khóa nút xác nhận lọ thứ hai và đếm lùi 5–10 phút để tránh hiện tượng rửa trôi thuốc (washout effect). | UC-007, UC-015 |
+| **BR24** | **Thời gian kích hoạt nhắc hẹn tái khám** | Hệ thống phải tự động kích hoạt thông báo đẩy (Push) và tin nhắn SMS/Zalo nhắc hẹn tái khám cho Caregiver trước thời điểm hẹn đúng 24 giờ. | UC-018 |
+| **BR25** | **Ràng buộc toàn vẹn khi lưu trữ hồ sơ bệnh nhân** | Không cho phép xóa vĩnh viễn hồ sơ bệnh nhân. Chỉ cho phép chuyển trạng thái sang `ARCHIVED` (xóa mềm). Nghiêm cấm lưu trữ hồ sơ nếu đang có Care Plan ở trạng thái `ACTIVE`. | Áp dụng toàn hệ thống |
+| **BR26** | **Tự động kích hoạt luồng CSKH cho ca xuất viện** | Ngay khi Care Plan chuyển sang trạng thái ACTIVE và hoàn tất bàn giao tại phòng lưu viện, hồ sơ bệnh nhân tự động xuất hiện trên Dashboard CSKH của chi nhánh để theo dõi từ xa. | Áp dụng toàn hệ thống |
+
+---
+
+### 3.2 Phân Loại BR Theo 6 Trụ Cột Nghiệp Vụ Chính
+
+1. **Trụ cột Xác thực & An ninh dữ liệu (Security & Compliance):** `BR1`, `BR2`, `BR3`, `BR4`, `BR14`, `BR15`, `BR17`, `BR21`. Tuân thủ nghiêm ngặt Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân y tế.
+2. **Trụ cột Bàn giao Lâm sàng & Vòng đời QR (Clinical Handoff & QR):** `BR4`, `BR5`, `BR16`, `BR18`. Tối ưu thời gian bàn giao <30 giây tại phòng lưu viện, giới hạn tối đa 3 Caregiver cùng liên kết.
+3. **Trụ cột Dược lý Nhãn khoa & Chống rửa trôi thuốc (Ophthalmic Pharmacology):** `BR7`, `BR20`, `BR23`. Bắt buộc bộ đếm thời gian giãn cách 5–10 phút giữa 2 loại thuốc nhỏ mắt (Drop Interval Buffer Timer).
+4. **Trụ cột Giám sát Hồi phục & Sàng lọc Biến chứng (Triage & Monitoring):** `BR9`, `BR10`, `BR22`, `BR26`. Bảng kiểm Recovery Check 3 mức Xanh/Vàng/Đỏ xuất hiện mỗi sáng trong 7 ngày đầu.
+5. **Trụ cột Cấp cứu Red Flag & Cam kết SLA (Emergency Response & SLA):** `BR11`, `BR12`, `BR13`. Hotline 1 chạm VISI 0395 151 151, cam kết CSKH liên hệ <5 phút, tự động leo thang sau 15 phút.
+6. **Trụ cột Quản trị Chuyên môn & Tái khám (Clinical Governance & Appointments):** `BR6`, `BR8`, `BR19`, `BR24`, `BR25`. Phê duyệt Master Template điện tử và theo dõi lộ trình 5 mốc tái khám chuẩn VISI.
