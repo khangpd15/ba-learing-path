@@ -5,7 +5,7 @@
 > **Doanh nghiệp mục tiêu:** Công ty Cổ phần Tập đoàn Y khoa VISI (VISI Medical Group)  
 > **Phiên bản:** V1 (Phân rã chi tiết toàn bộ các Use Case Quản lý thành các CRUD Sub-Use Cases theo chuẩn US_US_V1)  
 > **Ngày phê duyệt:** 15/09/2026  
-> **Mục tiêu kỹ thuật:** Đặc tả chi tiết từng thao tác CRUD (Create, Read/List, Read/Detail, Update, Delete/Archive) giúp Đội ngũ Lập trình (Dev) và Kiểm thử (QA/QC) nắm bắt chính xác logic API, form giao diện, phân quyền vai trò và luồng xử lý ngoại lệ.  
+> **Mục tiêu kỹ thuật:** Đặc tả chi tiết từng thao tác nghiệp vụ và phân rã CRUD đơn nguyên (Create, Read/List, Read/Detail, Update, Delete/Archive) giúp Đội ngũ Lập trình (Dev) và Kiểm thử (QA/QC) nắm bắt chính xác quy trình nghiệp vụ, form giao diện, phân quyền vai trò và luồng xử lý ngoại lệ. Toàn bộ đặc tả kỹ thuật RESTful APIs được tách biệt tại `06_API_Specification.md` và câu lệnh truy vấn CSDL tại `07_Database_Queries.md`.  
 
 ---
 
@@ -16,118 +16,118 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 ### 1.1 Danh mục Các Nhóm Use Case Phân Rã CRUD Chi Tiết
 
 1. **Nhóm UC-004: Quản lý Hồ sơ Định danh Bệnh Nhân (Patient Profiles CRUD):**
-   * `UC-004.1`: Tạo mới hồ sơ bệnh nhân (`POST /api/v1/patients`)
-   * `UC-004.2`: Tra cứu và lọc danh sách hồ sơ bệnh nhân theo cơ sở (`GET /api/v1/patients`)
-   * `UC-004.3`: Xem chi tiết hồ sơ bệnh nhân & Dòng thời gian phục hồi (`GET /api/v1/patients/{id}`)
-   * `UC-004.4`: Cập nhật chỉnh sửa thông tin hồ sơ bệnh nhân (`PUT /api/v1/patients/{id}`)
-   * `UC-004.5`: Lưu trữ / Vô hiệu hóa hồ sơ bệnh nhân (`DELETE /api/v1/patients/{id}` — Soft Delete)
+   * `UC-004.1`: Tạo mới hồ sơ bệnh nhân
+   * `UC-004.2`: Tra cứu và lọc danh sách hồ sơ bệnh nhân theo cơ sở
+   * `UC-004.3`: Xem chi tiết hồ sơ bệnh nhân & Dòng thời gian phục hồi
+   * `UC-004.4`: Cập nhật chỉnh sửa thông tin hồ sơ bệnh nhân
+   * `UC-004.5`: Lưu trữ / Vô hiệu hóa hồ sơ bệnh nhân
 
 2. **Nhóm UC-005: Quản lý Danh mục Mẫu Kế Hoạch Chăm Sóc (Care Plan Master Templates CRUD):**
-   * `UC-005.1`: Tạo mới Master Template (`POST /api/v1/templates`)
-   * `UC-005.2`: Xem danh sách & lọc Master Template theo loại phẫu thuật (`GET /api/v1/templates`)
-   * `UC-005.3`: Xem chi tiết cấu hình Master Template (`GET /api/v1/templates/{id}`)
-   * `UC-005.4`: Chỉnh sửa thông tin chung Master Template (`PUT /api/v1/templates/{id}`)
-   * `UC-005.5`: Kích hoạt / Lưu trữ Master Template (`PATCH /api/v1/templates/{id}/status`)
+   * `UC-005.1`: Tạo mới Master Template
+   * `UC-005.2`: Xem danh sách & lọc Master Template theo loại phẫu thuật
+   * `UC-005.3`: Xem chi tiết cấu hình Master Template
+   * `UC-005.4`: Chỉnh sửa thông tin chung Master Template
+   * `UC-005.5`: Kích hoạt / Lưu trữ Master Template
 
 3. **Nhóm UC-007: Cấu Hình Danh Mục Thuốc Mẫu Trong Template (Template Medications CRUD):**
-   * `UC-007.1`: Thêm thuốc mẫu vào Master Template & Cài đặt Timer đệm (`POST /api/v1/templates/{id}/medications`)
-   * `UC-007.2`: Xem danh sách thuốc mẫu trong Template (`GET /api/v1/templates/{id}/medications`)
-   * `UC-007.3`: Chỉnh sửa thuốc mẫu & thời gian đệm giãn cách (`PUT /api/v1/templates/{id}/medications/{med_id}`)
-   * `UC-007.4`: Xóa thuốc mẫu khỏi Master Template (`DELETE /api/v1/templates/{id}/medications/{med_id}`)
+   * `UC-007.1`: Thêm thuốc mẫu vào Master Template & Cài đặt Timer đệm
+   * `UC-007.2`: Xem danh sách thuốc mẫu trong Template
+   * `UC-007.3`: Chỉnh sửa thuốc mẫu & thời gian đệm giãn cách
+   * `UC-007.4`: Xóa thuốc mẫu khỏi Master Template
 
 4. **Nhóm UC-008: Cấu Hình Bộ Câu Hỏi Recovery Check & Red Flag (Recovery & Red Flags CRUD):**
-   * `UC-008.1`: Thêm mốc thời gian & câu hỏi Recovery Check (`POST /api/v1/templates/{id}/milestones`)
-   * `UC-008.2`: Xem danh sách mốc & câu hỏi Recovery Check (`GET /api/v1/templates/{id}/milestones`)
-   * `UC-008.3`: Chỉnh sửa mốc & câu hỏi Recovery Check (`PUT /api/v1/templates/{id}/milestones/{id}`)
-   * `UC-008.4`: Xóa mốc thời gian / câu hỏi Recovery Check (`DELETE /api/v1/templates/{id}/milestones/{id}`)
-   * `UC-008.5`: Thêm tiêu chí dấu hiệu nguy hiểm Red Flag & Hotline (`POST /api/v1/templates/{id}/red-flags`)
-   * `UC-008.6`: Xem danh sách tiêu chí Red Flag trong Template (`GET /api/v1/templates/{id}/red-flags`)
-   * `UC-008.7`: Chỉnh sửa tiêu chí Red Flag & Hướng xử trí lâm sàng (`PUT /api/v1/templates/{id}/red-flags/{id}`)
-   * `UC-008.8`: Xóa tiêu chí Red Flag khỏi Template (`DELETE /api/v1/templates/{id}/red-flags/{id}`)
+   * `UC-008.1`: Thêm mốc thời gian & câu hỏi Recovery Check
+   * `UC-008.2`: Xem danh sách mốc & câu hỏi Recovery Check
+   * `UC-008.3`: Chỉnh sửa mốc & câu hỏi Recovery Check
+   * `UC-008.4`: Xóa mốc thời gian / câu hỏi Recovery Check
+   * `UC-008.5`: Thêm tiêu chí dấu hiệu nguy hiểm Red Flag & Hotline
+   * `UC-008.6`: Xem danh sách tiêu chí Red Flag trong Template
+   * `UC-008.7`: Chỉnh sửa tiêu chí Red Flag & Hướng xử trí lâm sàng
+   * `UC-008.8`: Xóa tiêu chí Red Flag khỏi Template
 
 5. **Nhóm UC-009: Cấu Hình Cẩm Nang, Quy Tắc Sinh Hoạt & FAQ Lâm Sàng (Guidelines & FAQ CRUD):**
-   * `UC-009.1`: Thêm nội dung Cẩm nang 24h & Infographic bài học (`POST /api/v1/templates/{id}/modules`)
-   * `UC-009.2`: Xem danh mục Cẩm nang & Infographic bài học (`GET /api/v1/templates/{id}/modules`)
-   * `UC-009.3`: Chỉnh sửa nội dung Cẩm nang & Infographic bài học (`PUT /api/v1/templates/{id}/modules/{id}`)
-   * `UC-009.4`: Xóa bài học khỏi lộ trình Cẩm nang (`DELETE /api/v1/templates/{id}/modules/{id}`)
-   * `UC-009.5`: Thêm quy tắc Nên làm / Cần tránh 2 cột màu (`POST /api/v1/templates/{id}/do-dont`)
-   * `UC-009.6`: Xem danh sách quy tắc Nên làm / Cần tránh (`GET /api/v1/templates/{id}/do-dont`)
-   * `UC-009.7`: Chỉnh sửa quy tắc Nên làm / Cần tránh (`PUT /api/v1/templates/{id}/do-dont/{id}`)
-   * `UC-009.8`: Xóa quy tắc Nên làm / Cần tránh khỏi Template (`DELETE /api/v1/templates/{id}/do-dont/{id}`)
-   * `UC-009.9`: Quản lý ngân hàng tình huống hỏi đáp FAQ lâm sàng (`POST/GET/PUT/DELETE /api/v1/templates/{id}/faqs`)
+   * `UC-009.1`: Thêm nội dung Cẩm nang 24h & Infographic bài học
+   * `UC-009.2`: Xem danh mục Cẩm nang & Infographic bài học
+   * `UC-009.3`: Chỉnh sửa nội dung Cẩm nang & Infographic bài học
+   * `UC-009.4`: Xóa bài học khỏi lộ trình Cẩm nang
+   * `UC-009.5`: Thêm quy tắc Nên làm / Cần tránh 2 cột màu
+   * `UC-009.6`: Xem danh sách quy tắc Nên làm / Cần tránh
+   * `UC-009.7`: Chỉnh sửa quy tắc Nên làm / Cần tránh
+   * `UC-009.8`: Xóa quy tắc Nên làm / Cần tránh khỏi Template
+   * `UC-009.9`: Quản lý ngân hàng tình huống hỏi đáp FAQ lâm sàng (Manage Clinical FAQ Bank)
 
 6. **Nhóm UC-026: Quản Lý Tài Khoản Nhân Viên và Phân Quyền Cơ Sở (Staff Accounts & Multi-Branch RBAC CRUD):**
-   * `UC-026.1`: Khởi tạo tài khoản nhân viên y tế & gán chi nhánh (`POST /api/v1/staff`)
-   * `UC-026.2`: Xem danh sách và tìm kiếm nhân viên theo cơ sở (`GET /api/v1/staff`)
-   * `UC-026.3`: Chỉnh sửa thông tin định danh & vai trò RBAC nhân viên (`PUT /api/v1/staff/{id}`)
-   * `UC-026.4`: Khóa / Vô hiệu hóa tài khoản nhân viên (`DELETE /api/v1/staff/{id}` — Deactivate/Lock)
+   * `UC-026.1`: Khởi tạo tài khoản nhân viên y tế & gán chi nhánh
+   * `UC-026.2`: Xem danh sách và tìm kiếm nhân viên theo cơ sở
+   * `UC-026.3`: Chỉnh sửa thông tin định danh & vai trò RBAC nhân viên
+   * `UC-026.4`: Khóa / Vô hiệu hóa tài khoản nhân viên
 
 ---
 
 ### 1.2 Bảng Ma Trận Tổng Hợp Toàn Bộ Ca Sử Dụng (Traceability Index)
 
-| Mã Use Case | Tên Use Case / Thao Tác | Nhóm Nghiệp Vụ / Bản Chất | Tác Nhân Chính | API Endpoint & Method |
+| Mã Use Case | Tên Use Case / Thao Tác | Nhóm Nghiệp Vụ / Bản Chất | Tác Nhân Chính | Tham Chiếu Kỹ Thuật (API & Query) |
 | :--- | :--- | :--- | :--- | :--- |
-| **UC-001** | Đăng ký & Đăng nhập Caregiver OTP | Xác thực Người dùng (Auth) | Caregiver (ACT-008) | `POST /api/v1/auth/otp/request` & `verify` |
-| **UC-002** | Đăng nhập Nhân viên Y tế & 2FA | Xác thực Nhân sự (Auth) | Bác sĩ, Điều dưỡng, CSKH | `POST /api/v1/auth/staff/login` & `2fa` |
-| **UC-003** | Quét QR Bàn Giao Liên Kết Bệnh Nhân | Kích hoạt Hồ sơ (Linking) | Caregiver (ACT-008) | `POST /api/v1/patient-links/claim` |
-| **UC-004.1**| Tạo Mới Hồ Sơ Bệnh Nhân | **Patient CRUD - Create** | Điều dưỡng (ACT-003) | `POST /api/v1/patients` |
-| **UC-004.2**| Tra Cứu & Lọc Danh Sách Bệnh Nhân | **Patient CRUD - Read (List)** | Bác sĩ, Điều dưỡng, CSKH | `GET /api/v1/patients` |
-| **UC-004.3**| Xem Chi Tiết Hồ Sơ & Timeline | **Patient CRUD - Read (Detail)**| Bác sĩ, Điều dưỡng, CSKH | `GET /api/v1/patients/{id}` |
-| **UC-004.4**| Cập Nhật Thông Tin Bệnh Nhân | **Patient CRUD - Update** | Điều dưỡng (ACT-003) | `PUT /api/v1/patients/{id}` |
-| **UC-004.5**| Lưu Trữ / Vô Hiệu Hóa Hồ Sơ | **Patient CRUD - Delete/Archive**| Điều dưỡng trưởng, BS Trưởng | `DELETE /api/v1/patients/{id}` |
-| **UC-005.1**| Tạo Mới Master Template | **Template CRUD - Create** | Bác sĩ chuyên khoa, GCMO | `POST /api/v1/templates` |
-| **UC-005.2**| Xem Danh Sách & Lọc Master Template | **Template CRUD - Read (List)** | Bác sĩ, Điều dưỡng, GCMO | `GET /api/v1/templates` |
-| **UC-005.3**| Xem Chi Tiết Cấu Hình Template | **Template CRUD - Read (Detail)**| Bác sĩ, Điều dưỡng, GCMO | `GET /api/v1/templates/{id}` |
-| **UC-005.4**| Chỉnh Sửa Thông Tin Chung Template | **Template CRUD - Update** | Bác sĩ chuyên khoa, GCMO | `PUT /api/v1/templates/{id}` |
-| **UC-005.5**| Kích Hoạt / Lưu Trữ Master Template| **Template CRUD - Status** | GCMO (ACT-001) | `PATCH /api/v1/templates/{id}/status` |
-| **UC-006** | Phê Duyệt Lâm Sàng Master Template | Phê duyệt Chuyên môn (Approval) | GCMO (ACT-001) | `POST /api/v1/templates/{id}/approve` |
-| **UC-007.1**| Thêm Thuốc Mẫu & Buffer Timer | **Medication CRUD - Create** | Bác sĩ chuyên khoa (ACT-002) | `POST /api/v1/templates/{id}/medications` |
-| **UC-007.2**| Xem Danh Sách Thuốc Mẫu | **Medication CRUD - Read (List)**| Bác sĩ, Điều dưỡng | `GET /api/v1/templates/{id}/medications` |
-| **UC-007.3**| Chỉnh Sửa Thuốc Mẫu & Buffer | **Medication CRUD - Update** | Bác sĩ chuyên khoa (ACT-002) | `PUT /api/v1/templates/{id}/medications/{id}` |
-| **UC-007.4**| Xóa Thuốc Mẫu Khỏi Template | **Medication CRUD - Delete** | Bác sĩ chuyên khoa (ACT-002) | `DELETE /api/v1/templates/{id}/medications/{id}` |
-| **UC-008.1**| Thêm Mốc & Câu Hỏi Recovery Check | **Milestone CRUD - Create** | Bác sĩ chuyên khoa (ACT-002) | `POST /api/v1/templates/{id}/milestones` |
-| **UC-008.2**| Xem Danh Sách Mốc & Câu Hỏi Check | **Milestone CRUD - Read** | Bác sĩ, Điều dưỡng | `GET /api/v1/templates/{id}/milestones` |
-| **UC-008.3**| Chỉnh Sửa Mốc & Câu Hỏi Check | **Milestone CRUD - Update** | Bác sĩ chuyên khoa (ACT-002) | `PUT /api/v1/templates/{id}/milestones/{id}` |
-| **UC-008.4**| Xóa Mốc Thời Gian / Câu Hỏi Check | **Milestone CRUD - Delete** | Bác sĩ chuyên khoa (ACT-002) | `DELETE /api/v1/templates/{id}/milestones/{id}` |
-| **UC-008.5**| Thêm Tiêu Chí Red Flag & Hotline | **Red Flag CRUD - Create** | Bác sĩ chuyên khoa (ACT-002) | `POST /api/v1/templates/{id}/red-flags` |
-| **UC-008.6**| Xem Danh Sách Tiêu Chí Red Flag | **Red Flag CRUD - Read** | Bác sĩ, CSKH | `GET /api/v1/templates/{id}/red-flags` |
-| **UC-008.7**| Chỉnh Sửa Tiêu Chí Red Flag & Xử Trí| **Red Flag CRUD - Update** | Bác sĩ chuyên khoa (ACT-002) | `PUT /api/v1/templates/{id}/red-flags/{id}` |
-| **UC-008.8**| Xóa Tiêu Chí Red Flag Khỏi Template| **Red Flag CRUD - Delete** | Bác sĩ chuyên khoa (ACT-002) | `DELETE /api/v1/templates/{id}/red-flags/{id}` |
-| **UC-009.1**| Thêm Cẩm Nang 24h & Infographic | **Module CRUD - Create** | Bác sĩ chuyên khoa (ACT-002) | `POST /api/v1/templates/{id}/modules` |
-| **UC-009.2**| Xem Danh Mục Cẩm Nang & Infographic| **Module CRUD - Read** | Bác sĩ, Điều dưỡng | `GET /api/v1/templates/{id}/modules` |
-| **UC-009.3**| Chỉnh Sửa Cẩm Nang & Infographic | **Module CRUD - Update** | Bác sĩ chuyên khoa (ACT-002) | `PUT /api/v1/templates/{id}/modules/{id}` |
-| **UC-009.4**| Xóa Bài Học Khỏi Lộ Trình Cẩm Nang| **Module CRUD - Delete** | Bác sĩ chuyên khoa (ACT-002) | `DELETE /api/v1/templates/{id}/modules/{id}` |
-| **UC-009.5**| Thêm Quy Tắc Nên Làm / Cần Tránh | **Do/Don't CRUD - Create** | Bác sĩ chuyên khoa (ACT-002) | `POST /api/v1/templates/{id}/do-dont` |
-| **UC-009.6**| Xem Danh Sách Quy Tắc Do/Don't | **Do/Don't CRUD - Read** | Bác sĩ, Điều dưỡng | `GET /api/v1/templates/{id}/do-dont` |
-| **UC-009.7**| Chỉnh Sửa Quy Tắc Do/Don't | **Do/Don't CRUD - Update** | Bác sĩ chuyên khoa (ACT-002) | `PUT /api/v1/templates/{id}/do-dont/{id}` |
-| **UC-009.8**| Xóa Quy Tắc Do/Don't Khỏi Template| **Do/Don't CRUD - Delete** | Bác sĩ chuyên khoa (ACT-002) | `DELETE /api/v1/templates/{id}/do-dont/{id}` |
-| **UC-009.9**| Quản Lý Ngân Hàng FAQ Lâm Sàng | **FAQ CRUD - All** | Bác sĩ, CSKH | `POST/GET/PUT/DELETE /api/v1/templates/{id}/faqs` |
-| **UC-010** | Khởi Tạo & Cá Nhân Hóa Care Plan | Khởi tạo Lâm sàng (Instantiate) | Bác sĩ điều trị (ACT-002) | `POST /api/v1/patient-care-plans` |
-| **UC-010b**| Bàn Giao Xuất Viện Phòng Lưu Viện | Bàn giao Hậu phẫu (Handoff) | Điều dưỡng lưu viện (ACT-003)| Giao diện kiểm tra đối soát |
-| **UC-010c**| Xác Nhận Hoàn Tất Bàn Giao | Xác nhận Lâm sàng (Confirm) | Bác sĩ điều trị (ACT-002) | `POST /api/v1/patient-care-plans/{id}/confirm`|
-| **UC-011** | Tạo & Phát Hành Mã QR Xuất Viện | Quản lý Vòng đời QR | Điều dưỡng lưu viện (ACT-003)| `POST /api/v1/qr/issue` |
-| **UC-012** | In Phiếu Xuất Viện Kèm Mã QR | Tác vụ Vật lý (Print Output) | Điều dưỡng lưu viện (ACT-003)| `GET /api/v1/patient-care-plans/{id}/print-slip`|
-| **UC-013** | Cấp Lại hoặc Thu Hồi Mã QR | Ngoại lệ Vòng đời QR | Điều dưỡng lưu viện (ACT-003)| `POST /api/v1/qr/revoke-reissue` |
-| **UC-014** | Xem Lịch Thuốc & Hướng Dẫn Nhỏ Mắt | Hướng dẫn Tuân thủ (Compliance)| Caregiver, Care Recipient | `GET /api/v1/care-plans/{id}/medications` |
-| **UC-015** | Xác Nhận Thuốc & Buffer Timer 5-10p | Giám sát Dùng thuốc (Buffer) | Caregiver, Care Recipient | `POST /api/v1/medication-logs` |
-| **UC-016** | Xem Cẩm Nang 24h & Bảng Do/Don't | Tra Cứu Hướng Dẫn (Education) | Caregiver, Care Recipient | `GET /api/v1/care-plans/{id}/guidelines` |
-| **UC-017** | Xem Infographic Học Viện Caregiver | Giáo dục Sức khỏe (Academy) | Caregiver, Care Recipient | `GET /api/v1/care-plans/{id}/academy` |
-| **UC-018** | Xem Lịch Tái Khám 5 Mốc & Nhắc Hẹn | Theo dõi Tái khám (Follow-up) | Caregiver, Care Recipient | `GET /api/v1/care-plans/{id}/appointments` |
-| **UC-019** | Thực Hiện Khảo Sát Recovery Check | Khảo sát Định kỳ (Survey) | Caregiver, Care Recipient | `POST /api/v1/recovery-checks` |
-| **UC-020** | Kích Hoạt Cấp Cứu Red Flag | Xử lý Biến chứng (Emergency) | Caregiver, Care Recipient | `POST /api/v1/alerts/red-flag` |
-| **UC-021** | Giám Sát Dashboard Phục Hồi Tập Trung | Dashboard Giám sát (Monitoring)| Bác sĩ, CSKH, Điều dưỡng | `GET /api/v1/monitoring/dashboard` |
-| **UC-022** | Tiếp Nhận & Phân Loại Cảnh Báo | Điều phối Lâm sàng (Triaging) | CSKH, Bác sĩ trực | `PUT /api/v1/alerts/{id}/triage` |
-| **UC-022b**| Tự Động Leo Thang Cảnh Báo Quá Hạn| Xử lý Tự động Hệ thống (Daemon)| VISI Core Alert Daemon | Tự động kích hoạt sau 15p |
-| **UC-023** | Ghi Nhật Ký Cuộc Gọi Can Thiệp | Can thiệp Lâm sàng (Call Log) | CSKH, Bác sĩ | `POST /api/v1/call-logs` |
-| **UC-024** | Tra Cứu Tình Huống Khẩn Cấp - FAQ | Hỗ trợ Tức thì (Support) | Caregiver, Care Recipient | `GET /api/v1/faqs/search` |
-| **UC-025** | Kích Hoạt Trợ Năng Nhãn Khoa | Trải nghiệm Người dùng (A11y) | Caregiver, Care Recipient | Lưu trữ cục bộ + `PATCH /api/v1/users/a11y` |
-| **UC-026.1**| Khởi Tạo Tài Khoản Nhân Viên & Gán Chi Nhánh | **Staff CRUD - Create** | System Admin (ACT-006) | `POST /api/v1/staff` |
-| **UC-026.2**| Tra Cứu & Lọc Danh Sách Nhân Viên| **Staff CRUD - Read (List)** | System Admin, Giám đốc | `GET /api/v1/staff` |
-| **UC-026.3**| Chỉnh Sửa Thông Tin & Vai Trò RBAC| **Staff CRUD - Update** | System Admin (ACT-006) | `PUT /api/v1/staff/{id}` |
-| **UC-026.4**| Khóa / Vô Hiệu Hóa Tài Khoản | **Staff CRUD - Delete/Lock** | System Admin (ACT-006) | `DELETE /api/v1/staff/{id}` |
-| **UC-027** | Tra Cứu Nhật Ký Kiểm Toán Audit Log | An ninh & Tuân thủ (Compliance)| Quản trị viên, Thanh tra y tế| `GET /api/v1/audit-logs` |
-| **UC-028** | Kết Xuất Báo Cáo Vận Hành & KPI | Phân tích Quản trị (Analytics) | Giám đốc Bệnh viện | `GET /api/v1/reports/kpi` |
+| **UC-001** | Đăng ký & Đăng nhập Caregiver OTP | Xác thực Người dùng (Auth) | Caregiver (ACT-008) | Xem File 06 (§2.1) & File 07 (§2.1) |
+| **UC-002** | Đăng nhập Nhân viên Y tế & 2FA | Xác thực Nhân sự (Auth) | Bác sĩ, Điều dưỡng, CSKH | Xem File 06 (§2.1) & File 07 (§2.1) |
+| **UC-003** | Quét QR Bàn Giao Liên Kết Bệnh Nhân | Kích hoạt Hồ sơ (Linking) | Caregiver (ACT-008) | Xem File 06 (§2.4) & File 07 (§2.4) |
+| **UC-004.1** | Tạo Mới Hồ Sơ Bệnh Nhân | **Patient CRUD - Create** | Điều dưỡng (ACT-003) | Xem File 06 (§2.2) & File 07 (§2.2) |
+| **UC-004.2** | Tra Cứu & Lọc Danh Sách Bệnh Nhân | **Patient CRUD - Read (List)** | Bác sĩ, Điều dưỡng, CSKH | Xem File 06 (§2.2) & File 07 (§2.2) |
+| **UC-004.3** | Xem Chi Tiết Hồ Sơ & Timeline | **Patient CRUD - Read (Detail)**| Bác sĩ, Điều dưỡng, CSKH | Xem File 06 (§2.2) & File 07 (§2.2) |
+| **UC-004.4** | Cập Nhật Thông Tin Bệnh Nhân | **Patient CRUD - Update** | Điều dưỡng (ACT-003) | Xem File 06 (§2.2) & File 07 (§2.2) |
+| **UC-004.5** | Lưu Trữ / Vô Hiệu Hóa Hồ Sơ | **Patient CRUD - Delete/Archive**| Điều dưỡng trưởng, BS Trưởng | Xem File 06 (§2.2) & File 07 (§2.2) |
+| **UC-005.1** | Tạo Mới Master Template | **Template CRUD - Create** | Bác sĩ chuyên khoa, GCMO | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-005.2** | Xem Danh Sách & Lọc Master Template | **Template CRUD - Read (List)** | Bác sĩ, Điều dưỡng, GCMO | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-005.3** | Xem Chi Tiết Cấu Hình Template | **Template CRUD - Read (Detail)**| Bác sĩ, Điều dưỡng, GCMO | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-005.4** | Chỉnh Sửa Thông Tin Chung Template | **Template CRUD - Update** | Bác sĩ chuyên khoa, GCMO | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-005.5** | Kích Hoạt / Lưu Trữ Master Template| **Template CRUD - Status** | GCMO (ACT-001) | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-006** | Phê Duyệt Lâm Sàng Master Template | Phê duyệt Chuyên môn (Approval) | GCMO (ACT-001) | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-007.1** | Thêm Thuốc Mẫu & Buffer Timer | **Medication CRUD - Create** | Bác sĩ chuyên khoa (ACT-002) | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-007.2** | Xem Danh Sách Thuốc Mẫu | **Medication CRUD - Read (List)**| Bác sĩ, Điều dưỡng | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-007.3** | Chỉnh Sửa Thuốc Mẫu & Buffer | **Medication CRUD - Update** | Bác sĩ chuyên khoa (ACT-002) | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-007.4** | Xóa Thuốc Mẫu Khỏi Template | **Medication CRUD - Delete** | Bác sĩ chuyên khoa (ACT-002) | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-008.1** | Thêm Mốc & Câu Hỏi Recovery Check | **Milestone CRUD - Create** | Bác sĩ chuyên khoa (ACT-002) | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-008.2** | Xem Danh Sách Mốc & Câu Hỏi Check | **Milestone CRUD - Read** | Bác sĩ, Điều dưỡng | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-008.3** | Chỉnh Sửa Mốc & Câu Hỏi Check | **Milestone CRUD - Update** | Bác sĩ chuyên khoa (ACT-002) | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-008.4** | Xóa Mốc Thời Gian / Câu Hỏi Check | **Milestone CRUD - Delete** | Bác sĩ chuyên khoa (ACT-002) | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-008.5** | Thêm Tiêu Chí Red Flag & Hotline | **Red Flag CRUD - Create** | Bác sĩ chuyên khoa (ACT-002) | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-008.6** | Xem Danh Sách Tiêu Chí Red Flag | **Red Flag CRUD - Read** | Bác sĩ, CSKH | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-008.7** | Chỉnh Sửa Tiêu Chí Red Flag & Xử Trí| **Red Flag CRUD - Update** | Bác sĩ chuyên khoa (ACT-002) | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-008.8** | Xóa Tiêu Chí Red Flag Khỏi Template| **Red Flag CRUD - Delete** | Bác sĩ chuyên khoa (ACT-002) | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-009.1** | Thêm Cẩm Nang 24h & Infographic | **Module CRUD - Create** | Bác sĩ chuyên khoa (ACT-002) | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-009.2** | Xem Danh Mục Cẩm Nang & Infographic| **Module CRUD - Read** | Bác sĩ, Điều dưỡng | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-009.3** | Chỉnh Sửa Cẩm Nang & Infographic | **Module CRUD - Update** | Bác sĩ chuyên khoa (ACT-002) | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-009.4** | Xóa Bài Học Khỏi Lộ Trình Cẩm Nang| **Module CRUD - Delete** | Bác sĩ chuyên khoa (ACT-002) | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-009.5** | Thêm Quy Tắc Nên Làm / Cần Tránh | **Do/Don't CRUD - Create** | Bác sĩ chuyên khoa (ACT-002) | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-009.6** | Xem Danh Sách Quy Tắc Do/Don't | **Do/Don't CRUD - Read** | Bác sĩ, Điều dưỡng | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-009.7** | Chỉnh Sửa Quy Tắc Do/Don't | **Do/Don't CRUD - Update** | Bác sĩ chuyên khoa (ACT-002) | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-009.8** | Xóa Quy Tắc Do/Don't Khỏi Template| **Do/Don't CRUD - Delete** | Bác sĩ chuyên khoa (ACT-002) | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-009.9** | Quản Lý Ngân Hàng FAQ Lâm Sàng | **FAQ CRUD - All** | Bác sĩ, CSKH | Xem File 06 (§2.3) & File 07 (§2.3) |
+| **UC-010** | Khởi Tạo & Cá Nhân Hóa Care Plan | Khởi tạo Lâm sàng (Instantiate) | Bác sĩ điều trị (ACT-002) | Xem File 06 (§2.4) & File 07 (§2.4) |
+| **UC-010b** | Bàn Giao Xuất Viện Phòng Lưu Viện | Bàn giao Hậu phẫu (Handoff) | Điều dưỡng lưu viện (ACT-003)| Xem File 06 (§2.4) & File 07 (§2.4) |
+| **UC-010c** | Xác Nhận Hoàn Tất Bàn Giao | Xác nhận Lâm sàng (Confirm) | Bác sĩ điều trị (ACT-002) | Xem File 06 (§2.4) & File 07 (§2.4) |
+| **UC-011** | Tạo & Phát Hành Mã QR Xuất Viện | Quản lý Vòng đời QR | Điều dưỡng lưu viện (ACT-003)| Xem File 06 (§2.4) & File 07 (§2.4) |
+| **UC-012** | In Phiếu Xuất Viện Kèm Mã QR | Tác vụ Vật lý (Print Output) | Điều dưỡng lưu viện (ACT-003)| Xem File 06 (§2.4) & File 07 (§2.4) |
+| **UC-013** | Cấp Lại hoặc Thu Hồi Mã QR | Ngoại lệ Vòng đời QR | Điều dưỡng lưu viện (ACT-003)| Xem File 06 (§2.4) & File 07 (§2.4) |
+| **UC-014** | Xem Lịch Thuốc & Hướng Dẫn Nhỏ Mắt | Hướng dẫn Tuân thủ (Compliance)| Caregiver, Care Recipient | Xem File 06 (§2.5) & File 07 (§2.5) |
+| **UC-015** | Xác Nhận Thuốc & Buffer Timer 5-10p | Giám sát Dùng thuốc (Buffer) | Caregiver, Care Recipient | Xem File 06 (§2.5) & File 07 (§2.5) |
+| **UC-016** | Xem Cẩm Nang 24h & Bảng Do/Don't | Tra Cứu Hướng Dẫn (Education) | Caregiver, Care Recipient | Xem File 06 (§2.5) & File 07 (§2.5) |
+| **UC-017** | Xem Infographic Học Viện Caregiver | Giáo dục Sức khỏe (Academy) | Caregiver, Care Recipient | Xem File 06 (§2.5) & File 07 (§2.5) |
+| **UC-018** | Xem Lịch Tái Khám 5 Mốc & Nhắc Hẹn | Theo dõi Tái khám (Follow-up) | Caregiver, Care Recipient | Xem File 06 (§2.5) & File 07 (§2.5) |
+| **UC-019** | Thực Hiện Khảo Sát Recovery Check | Khảo sát Định kỳ (Survey) | Caregiver, Care Recipient | Xem File 06 (§2.6) & File 07 (§2.6) |
+| **UC-020** | Kích Hoạt Cấp Cứu Red Flag | Xử lý Biến chứng (Emergency) | Caregiver, Care Recipient | Xem File 06 (§2.6) & File 07 (§2.6) |
+| **UC-021** | Giám Sát Dashboard Phục Hồi Tập Trung | Dashboard Giám sát (Monitoring)| Bác sĩ, CSKH, Điều dưỡng | Xem File 06 (§2.7) & File 07 (§2.7) |
+| **UC-022** | Tiếp Nhận & Phân Loại Cảnh Báo | Điều phối Lâm sàng (Triaging) | CSKH, Bác sĩ trực | Xem File 06 (§2.7) & File 07 (§2.7) |
+| **UC-022b** | Tự Động Leo Thang Cảnh Báo Quá Hạn| Xử lý Tự động Hệ thống (Daemon)| VISI Core Alert Daemon | Xem File 06 (§2.7) & File 07 (§2.7) |
+| **UC-023** | Ghi Nhật Ký Cuộc Gọi Can Thiệp | Can thiệp Lâm sàng (Call Log) | CSKH, Bác sĩ | Xem File 06 (§2.7) & File 07 (§2.7) |
+| **UC-024** | Tra Cứu Tình Huống Khẩn Cấp - FAQ | Hỗ trợ Tức thì (Support) | Caregiver, Care Recipient | Xem File 06 (§2.5) & File 07 (§2.5) |
+| **UC-025** | Kích Hoạt Trợ Năng Nhãn Khoa | Trải nghiệm Người dùng (A11y) | Caregiver, Care Recipient | Xem File 06 (§2.5) & File 07 (§2.5) |
+| **UC-026.1** | Khởi Tạo Tài Khoản Nhân Viên & Gán Chi Nhánh | **Staff CRUD - Create** | System Admin (ACT-006) | Xem File 06 (§2.8) & File 07 (§2.8) |
+| **UC-026.2** | Tra Cứu & Lọc Danh Sách Nhân Viên| **Staff CRUD - Read (List)** | System Admin, Giám đốc | Xem File 06 (§2.8) & File 07 (§2.8) |
+| **UC-026.3** | Chỉnh Sửa Thông Tin & Vai Trò RBAC| **Staff CRUD - Update** | System Admin (ACT-006) | Xem File 06 (§2.8) & File 07 (§2.8) |
+| **UC-026.4** | Khóa / Vô Hiệu Hóa Tài Khoản | **Staff CRUD - Delete/Lock** | System Admin (ACT-006) | Xem File 06 (§2.8) & File 07 (§2.8) |
+| **UC-027** | Tra Cứu Nhật Ký Kiểm Toán Audit Log | An ninh & Tuân thủ (Compliance)| Quản trị viên, Thanh tra y tế| Xem File 06 (§2.8) & File 07 (§2.8) |
+| **UC-028** | Kết Xuất Báo Cáo Vận Hành & KPI | Phân tích Quản trị (Analytics) | Giám đốc Bệnh viện | Xem File 06 (§2.8) & File 07 (§2.8) |
 
 ---
 
@@ -348,12 +348,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 > **Mô tả nhóm nghiệp vụ:** Quản lý toàn diện dữ liệu định danh bệnh nhân hậu phẫu nhãn khoa tại 5 cơ sở VISI. Nhóm nghiệp vụ này được phân rã thành 5 Use Case CRUD đơn nguyên nhằm giúp đội ngũ phát triển (Dev) phân định rành mạch các API endpoint RESTful, kiểm tra hợp lệ dữ liệu y khoa, và bảo đảm tuân thủ nghiêm ngặt Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân.
 
-#### UC-004.1: Tạo Mới Hồ Sơ Bệnh Nhân (Create Patient Profile — POST /api/v1/patients)
+#### UC-004.1: Tạo Mới Hồ Sơ Bệnh Nhân (Create Patient Profile)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-004.1** | | |
-| **Tên Use Case (Use Case Name)** | Tạo Mới Hồ Sơ Bệnh Nhân (Create Patient Profile — POST /api/v1/patients) | | |
+| **Tên Use Case (Use Case Name)** | Tạo Mới Hồ Sơ Bệnh Nhân (Create Patient Profile) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Điều dưỡng lưu viện (ACT-003) / Tiếp đón (ACT-007) | | |
@@ -370,7 +370,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | | 3 | Điều dưỡng nhập Số điện thoại liên hệ (10 chữ số), Năm sinh, Giới tính. | Hệ thống kiểm tra định dạng SĐT Việt Nam hợp lệ và tính toán tuổi bệnh nhân. |
 | | 4 | Điều dưỡng chọn Mắt phẫu thuật (Mắt Phải - OD / Mắt Trái - OS / Cả Hai Mắt - OU). | Hệ thống đánh dấu trực quan mắt can thiệp trên sơ đồ nhãn khoa. |
 | | 5 | Điều dưỡng chọn Loại phẫu thuật (Phaco, SMILE, Femto-Lasik, SILK) và Ngày phẫu thuật. | Hệ thống tự động gán cơ sở bệnh viện (`facility_id`) theo cơ sở mà điều dưỡng đang công tác (BR26). |
-| | 6 | Điều dưỡng kiểm tra thông tin và bấm nút 'Lưu & Chuyển Sang Gán Care Plan'. | Hệ thống gửi `POST /api/v1/patients`, lưu bản ghi vào CSDL, ghi nhận Audit Log (UC-027), trả về HTTP 201 Created và tự động chuyển giao diện sang SCR-DOC-04. |
+| | 6 | Điều dưỡng kiểm tra thông tin và bấm nút 'Lưu & Chuyển Sang Gán Care Plan'. | Hệ thống gửi giao diện lập trình (API), lưu bản ghi vào CSDL, ghi nhận Audit Log (UC-027), trả về HTTP 201 Created và tự động chuyển giao diện sang SCR-DOC-04. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | Không có | - | Luồng thực hiện chuẩn không rẽ nhánh | - |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
@@ -381,12 +381,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-004.2: Tra Cứu và Lọc Danh Sách Hồ Sơ Bệnh Nhân (Read/List Patient Profiles — GET /api/v1/patients)
+#### UC-004.2: Tra Cứu và Lọc Danh Sách Hồ Sơ Bệnh Nhân (Read/List Patient Profiles)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-004.2** | | |
-| **Tên Use Case (Use Case Name)** | Tra Cứu và Lọc Danh Sách Hồ Sơ Bệnh Nhân (Read/List Patient Profiles — GET /api/v1/patients) | | |
+| **Tên Use Case (Use Case Name)** | Tra Cứu và Lọc Danh Sách Hồ Sơ Bệnh Nhân (Read/List Patient Profiles) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Điều dưỡng (ACT-003), Bác sĩ điều trị (ACT-002), Nhân viên CSKH (ACT-004) | | |
@@ -398,8 +398,8 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Điều kiện tiên quyết (Pre-conditions)** | Nhân viên đã đăng nhập và được gắn `facility_id` hợp lệ trong phiên làm việc JWT. | | |
 | **Điều kiện sau (Post-conditions)** | Danh sách bệnh nhân hiển thị đúng phạm vi quyền hạn cơ sở, bảo đảm không rò rỉ dữ liệu chéo giữa các chi nhánh bệnh viện (BR26). | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Nhân viên truy cập menu 'Danh sách Bệnh nhân' (SCR-DOC-03). | Frontend gửi request `GET /api/v1/patients?facility_id={id}&page=1&limit=20` kèm access token. |
-| | 2 | Backend trích xuất `facility_id` từ JWT token. | Hệ thống thực thi truy vấn có điều kiện `WHERE facility_id = :facility_id AND status != 'DELETED'`. |
+| | 1 | Nhân viên truy cập menu 'Danh sách Bệnh nhân' (SCR-DOC-03). | Frontend gửi request giao diện lập trình (API) kèm access token. |
+| | 2 | Backend trích xuất `facility_id` từ JWT token. | Hệ thống tự động thực thi truy vấn phân quyền đa chi nhánh, chỉ trả về dữ liệu bệnh nhân thuộc cơ sở y tế (facility_id) của người dùng hiện tại và lọc bỏ các bản ghi đã lưu trữ. |
 | | 3 | Hệ thống tải dữ liệu và hiển thị bảng phân trang. | Bảng hiển thị: Mã BN, Tên viết tắt bảo mật, Mắt mổ, Loại mổ, Ngày mổ, Tên gói Care Plan, Huy hiệu trạng thái cảnh báo (Đỏ/Vàng/Xanh). |
 | | 4 | Nhân viên nhập từ khóa tìm kiếm (Tên viết tắt hoặc 4 số cuối SĐT) hoặc chọn bộ lọc Loại mổ (ví dụ: 'Phaco'). | Frontend debounce 300ms và gửi request lọc cập nhật bảng danh sách tức thì. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
@@ -411,12 +411,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-004.3: Xem Chi Tiết Hồ Sơ Bệnh Nhân & Dòng Thời Gian Phục Hồi (Read/Detail Patient Profile — GET /api/v1/patients/{id})
+#### UC-004.3: Xem Chi Tiết Hồ Sơ Bệnh Nhân & Dòng Thời Gian Phục Hồi (Read/Detail Patient Profile)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-004.3** | | |
-| **Tên Use Case (Use Case Name)** | Xem Chi Tiết Hồ Sơ Bệnh Nhân & Dòng Thời Gian Phục Hồi (Read/Detail Patient Profile — GET /api/v1/patients/{id}) | | |
+| **Tên Use Case (Use Case Name)** | Xem Chi Tiết Hồ Sơ Bệnh Nhân & Dòng Thời Gian Phục Hồi (Read/Detail Patient Profile) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ điều trị (ACT-002), Điều dưỡng (ACT-003), Nhân viên CSKH (ACT-004) | | |
@@ -428,7 +428,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Điều kiện tiên quyết (Pre-conditions)** | Bệnh nhân tồn tại trong hệ thống và thuộc cơ sở nhân viên được phân quyền. | | |
 | **Điều kiện sau (Post-conditions)** | Giao diện chi tiết bệnh nhân hiển thị đầy đủ các thẻ thông tin lâm sàng (SCR-DOC-05 / SCR-DOC-06). | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Nhân viên bấm chọn bệnh nhân có ID cụ thể. | Frontend gửi request `GET /api/v1/patients/{id}` kèm các liên kết quan hệ. |
+| | 1 | Nhân viên bấm chọn bệnh nhân có ID cụ thể. | Frontend gửi request giao diện lập trình (API) kèm các liên kết quan hệ. |
 | | 2 | Hệ thống xác thực quyền truy cập cơ sở. | Backend tập hợp dữ liệu từ các bảng `patients`, `patient_care_plans`, `patient_medications`, `recovery_check_submissions`, `caregiver_patient_links`. |
 | | 3 | Hệ thống trả về HTTP 200 OK kèm JSON chi tiết. | Giao diện hiển thị 4 phân khu lâm sàng: (1) Thẻ định danh & Phẫu thuật; (2) Lịch dùng thuốc & Tỷ lệ tuân thủ; (3) Timeline Recovery Check & Lịch tái khám; (4) Danh sách Caregiver đã liên kết. |
 | | 4 | Nhân viên chuyển đổi qua lại giữa các tab dữ liệu. | Hệ thống render mượt mà biểu đồ phục hồi và lịch sử trả lời khảo sát từng ngày. |
@@ -441,12 +441,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-004.4: Cập Nhật Chỉnh Sửa Thông Tin Hồ Sơ Bệnh Nhân (Update Patient Profile — PUT /api/v1/patients/{id})
+#### UC-004.4: Cập Nhật Chỉnh Sửa Thông Tin Hồ Sơ Bệnh Nhân (Update Patient Profile)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-004.4** | | |
-| **Tên Use Case (Use Case Name)** | Cập Nhật Chỉnh Sửa Thông Tin Hồ Sơ Bệnh Nhân (Update Patient Profile — PUT /api/v1/patients/{id}) | | |
+| **Tên Use Case (Use Case Name)** | Cập Nhật Chỉnh Sửa Thông Tin Hồ Sơ Bệnh Nhân (Update Patient Profile) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Điều dưỡng lưu viện (ACT-003), Bác sĩ điều trị (ACT-002) | | |
@@ -460,7 +460,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | | 1 | Điều dưỡng bấm nút 'Chỉnh sửa Hồ sơ' tại SCR-DOC-05. | Hệ thống mở form chỉnh sửa cho phép sửa SĐT, Tên hiển thị, Địa chỉ liên lạc, Ghi chú cơ địa dị ứng thuốc. |
 | | 2 | Điều dưỡng cập nhật số điện thoại mới của người bệnh. | Hệ thống kiểm tra tính hợp lệ của số điện thoại mới. |
-| | 3 | Điều dưỡng bấm nút 'Lưu Thay Đổi'. | Frontend gửi request `PUT /api/v1/patients/{id}` kèm payload cập nhật. |
+| | 3 | Điều dưỡng bấm nút 'Lưu Thay Đổi'. | Frontend gửi dữ liệu cập nhật hồ sơ bệnh nhân lên máy chủ để kiểm tra và ghi nhận thay đổi. |
 | | 4 | Backend kiểm tra tính toàn vẹn và phân quyền. | Hệ thống ghi nhận thay đổi vào CSDL, ghi nhật ký kiểm toán (Audit Trail) chi tiết giá trị cũ/mới. |
 | | 5 | Hệ thống trả về HTTP 200 OK. | Hiển thị thông báo 'Cập nhật thông tin bệnh nhân thành công' và cập nhật lại giao diện. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
@@ -473,12 +473,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-004.5: Lưu Trữ / Vô Hiệu Hóa Hồ Sơ Bệnh Nhân (Archive/Soft Delete — DELETE /api/v1/patients/{id})
+#### UC-004.5: Lưu Trữ / Vô Hiệu Hóa Hồ Sơ Bệnh Nhân (Archive/Soft Delete)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-004.5** | | |
-| **Tên Use Case (Use Case Name)** | Lưu Trữ / Vô Hiệu Hóa Hồ Sơ Bệnh Nhân (Archive/Soft Delete — DELETE /api/v1/patients/{id}) | | |
+| **Tên Use Case (Use Case Name)** | Lưu Trữ / Vô Hiệu Hóa Hồ Sơ Bệnh Nhân (Archive/Soft Delete) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Điều dưỡng trưởng (ACT-003) / Bác sĩ trưởng khoa (ACT-002) | | |
@@ -491,7 +491,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Điều kiện sau (Post-conditions)** | Trường `status` của bệnh nhân chuyển sang `'ARCHIVED'`, `archived_at` ghi nhận thời gian hiện tại; hồ sơ ẩn khỏi danh sách theo dõi thường quy nhưng vẫn lưu vết trong kho lưu trữ dữ liệu y khoa. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | | 1 | Điều dưỡng trưởng chọn hồ sơ cần lưu trữ, bấm 'Lưu trữ Hồ sơ'. | Hệ thống hiển thị hộp thoại xác nhận yêu cầu nhập 'Lý do lưu trữ' (ví dụ: 'Hồ sơ nhập trùng lặp', 'Bệnh nhân chuyển viện điều trị'). |
-| | 2 | Điều dưỡng nhập lý do và bấm 'Xác nhận Lưu trữ'. | Frontend gửi request `DELETE /api/v1/patients/{id}` kèm reason. |
+| | 2 | Điều dưỡng nhập lý do và bấm 'Xác nhận Lưu trữ'. | Frontend gửi request giao diện lập trình (API) kèm reason. |
 | | 3 | Backend kiểm tra điều kiện an toàn lâm sàng. | Hệ thống xác minh không có cảnh báo Red Flag chưa xử lý; cập nhật `status = 'ARCHIVED'`, thu hồi QR code chưa dùng (`status = 'REVOKED'`). |
 | | 4 | Hệ thống ghi log `ARCHIVE_PATIENT` vào `system_audit_logs`. | Hệ thống trả về HTTP 200 OK kèm thông điệp 'Đã chuyển hồ sơ bệnh nhân vào kho lưu trữ'. |
 | | 5 | Hệ thống điều hướng về danh sách bệnh nhân active. | Hồ sơ vừa lưu trữ không còn xuất hiện trong danh sách theo dõi thường quy. |
@@ -510,12 +510,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 > **Mô tả nhóm nghiệp vụ:** Quản lý vòng đời và phiên bản của các gói phác đồ mẫu chuẩn hóa cho từng loại phẫu thuật nhãn khoa (Phaco, SMILE, Femto-Lasik, SILK). Phân rã thành 5 Use Case CRUD độc lập giúp phân biệt rõ ràng luồng khởi tạo, tra cứu, xem chi tiết, điều chỉnh và kích hoạt/ngưng sử dụng template.
 
-#### UC-005.1: Tạo Mới Master Template (Create Master Template — POST /api/v1/templates)
+#### UC-005.1: Tạo Mới Master Template (Create Master Template)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-005.1** | | |
-| **Tên Use Case (Use Case Name)** | Tạo Mới Master Template (Create Master Template — POST /api/v1/templates) | | |
+| **Tên Use Case (Use Case Name)** | Tạo Mới Master Template (Create Master Template) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002) / Giám đốc Lâm sàng GCMO (ACT-001) | | |
@@ -546,12 +546,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-005.2: Xem Danh Sách & Lọc Master Template (Read/List Master Templates — GET /api/v1/templates)
+#### UC-005.2: Xem Danh Sách & Lọc Master Template (Read/List Master Templates)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-005.2** | | |
-| **Tên Use Case (Use Case Name)** | Xem Danh Sách & Lọc Master Template (Read/List Master Templates — GET /api/v1/templates) | | |
+| **Tên Use Case (Use Case Name)** | Xem Danh Sách & Lọc Master Template (Read/List Master Templates) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002), Giám đốc Lâm sàng (ACT-001), Điều dưỡng (ACT-003) | | |
@@ -563,7 +563,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Điều kiện tiên quyết (Pre-conditions)** | Người dùng đã đăng nhập hệ thống nội bộ bệnh viện. | | |
 | **Điều kiện sau (Post-conditions)** | Danh sách phác đồ mẫu hiển thị đầy đủ, hỗ trợ lọc theo loại mổ và trạng thái. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Người dùng truy cập màn hình SCR-DOC-07. | Frontend gửi request `GET /api/v1/templates` kèm bộ lọc mặc định. |
+| | 1 | Người dùng truy cập màn hình SCR-DOC-07. | Frontend gửi request giao diện lập trình (API) kèm bộ lọc mặc định. |
 | | 2 | Backend truy vấn bảng `care_plan_templates` kèm đếm số lượng thuốc và bài học liên kết. | Hệ thống trả về danh sách các template. |
 | | 3 | Giao diện hiển thị danh sách trực quan. | Mỗi template hiển thị: Tên mẫu, Loại phẫu thuật, Phiên bản (v1.0, v1.1), Bác sĩ tạo, Ngày cập nhật, Huy hiệu trạng thái (`DRAFT` xám, `PENDING_APPROVAL` cam, `ACTIVE` xanh lá, `INACTIVE` đỏ). |
 | | 4 | Người dùng chọn bộ lọc Loại mổ (ví dụ: 'SILK') hoặc Trạng thái ('ACTIVE'). | Danh sách được lọc tức thì theo tiêu chí đã chọn. |
@@ -576,12 +576,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-005.3: Xem Chi Tiết Cấu Hình Master Template (Read/Detail Master Template — GET /api/v1/templates/{id})
+#### UC-005.3: Xem Chi Tiết Cấu Hình Master Template (Read/Detail Master Template)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-005.3** | | |
-| **Tên Use Case (Use Case Name)** | Xem Chi Tiết Cấu Hình Master Template (Read/Detail Master Template — GET /api/v1/templates/{id}) | | |
+| **Tên Use Case (Use Case Name)** | Xem Chi Tiết Cấu Hình Master Template (Read/Detail Master Template) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002), Giám đốc Lâm sàng (ACT-001), Điều dưỡng (ACT-003) | | |
@@ -593,7 +593,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Điều kiện tiên quyết (Pre-conditions)** | Template tồn tại trong hệ thống. | | |
 | **Điều kiện sau (Post-conditions)** | Tải đầy đủ dữ liệu cấu phần vào 4 tab của giao diện SCR-DOC-08. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Bác sĩ chọn một Template cụ thể tại SCR-DOC-07. | Frontend gọi `GET /api/v1/templates/{id}` cùng các endpoint lấy sub-resources. |
+| | 1 | Bác sĩ chọn một Template cụ thể tại SCR-DOC-07. | Frontend gọi giao diện lập trình (API) cùng các endpoint lấy sub-resources. |
 | | 2 | Backend tổng hợp dữ liệu cấu hình từ các bảng `care_plan_templates`, `template_medications`, `template_recovery_milestones`, `template_red_flags`, `template_learning_modules`, `template_do_dont_items`. | Hệ thống trả về payload JSON tổng hợp. |
 | | 3 | Giao diện SCR-DOC-08 hiển thị 4 tab điều hướng. | Tab 1: Thông tin chung & Phiên bản; Tab 2: Danh mục Thuốc mẫu & Timer đệm; Tab 3: Recovery Check & Red Flag; Tab 4: Cẩm nang 24h & Bảng Do/Don't. |
 | | 4 | Bác sĩ chuyển qua lại giữa các tab để rà soát phác đồ. | Hệ thống hiển thị trạng thái chỉnh sửa tương ứng (nếu `DRAFT` cho phép sửa, nếu `ACTIVE` ở chế độ Read-only kèm nút 'Tạo phiên bản mới'). |
@@ -606,12 +606,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-005.4: Chỉnh Sửa Thông Tin Chung Master Template (Update Master Template — PUT /api/v1/templates/{id})
+#### UC-005.4: Chỉnh Sửa Thông Tin Chung Master Template (Update Master Template)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-005.4** | | |
-| **Tên Use Case (Use Case Name)** | Chỉnh Sửa Thông Tin Chung Master Template (Update Master Template — PUT /api/v1/templates/{id}) | | |
+| **Tên Use Case (Use Case Name)** | Chỉnh Sửa Thông Tin Chung Master Template (Update Master Template) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002), Giám đốc Lâm sàng (ACT-001) | | |
@@ -636,12 +636,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-005.5: Kích Hoạt / Lưu Trữ Master Template (Patch Template Status — PATCH /api/v1/templates/{id}/status)
+#### UC-005.5: Kích Hoạt / Lưu Trữ Master Template (Patch Template Status)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-005.5** | | |
-| **Tên Use Case (Use Case Name)** | Kích Hoạt / Lưu Trữ Master Template (Patch Template Status — PATCH /api/v1/templates/{id}/status) | | |
+| **Tên Use Case (Use Case Name)** | Kích Hoạt / Lưu Trữ Master Template (Patch Template Status) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Giám đốc Lâm sàng GCMO (ACT-001) | | |
@@ -654,7 +654,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Điều kiện sau (Post-conditions)** | Cập nhật cột `status` trong `care_plan_templates`, ghi nhận chữ ký điện tử và thời điểm phê duyệt nếu duyệt ban hành. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | | 1 | GCMO xem xét toàn bộ cấu hình template tại SCR-DOC-08 và bấm 'Ban Hành Áp Dụng Toàn Viện'. | Hệ thống mở modal xác nhận ký duyệt lâm sàng. |
-| | 2 | GCMO nhập mật khẩu / mã xác thực phê duyệt. | Frontend gửi request `PATCH /api/v1/templates/{id}/status` với body `{"status": "ACTIVE"}`. |
+| | 2 | GCMO nhập mật khẩu / mã xác thực phê duyệt. | Frontend gửi request giao diện lập trình (API) với body `{"status": "ACTIVE"}`. |
 | | 3 | Backend kiểm tra điều kiện toàn vẹn lâm sàng: | - Phải có ít nhất 1 loại thuốc mẫu (F-007)
 - Phải có ít nhất 1 mốc Recovery Check (F-008)
 - Phải có ít nhất 1 tiêu chí Red Flag kèm Hotline VISI (BR11)
@@ -709,12 +709,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 > **Mô tả nhóm nghiệp vụ:** Quản lý danh mục các loại thuốc điều trị hậu phẫu chuẩn hóa được gán vào Master Template. Bao gồm thiết lập liều lượng, số giọt, lịch cữ uống/nhỏ trong ngày, định danh trực quan qua màu nắp lọ và đặc biệt là cài đặt thời gian đệm giãn cách an toàn 5–10 phút (Drop Interval Buffer Timer — BR23) để chống rửa trôi dược chất nhãn khoa.
 
-#### UC-007.1: Thêm Thuốc Mẫu Vào Master Template & Cài Đặt Timer Đệm (Create Template Medication — POST /api/v1/templates/{id}/medications)
+#### UC-007.1: Thêm Thuốc Mẫu Vào Master Template & Cài Đặt Timer Đệm (Create Template Medication)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-007.1** | | |
-| **Tên Use Case (Use Case Name)** | Thêm Thuốc Mẫu Vào Master Template & Cài Đặt Timer Đệm (Create Template Medication — POST /api/v1/templates/{id}/medications) | | |
+| **Tên Use Case (Use Case Name)** | Thêm Thuốc Mẫu Vào Master Template & Cài Đặt Timer Đệm (Create Template Medication) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002) | | |
@@ -732,7 +732,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | | 4 | Bác sĩ cấu hình Lịch dùng trong ngày: Chọn các cữ Sáng (08:00), Trưa (12:00), Chiều (16:00), Tối (20:00). | Hệ thống hiển thị timeline phân bổ các cữ trong ngày trực quan. |
 | | 5 | Bác sĩ cấu hình 'Thời gian đệm giãn cách (Buffer Interval)': Chọn 5 phút (mặc định cho dung dịch thông thường) hoặc 10 phút (cho hỗn dịch/gel/mỡ tra mắt). | Hệ thống gán quy tắc đệm BR23 vào cấu hình thuốc. |
 | | 6 | Bác sĩ chọn Mã màu nắp lọ hoặc tải ảnh vỏ lọ nhận diện. | Hệ thống preview ảnh lọ thuốc với màu nắp tương ứng (ví dụ: Vàng, Cam, Trắng). |
-| | 7 | Bác sĩ bấm 'Lưu Thuốc Mẫu'. | Frontend gửi `POST /api/v1/templates/{id}/medications`, backend validate dữ liệu, lưu vào `template_medications` và trả về HTTP 201 Created. |
+| | 7 | Bác sĩ bấm 'Lưu Thuốc Mẫu'. | Hệ thống tiếp nhận thông tin thuốc mẫu, kiểm tra tính hợp lệ dữ liệu y tế và lưu trữ cấu hình thành công. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | **Chọn từ Danh mục Dược thư Chuẩn VISI** | 1 | Bác sĩ gõ tìm kiếm tên thuốc trong danh mục dược thư đã được Bệnh viện phê duyệt sẵn. | Hệ thống tự động điền sẵn Dạng bào chế, hoạt chất, màu nắp và khuyến nghị thời gian đệm chuẩn. |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
@@ -743,12 +743,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-007.2: Xem Danh Sách Thuốc Mẫu Trong Template (Read/List Template Medications — GET /api/v1/templates/{id}/medications)
+#### UC-007.2: Xem Danh Sách Thuốc Mẫu Trong Template (Read/List Template Medications)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-007.2** | | |
-| **Tên Use Case (Use Case Name)** | Xem Danh Sách Thuốc Mẫu Trong Template (Read/List Template Medications — GET /api/v1/templates/{id}/medications) | | |
+| **Tên Use Case (Use Case Name)** | Xem Danh Sách Thuốc Mẫu Trong Template (Read/List Template Medications) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002), Điều dưỡng (ACT-003), GCMO (ACT-001) | | |
@@ -760,7 +760,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Điều kiện tiên quyết (Pre-conditions)** | Template tồn tại trong hệ thống. | | |
 | **Điều kiện sau (Post-conditions)** | Hiển thị bảng danh mục thuốc đầy đủ, rõ ràng và trực quan. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Người dùng mở Tab 2 tại SCR-DOC-08. | Frontend gọi `GET /api/v1/templates/{id}/medications`. |
+| | 1 | Người dùng mở Tab 2 tại SCR-DOC-08. | Frontend gửi yêu cầu tải danh sách các loại thuốc mẫu và thời gian đệm nhỏ mắt của Template. |
 | | 2 | Backend truy vấn bảng `template_medications` sắp xếp theo thứ tự ưu tiên dùng thuốc. | Hệ thống trả về danh sách các loại thuốc. |
 | | 3 | Giao diện hiển thị bảng thuốc: | Cột 1: Ảnh nắp lọ & Tên thuốc; Cột 2: Dạng bào chế & Liều dùng; Cột 3: Khung giờ các cữ; Cột 4: Thời gian đệm giãn cách (5–10p); Cột 5: Nút thao tác (Sửa, Xóa). |
 | | 4 | Người dùng xem chi tiết thứ tự nhỏ thuốc trong từng khung giờ. | Hệ thống hiển thị timeline tuần tự: Ví dụ lúc 08:00 nhỏ Kháng sinh Lọ 1 -> Đếm lùi 5p -> Nhỏ Kháng viêm Lọ 2. |
@@ -773,12 +773,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-007.3: Chỉnh Sửa Thuốc Mẫu & Thời Gian Đệm (Update Template Medication — PUT /api/v1/templates/{id}/medications/{med_id})
+#### UC-007.3: Chỉnh Sửa Thuốc Mẫu & Thời Gian Đệm (Update Template Medication)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-007.3** | | |
-| **Tên Use Case (Use Case Name)** | Chỉnh Sửa Thuốc Mẫu & Thời Gian Đệm (Update Template Medication — PUT /api/v1/templates/{id}/medications/{med_id}) | | |
+| **Tên Use Case (Use Case Name)** | Chỉnh Sửa Thuốc Mẫu & Thời Gian Đệm (Update Template Medication) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002) | | |
@@ -792,7 +792,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | | 1 | Bác sĩ bấm icon 'Sửa' trên một loại thuốc mẫu. | Hệ thống mở modal chỉnh sửa với dữ liệu hiện tại của thuốc được điền sẵn. |
 | | 2 | Bác sĩ điều chỉnh số giọt (ví dụ từ 1 giọt lên 2 giọt) hoặc tăng thời gian đệm từ 5 phút lên 10 phút. | Hệ thống kiểm tra tính logic của dữ liệu. |
-| | 3 | Bác sĩ bấm 'Lưu Cập Nhật'. | Frontend gửi request `PUT /api/v1/templates/{id}/medications/{med_id}`. |
+| | 3 | Bác sĩ bấm 'Lưu Cập Nhật'. | Frontend gửi thông tin điều chỉnh thuốc mẫu và thời gian đệm lên hệ thống để cập nhật. |
 | | 4 | Backend cập nhật CSDL và trả về HTTP 200 OK. | Giao diện cập nhật lại dòng thuốc tương ứng tức thì. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | Không có | - | Luồng thực hiện chuẩn không rẽ nhánh | - |
@@ -803,12 +803,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-007.4: Xóa Thuốc Mẫu Khỏi Master Template (Delete Template Medication — DELETE /api/v1/templates/{id}/medications/{med_id})
+#### UC-007.4: Xóa Thuốc Mẫu Khỏi Master Template (Delete Template Medication)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-007.4** | | |
-| **Tên Use Case (Use Case Name)** | Xóa Thuốc Mẫu Khỏi Master Template (Delete Template Medication — DELETE /api/v1/templates/{id}/medications/{med_id}) | | |
+| **Tên Use Case (Use Case Name)** | Xóa Thuốc Mẫu Khỏi Master Template (Delete Template Medication) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002) | | |
@@ -821,7 +821,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Điều kiện sau (Post-conditions)** | Bản ghi thuốc bị xóa khỏi bảng `template_medications`. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | | 1 | Bác sĩ bấm icon 'Xóa' trên dòng thuốc cần loại bỏ. | Hệ thống hiển thị hộp thoại xác nhận: 'Bạn có chắc chắn muốn xóa thuốc này khỏi Master Template không?'. |
-| | 2 | Bác sĩ bấm 'Xác nhận Xóa'. | Frontend gửi request `DELETE /api/v1/templates/{id}/medications/{med_id}`. |
+| | 2 | Bác sĩ bấm 'Xác nhận Xóa'. | Frontend gửi yêu cầu loại bỏ thuốc mẫu khỏi cấu hình Master Template. |
 | | 3 | Backend xóa bản ghi trong CSDL và sắp xếp lại thứ tự ưu tiên các thuốc còn lại. | Hệ thống trả về HTTP 200 OK. |
 | | 4 | Frontend gỡ bỏ dòng thuốc khỏi bảng danh mục. | Hiển thị thông báo 'Đã xóa thuốc mẫu thành công'. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
@@ -838,12 +838,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 > **Mô tả nhóm nghiệp vụ:** Cấu hình hệ thống giám sát phục hồi lâm sàng đa tầng cho Master Template. Bao gồm thiết lập các mốc thời gian đánh giá định kỳ (Milestones) kèm bộ câu hỏi 3 mức phân loại màu sắc (Xanh: Bình thường, Vàng: Chú ý, Đỏ: Nguy hiểm — F-008, F-019) và cấu hình các tiêu chí báo động đỏ Red Flag khẩn cấp gắn liền với Hotline VISI 0395 151 151 và thời gian cam kết can thiệp lâm sàng SLA <5 phút (BR11, BR12).
 
-#### UC-008.1: Thêm Mốc Thời Gian & Câu Hỏi Recovery Check (Create Milestone & Questions — POST /api/v1/templates/{id}/milestones)
+#### UC-008.1: Thêm Mốc Thời Gian & Câu Hỏi Recovery Check (Create Milestone & Questions)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-008.1** | | |
-| **Tên Use Case (Use Case Name)** | Thêm Mốc Thời Gian & Câu Hỏi Recovery Check (Create Milestone & Questions — POST /api/v1/templates/{id}/milestones) | | |
+| **Tên Use Case (Use Case Name)** | Thêm Mốc Thời Gian & Câu Hỏi Recovery Check (Create Milestone & Questions) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002) | | |
@@ -862,7 +862,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 - Mức 2 (Vàng): 'Đau âm ỉ nhưng giảm sau khi nghỉ ngơi' -> Bác sĩ/CSKH theo dõi.
 - Mức 3 (Đỏ): 'Đau nhức dữ dội lan lên nửa đầu, dùng thuốc giảm đau không đỡ' -> Tự động kích hoạt Red Flag Incident (F-020). |
 | | 5 | Bác sĩ thêm tiếp các câu hỏi về Đỏ mắt, Thị lực mờ sương, Tiết dịch ghèn (tổng 3–5 câu hỏi theo chuẩn BR24). | Hệ thống hiển thị danh sách câu hỏi xem trước trực quan. |
-| | 6 | Bác sĩ bấm 'Lưu Mốc Khảo Sát'. | Frontend gửi `POST /api/v1/templates/{id}/milestones`, backend lưu CSDL và trả về HTTP 201 Created. |
+| | 6 | Bác sĩ bấm 'Lưu Mốc Khảo Sát'. | Hệ thống tiếp nhận cấu hình mốc khảo sát và bộ câu hỏi sàng lọc, lưu trữ dữ liệu thành công. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | Không có | - | Luồng thực hiện chuẩn không rẽ nhánh | - |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
@@ -873,12 +873,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-008.2: Xem Danh Sách Mốc & Câu Hỏi Recovery Check (Read/List Milestones — GET /api/v1/templates/{id}/milestones)
+#### UC-008.2: Xem Danh Sách Mốc & Câu Hỏi Recovery Check (Read/List Milestones)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-008.2** | | |
-| **Tên Use Case (Use Case Name)** | Xem Danh Sách Mốc & Câu Hỏi Recovery Check (Read/List Milestones — GET /api/v1/templates/{id}/milestones) | | |
+| **Tên Use Case (Use Case Name)** | Xem Danh Sách Mốc & Câu Hỏi Recovery Check (Read/List Milestones) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002), Điều dưỡng (ACT-003), GCMO (ACT-001) | | |
@@ -890,7 +890,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Điều kiện tiên quyết (Pre-conditions)** | Template tồn tại trong hệ thống. | | |
 | **Điều kiện sau (Post-conditions)** | Danh sách các mốc hiển thị dạng Timeline tuần tự theo từng ngày sau mổ. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Người dùng mở Tab 3 SCR-DOC-08. | Frontend gửi request `GET /api/v1/templates/{id}/milestones`. |
+| | 1 | Người dùng mở Tab 3 SCR-DOC-08. | Frontend gửi yêu cầu tải danh sách các mốc khảo sát Recovery Check trong Template. |
 | | 2 | Backend truy vấn bảng `template_recovery_milestones` kèm join bảng `template_recovery_questions` sắp xếp theo `day_offset`. | Hệ thống trả về danh sách mốc và câu hỏi. |
 | | 3 | Giao diện hiển thị danh sách Accordion các mốc: Ngày 1, Ngày 3, Ngày 7, Ngày 14, Ngày 30. | Mỗi mốc mở rộng hiển thị các câu hỏi thành phần kèm 3 nhãn màu Xanh/Vàng/Đỏ trực quan. |
 | | 4 | Người dùng bấm vào từng mốc để xem chi tiết. | Hệ thống hiển thị trạng thái câu hỏi và trọng số cảnh báo. |
@@ -903,12 +903,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-008.3: Chỉnh Sửa Mốc & Câu Hỏi Recovery Check (Update Milestone — PUT /api/v1/templates/{id}/milestones/{id})
+#### UC-008.3: Chỉnh Sửa Mốc & Câu Hỏi Recovery Check (Update Milestone)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-008.3** | | |
-| **Tên Use Case (Use Case Name)** | Chỉnh Sửa Mốc & Câu Hỏi Recovery Check (Update Milestone — PUT /api/v1/templates/{id}/milestones/{id}) | | |
+| **Tên Use Case (Use Case Name)** | Chỉnh Sửa Mốc & Câu Hỏi Recovery Check (Update Milestone) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002) | | |
@@ -922,7 +922,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | | 1 | Bác sĩ bấm 'Sửa' trên mốc Ngày 1. | Hệ thống mở modal với dữ liệu hiện tại. |
 | | 2 | Bác sĩ chỉnh sửa văn phong câu hỏi cho rõ ràng hơn. | Hệ thống kiểm tra cú pháp và độ dài chuỗi. |
-| | 3 | Bác sĩ bấm 'Lưu Thay Đổi'. | Frontend gửi `PUT /api/v1/templates/{id}/milestones/{id}`, backend cập nhật và trả về HTTP 200 OK. |
+| | 3 | Bác sĩ bấm 'Lưu Thay Đổi'. | Hệ thống tiếp nhận thông tin chỉnh sửa mốc khảo sát và cập nhật dữ liệu thành công. |
 | | 4 | Giao diện cập nhật lại nội dung câu hỏi tức thì. | Hiển thị thông báo cập nhật thành công. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | Không có | - | Luồng thực hiện chuẩn không rẽ nhánh | - |
@@ -933,12 +933,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-008.4: Xóa Mốc Thời Gian / Câu Hỏi Recovery Check (Delete Milestone — DELETE /api/v1/templates/{id}/milestones/{id})
+#### UC-008.4: Xóa Mốc Thời Gian / Câu Hỏi Recovery Check (Delete Milestone)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-008.4** | | |
-| **Tên Use Case (Use Case Name)** | Xóa Mốc Thời Gian / Câu Hỏi Recovery Check (Delete Milestone — DELETE /api/v1/templates/{id}/milestones/{id}) | | |
+| **Tên Use Case (Use Case Name)** | Xóa Mốc Thời Gian / Câu Hỏi Recovery Check (Delete Milestone) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002) | | |
@@ -951,7 +951,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Điều kiện sau (Post-conditions)** | Bản ghi mốc khảo sát và các câu hỏi phụ thuộc bị xóa khỏi CSDL. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | | 1 | Bác sĩ bấm icon 'Xóa' trên mốc khảo sát. | Hệ thống yêu cầu xác nhận: 'Bạn có chắc chắn muốn xóa mốc khảo sát này cùng toàn bộ các câu hỏi bên trong?'. |
-| | 2 | Bác sĩ bấm 'Xác nhận Xóa'. | Frontend gửi request `DELETE /api/v1/templates/{id}/milestones/{id}`. |
+| | 2 | Bác sĩ bấm 'Xác nhận Xóa'. | Frontend gửi yêu cầu xóa mốc khảo sát hoặc câu hỏi tương ứng khỏi Template. |
 | | 3 | Backend xóa mốc và câu hỏi dạng cascade trong CSDL. | Hệ thống trả về HTTP 200 OK và cập nhật lại danh sách. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | Không có | - | Luồng thực hiện chuẩn không rẽ nhánh | - |
@@ -962,12 +962,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-008.5: Thêm Tiêu Chí Dấu Hiệu Nguy Hiểm Red Flag & Hotline (Create Red Flag Rule — POST /api/v1/templates/{id}/red-flags)
+#### UC-008.5: Thêm Tiêu Chí Dấu Hiệu Nguy Hiểm Red Flag & Hotline (Create Red Flag Rule)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-008.5** | | |
-| **Tên Use Case (Use Case Name)** | Thêm Tiêu Chí Dấu Hiệu Nguy Hiểm Red Flag & Hotline (Create Red Flag Rule — POST /api/v1/templates/{id}/red-flags) | | |
+| **Tên Use Case (Use Case Name)** | Thêm Tiêu Chí Dấu Hiệu Nguy Hiểm Red Flag & Hotline (Create Red Flag Rule) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002) | | |
@@ -983,7 +983,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | | 2 | Bác sĩ nhập Tên triệu chứng (ví dụ: 'Đột ngột suy giảm hoặc mất hoàn toàn thị lực'). | Hệ thống ghi nhận mô tả triệu chứng lâm sàng. |
 | | 3 | Bác sĩ nhập Hướng dẫn sơ cứu tức thì cho người nhà (ví dụ: 'Tuyệt đối không dụi mắt, không nhỏ thêm bất kỳ loại thuốc nào, giữ nguyên tư thế và gọi ngay Hotline viện'). | Hệ thống hiển thị preview khung giao diện cấp cứu của Caregiver. |
 | | 4 | Hệ thống mặc định gắn Số Hotline Cấp cứu: `0395 151 151` (cố định theo BR11) và Thời gian cam kết phản hồi SLA: `5 phút` (BR12). | Bác sĩ xác nhận thông số cấp cứu. |
-| | 5 | Bác sĩ bấm 'Lưu Tiêu Chí Red Flag'. | Frontend gửi `POST /api/v1/templates/{id}/red-flags`, backend lưu CSDL và trả về HTTP 201 Created. |
+| | 5 | Bác sĩ bấm 'Lưu Tiêu Chí Red Flag'. | Hệ thống tiếp nhận cấu hình tiêu chí Red Flag cùng hướng xử trí lâm sàng và lưu trữ thành công. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | Không có | - | Luồng thực hiện chuẩn không rẽ nhánh | - |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
@@ -993,12 +993,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-008.6: Xem Danh Sách Tiêu Chí Red Flag Trong Template (Read/List Red Flags — GET /api/v1/templates/{id}/red-flags)
+#### UC-008.6: Xem Danh Sách Tiêu Chí Red Flag Trong Template (Read/List Red Flags)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-008.6** | | |
-| **Tên Use Case (Use Case Name)** | Xem Danh Sách Tiêu Chí Red Flag Trong Template (Read/List Red Flags — GET /api/v1/templates/{id}/red-flags) | | |
+| **Tên Use Case (Use Case Name)** | Xem Danh Sách Tiêu Chí Red Flag Trong Template (Read/List Red Flags) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002), Nhân viên CSKH (ACT-004), GCMO (ACT-001) | | |
@@ -1010,7 +1010,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Điều kiện tiên quyết (Pre-conditions)** | Template tồn tại trong hệ thống. | | |
 | **Điều kiện sau (Post-conditions)** | Bảng danh sách tiêu chí Red Flag hiển thị đầy đủ kèm hướng dẫn sơ cứu tức thì. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Người dùng mở phân khu Red Flag tại Tab 3. | Frontend gọi `GET /api/v1/templates/{id}/red-flags`. |
+| | 1 | Người dùng mở phân khu Red Flag tại Tab 3. | Frontend gửi yêu cầu tải danh mục các tiêu chí dấu hiệu nguy hiểm Red Flag trong Template. |
 | | 2 | Backend truy vấn bảng `template_red_flags`. | Hệ thống trả về danh sách các tiêu chí báo động đỏ. |
 | | 3 | Giao diện hiển thị bảng viền đỏ nổi bật: | Cột 1: Tên triệu chứng biến chứng; Cột 2: Hướng dẫn sơ cứu người nhà; Cột 3: Hotline cấp cứu (0395 151 151); Cột 4: SLA xử lý (<5 phút); Cột 5: Nút thao tác. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
@@ -1022,12 +1022,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-008.7: Chỉnh Sửa Tiêu Chí Red Flag & Hướng Xử Trí Lâm Sàng (Update Red Flag — PUT /api/v1/templates/{id}/red-flags/{id})
+#### UC-008.7: Chỉnh Sửa Tiêu Chí Red Flag & Hướng Xử Trí Lâm Sàng (Update Red Flag)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-008.7** | | |
-| **Tên Use Case (Use Case Name)** | Chỉnh Sửa Tiêu Chí Red Flag & Hướng Xử Trí Lâm Sàng (Update Red Flag — PUT /api/v1/templates/{id}/red-flags/{id}) | | |
+| **Tên Use Case (Use Case Name)** | Chỉnh Sửa Tiêu Chí Red Flag & Hướng Xử Trí Lâm Sàng (Update Red Flag) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002) | | |
@@ -1041,7 +1041,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | | 1 | Bác sĩ bấm 'Sửa' trên một tiêu chí Red Flag. | Hệ thống mở modal chỉnh sửa. |
 | | 2 | Bác sĩ bổ sung thêm hướng dẫn sơ cứu cụ thể. | Hệ thống kiểm tra nội dung. |
-| | 3 | Bác sĩ bấm 'Lưu Cập Nhật'. | Frontend gửi `PUT /api/v1/templates/{id}/red-flags/{id}`, backend lưu dữ liệu và trả về HTTP 200 OK. |
+| | 3 | Bác sĩ bấm 'Lưu Cập Nhật'. | Hệ thống tiếp nhận thông tin điều chỉnh tiêu chí Red Flag và cập nhật thành công. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | Không có | - | Luồng thực hiện chuẩn không rẽ nhánh | - |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
@@ -1051,12 +1051,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-008.8: Xóa Tiêu Chí Red Flag Khỏi Template (Delete Red Flag — DELETE /api/v1/templates/{id}/red-flags/{id})
+#### UC-008.8: Xóa Tiêu Chí Red Flag Khỏi Template (Delete Red Flag)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-008.8** | | |
-| **Tên Use Case (Use Case Name)** | Xóa Tiêu Chí Red Flag Khỏi Template (Delete Red Flag — DELETE /api/v1/templates/{id}/red-flags/{id}) | | |
+| **Tên Use Case (Use Case Name)** | Xóa Tiêu Chí Red Flag Khỏi Template (Delete Red Flag) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002) | | |
@@ -1069,7 +1069,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Điều kiện sau (Post-conditions)** | Bản ghi bị xóa khỏi CSDL. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | | 1 | Bác sĩ bấm 'Xóa' trên tiêu chí Red Flag. | Hệ thống hiển thị cảnh báo an toàn y khoa: 'Bạn có chắc chắn muốn xóa tiêu chí cảnh báo nguy hiểm này?'. |
-| | 2 | Bác sĩ bấm 'Xác nhận Xóa'. | Frontend gửi `DELETE /api/v1/templates/{id}/red-flags/{id}`. |
+| | 2 | Bác sĩ bấm 'Xác nhận Xóa'. | Frontend gửi yêu cầu xóa tiêu chí Red Flag khỏi cấu hình Template. |
 | | 3 | Backend xóa bản ghi trong CSDL và trả về HTTP 200 OK. | Giao diện cập nhật lại bảng tiêu chí. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | Không có | - | Luồng thực hiện chuẩn không rẽ nhánh | - |
@@ -1085,12 +1085,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 > **Mô tả nhóm nghiệp vụ:** Quản lý toàn diện kho nội dung giáo dục sức khỏe và hướng dẫn thực hành cho thân nhân và người bệnh. Phân rã thành 9 Use Case CRUD chi tiết giúp phân tách độc lập việc quản lý cẩm nang 24h đầu & Infographic tĩnh (F-009, F-016, F-017), quản lý bảng 2 cột màu Nên làm / Cần tránh phân nhóm hoạt động sinh hoạt, và cấu hình ngân hàng hỏi đáp tình huống lâm sàng khẩn cấp (F-024).
 
-#### UC-009.1: Thêm Nội Dung Cẩm Nang 24h & Infographic Bài Học (Create Learning Module — POST /api/v1/templates/{id}/modules)
+#### UC-009.1: Thêm Nội Dung Cẩm Nang 24h & Infographic Bài Học (Create Learning Module)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-009.1** | | |
-| **Tên Use Case (Use Case Name)** | Thêm Nội Dung Cẩm Nang 24h & Infographic Bài Học (Create Learning Module — POST /api/v1/templates/{id}/modules) | | |
+| **Tên Use Case (Use Case Name)** | Thêm Nội Dung Cẩm Nang 24h & Infographic Bài Học (Create Learning Module) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002) | | |
@@ -1107,7 +1107,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | | 3 | Bác sĩ đánh dấu checkbox: 'Thuộc Cẩm nang 24h đầu sống còn (Critical 24h Guide)' (F-016). | Hệ thống gán cờ ưu tiên hiển thị ngay trên đầu trang chủ Caregiver (SCR-CG-04). |
 | | 4 | Bác sĩ tải lên file ảnh Infographic đồ họa tĩnh (PNG/JPG chuẩn tối ưu dung lượng <500KB) hoặc chọn từ Thư viện Đồ họa VISI. | Hệ thống upload lên CDN an toàn và hiển thị hình ảnh xem trước. |
 | | 5 | Bác sĩ nhập Tóm tắt y khoa 3 gạch đầu dòng (Lời dặn cốt lõi). | Hệ thống kiểm tra độ dài và định dạng văn bản. |
-| | 6 | Bác sĩ bấm 'Lưu Bài Học'. | Frontend gửi `POST /api/v1/templates/{id}/modules`, backend lưu CSDL và trả về HTTP 201 Created. |
+| | 6 | Bác sĩ bấm 'Lưu Bài Học'. | Hệ thống tiếp nhận nội dung bài học cẩm nang và infographic, lưu trữ vào lộ trình học tập. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | Không có | - | Luồng thực hiện chuẩn không rẽ nhánh | - |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
@@ -1118,12 +1118,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-009.2: Xem Danh Mục Cẩm Nang & Infographic Bài Học (Read/List Modules — GET /api/v1/templates/{id}/modules)
+#### UC-009.2: Xem Danh Mục Cẩm Nang & Infographic Bài Học (Read/List Modules)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-009.2** | | |
-| **Tên Use Case (Use Case Name)** | Xem Danh Mục Cẩm Nang & Infographic Bài Học (Read/List Modules — GET /api/v1/templates/{id}/modules) | | |
+| **Tên Use Case (Use Case Name)** | Xem Danh Mục Cẩm Nang & Infographic Bài Học (Read/List Modules) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002), Điều dưỡng (ACT-003), GCMO (ACT-001) | | |
@@ -1135,7 +1135,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Điều kiện tiên quyết (Pre-conditions)** | Template tồn tại trong hệ thống. | | |
 | **Điều kiện sau (Post-conditions)** | Danh sách bài học hiển thị trực quan dạng lưới kèm hình ảnh thu nhỏ (thumbnail). | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Người dùng truy cập phân khu Cẩm nang tại Tab 4. | Frontend gọi `GET /api/v1/templates/{id}/modules`. |
+| | 1 | Người dùng truy cập phân khu Cẩm nang tại Tab 4. | Frontend gửi yêu cầu tải danh mục các bài học cẩm nang 24h và tài liệu infographic. |
 | | 2 | Backend truy vấn bảng `template_learning_modules` sắp xếp theo `display_order`. | Hệ thống trả về danh sách các bài học. |
 | | 3 | Giao diện hiển thị danh sách dạng thẻ card trực quan: | Mỗi card hiển thị ảnh Thumbnail, Tiêu đề bài học, Thẻ đánh dấu 'Cẩm nang 24h', Thứ tự hiển thị, Nút sửa/xóa. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
@@ -1147,12 +1147,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-009.3: Chỉnh Sửa Nội Dung Cẩm Nang & Infographic Bài Học (Update Module — PUT /api/v1/templates/{id}/modules/{id})
+#### UC-009.3: Chỉnh Sửa Nội Dung Cẩm Nang & Infographic Bài Học (Update Module)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-009.3** | | |
-| **Tên Use Case (Use Case Name)** | Chỉnh Sửa Nội Dung Cẩm Nang & Infographic Bài Học (Update Module — PUT /api/v1/templates/{id}/modules/{id}) | | |
+| **Tên Use Case (Use Case Name)** | Chỉnh Sửa Nội Dung Cẩm Nang & Infographic Bài Học (Update Module) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002) | | |
@@ -1166,7 +1166,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | | 1 | Bác sĩ bấm 'Sửa' trên một bài học. | Hệ thống mở modal chỉnh sửa với dữ liệu bài học hiện tại. |
 | | 2 | Bác sĩ thay đổi nội dung lời dặn tóm tắt. | Hệ thống hiển thị preview tức thì. |
-| | 3 | Bác sĩ bấm 'Lưu Thay Đổi'. | Frontend gửi `PUT /api/v1/templates/{id}/modules/{id}`, backend lưu CSDL và trả về HTTP 200 OK. |
+| | 3 | Bác sĩ bấm 'Lưu Thay Đổi'. | Hệ thống tiếp nhận thông tin chỉnh sửa bài học cẩm nang và cập nhật dữ liệu thành công. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | Không có | - | Luồng thực hiện chuẩn không rẽ nhánh | - |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
@@ -1176,12 +1176,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-009.4: Xóa Bài Học Khỏi Lộ Trình Cẩm Nang (Delete Module — DELETE /api/v1/templates/{id}/modules/{id})
+#### UC-009.4: Xóa Bài Học Khỏi Lộ Trình Cẩm Nang (Delete Module)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-009.4** | | |
-| **Tên Use Case (Use Case Name)** | Xóa Bài Học Khỏi Lộ Trình Cẩm Nang (Delete Module — DELETE /api/v1/templates/{id}/modules/{id}) | | |
+| **Tên Use Case (Use Case Name)** | Xóa Bài Học Khỏi Lộ Trình Cẩm Nang (Delete Module) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002) | | |
@@ -1194,7 +1194,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Điều kiện sau (Post-conditions)** | Bản ghi bị xóa khỏi CSDL. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | | 1 | Bác sĩ bấm 'Xóa' trên bài học. | Hệ thống hiển thị hộp thoại xác nhận: 'Bạn có chắc chắn muốn xóa bài học này khỏi lộ trình cẩm nang?'. |
-| | 2 | Bác sĩ bấm 'Xác nhận Xóa'. | Frontend gửi `DELETE /api/v1/templates/{id}/modules/{id}`. |
+| | 2 | Bác sĩ bấm 'Xác nhận Xóa'. | Frontend gửi yêu cầu loại bỏ bài học khỏi lộ trình cẩm nang. |
 | | 3 | Backend xóa bản ghi trong CSDL và sắp xếp lại thứ tự bài học còn lại. | Hệ thống trả về HTTP 200 OK. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | Không có | - | Luồng thực hiện chuẩn không rẽ nhánh | - |
@@ -1205,12 +1205,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-009.5: Thêm Quy Tắc Nên Làm / Cần Tránh 2 Cột Màu (Create Do/Don't Item — POST /api/v1/templates/{id}/do-dont)
+#### UC-009.5: Thêm Quy Tắc Nên Làm / Cần Tránh 2 Cột Màu (Create Do/Don't Item)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-009.5** | | |
-| **Tên Use Case (Use Case Name)** | Thêm Quy Tắc Nên Làm / Cần Tránh 2 Cột Màu (Create Do/Don't Item — POST /api/v1/templates/{id}/do-dont) | | |
+| **Tên Use Case (Use Case Name)** | Thêm Quy Tắc Nên Làm / Cần Tránh 2 Cột Màu (Create Do/Don't Item) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002) | | |
@@ -1227,7 +1227,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | | 3 | Bác sĩ chọn Nhóm sinh hoạt (`category`): Vệ sinh mắt / Tắm gội / Ăn uống / Vận động / Sử dụng màn hình điện tử / Giấc ngủ. | Hệ thống hiển thị icon sinh hoạt minh họa tương ứng. |
 | | 4 | Bác sĩ nhập Tiêu đề quy tắc (ví dụ: 'Đeo kính bảo hộ cả khi ngủ trong 3 ngày đầu'). | Hệ thống ghi nhận tiêu đề ngắn gọn. |
 | | 5 | Bác sĩ nhập Giải thích lý do y khoa (ví dụ: 'Để tránh vô tình đưa tay lên dụi mắt trong lúc ngủ say gây lệch vạt giác mạc'). | Hệ thống ghi nhận giải thích chuyên môn. |
-| | 6 | Bác sĩ bấm 'Lưu Quy Tắc'. | Frontend gửi `POST /api/v1/templates/{id}/do-dont`, backend lưu CSDL và trả về HTTP 201 Created. |
+| | 6 | Bác sĩ bấm 'Lưu Quy Tắc'. | Hệ thống tiếp nhận nội dung quy tắc Nên làm / Cần tránh và phân loại theo 2 cột màu trực quan. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | Không có | - | Luồng thực hiện chuẩn không rẽ nhánh | - |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
@@ -1237,12 +1237,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-009.6: Xem Danh Sách Quy Tắc Nên Làm / Cần Tránh (Read/List Do/Don't — GET /api/v1/templates/{id}/do-dont)
+#### UC-009.6: Xem Danh Sách Quy Tắc Nên Làm / Cần Tránh (Read/List Do/Don't)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-009.6** | | |
-| **Tên Use Case (Use Case Name)** | Xem Danh Sách Quy Tắc Nên Làm / Cần Tránh (Read/List Do/Don't — GET /api/v1/templates/{id}/do-dont) | | |
+| **Tên Use Case (Use Case Name)** | Xem Danh Sách Quy Tắc Nên Làm / Cần Tránh (Read/List Do/Don't) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002), Điều dưỡng (ACT-003), GCMO (ACT-001) | | |
@@ -1254,7 +1254,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Điều kiện tiên quyết (Pre-conditions)** | Template tồn tại trong hệ thống. | | |
 | **Điều kiện sau (Post-conditions)** | Giao diện hiển thị bảng 2 cột màu trực quan phân nhóm rõ ràng. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Người dùng mở phân khu Do/Don't tại Tab 4. | Frontend gửi request `GET /api/v1/templates/{id}/do-dont`. |
+| | 1 | Người dùng mở phân khu Do/Don't tại Tab 4. | Frontend gửi yêu cầu tải danh mục quy tắc sinh hoạt Nên làm / Cần tránh trong Template. |
 | | 2 | Backend truy vấn bảng `template_do_dont_items` nhóm theo `category` và `item_type`. | Hệ thống trả về danh sách quy tắc. |
 | | 3 | Giao diện hiển thị bảng chia 2 cột đối xứng: | Cột Trái (Xanh lá): Các điều Nên Làm (DO); Cột Phải (Đỏ gạch): Các điều Tuyệt Đối Tránh (DON'T). |
 | | 4 | Hỗ trợ lọc theo từng nhóm sinh hoạt (Ăn uống, Vệ sinh, Vận động). | Người dùng có thể chuyển đổi nhanh các tab danh mục sinh hoạt. |
@@ -1267,12 +1267,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-009.7: Chỉnh Sửa Quy Tắc Nên Làm / Cần Tránh (Update Do/Don't Item — PUT /api/v1/templates/{id}/do-dont/{id})
+#### UC-009.7: Chỉnh Sửa Quy Tắc Nên Làm / Cần Tránh (Update Do/Don't Item)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-009.7** | | |
-| **Tên Use Case (Use Case Name)** | Chỉnh Sửa Quy Tắc Nên Làm / Cần Tránh (Update Do/Don't Item — PUT /api/v1/templates/{id}/do-dont/{id}) | | |
+| **Tên Use Case (Use Case Name)** | Chỉnh Sửa Quy Tắc Nên Làm / Cần Tránh (Update Do/Don't Item) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002) | | |
@@ -1286,7 +1286,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | | 1 | Bác sĩ bấm 'Sửa' trên quy tắc sinh hoạt. | Hệ thống mở modal chỉnh sửa. |
 | | 2 | Bác sĩ chỉnh sửa nội dung văn bản. | Hệ thống lưu trữ tạm thời. |
-| | 3 | Bác sĩ bấm 'Lưu Cập Nhật'. | Frontend gửi `PUT /api/v1/templates/{id}/do-dont/{id}`, backend cập nhật và trả về HTTP 200 OK. |
+| | 3 | Bác sĩ bấm 'Lưu Cập Nhật'. | Hệ thống tiếp nhận thông tin điều chỉnh quy tắc sinh hoạt và cập nhật thành công. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | Không có | - | Luồng thực hiện chuẩn không rẽ nhánh | - |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
@@ -1296,12 +1296,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-009.8: Xóa Quy Tắc Nên Làm / Cần Tránh Khỏi Template (Delete Do/Don't Item — DELETE /api/v1/templates/{id}/do-dont/{id})
+#### UC-009.8: Xóa Quy Tắc Nên Làm / Cần Tránh Khỏi Template (Delete Do/Don't Item)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-009.8** | | |
-| **Tên Use Case (Use Case Name)** | Xóa Quy Tắc Nên Làm / Cần Tránh Khỏi Template (Delete Do/Don't Item — DELETE /api/v1/templates/{id}/do-dont/{id}) | | |
+| **Tên Use Case (Use Case Name)** | Xóa Quy Tắc Nên Làm / Cần Tránh Khỏi Template (Delete Do/Don't Item) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002) | | |
@@ -1314,7 +1314,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Điều kiện sau (Post-conditions)** | Bản ghi bị xóa khỏi CSDL. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | | 1 | Bác sĩ bấm 'Xóa' trên quy tắc sinh hoạt. | Hệ thống yêu cầu xác nhận xóa. |
-| | 2 | Bác sĩ bấm 'Xác nhận Xóa'. | Frontend gửi request `DELETE /api/v1/templates/{id}/do-dont/{id}`. |
+| | 2 | Bác sĩ bấm 'Xác nhận Xóa'. | Frontend gửi yêu cầu loại bỏ quy tắc sinh hoạt khỏi cấu hình Template. |
 | | 3 | Backend xóa bản ghi trong CSDL và trả về HTTP 200 OK. | Giao diện cập nhật lại bảng 2 cột màu. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | Không có | - | Luồng thực hiện chuẩn không rẽ nhánh | - |
@@ -1325,12 +1325,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-009.9: Quản Lý Ngân Hàng Tình Huống Hỏi Đáp FAQ Lâm Sàng (Manage Clinical FAQ Bank — POST/GET/PUT/DELETE /api/v1/templates/{id}/faqs)
+#### UC-009.9: Quản Lý Ngân Hàng Tình Huống Hỏi Đáp FAQ Lâm Sàng (Manage Clinical FAQ Bank)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-009.9** | | |
-| **Tên Use Case (Use Case Name)** | Quản Lý Ngân Hàng Tình Huống Hỏi Đáp FAQ Lâm Sàng (Manage Clinical FAQ Bank — POST/GET/PUT/DELETE /api/v1/templates/{id}/faqs) | | |
+| **Tên Use Case (Use Case Name)** | Quản Lý Ngân Hàng Tình Huống Hỏi Đáp FAQ Lâm Sàng (Manage Clinical FAQ Bank) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Bác sĩ chuyên khoa (ACT-002), Nhân viên CSKH (ACT-004) | | |
@@ -1346,7 +1346,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | | 2 | Bác sĩ nhập Tình huống / Câu hỏi: (ví dụ: 'Vô tình bị nước bắn vào mắt khi tắm rửa thì phải xử trí thế nào?'). | Hệ thống ghi nhận tiêu đề tình huống. |
 | | 3 | Bác sĩ chọn Từ khóa gợi nhớ (Tags): 'Dính nước', 'Vệ sinh', 'Tắm gội', 'Cộm mắt'. | Hệ thống tạo chỉ mục tìm kiếm nhanh (F-024). |
 | | 4 | Bác sĩ nhập Lời khuyên lâm sàng tức thì chuẩn VISI: '1. Tuyệt đối không dụi mắt; 2. Nhỏ ngay 2 giọt nước mắt nhân tạo để đẩy dị vật; 3. Nếu mắt đỏ kèm đau nhức gọi ngay Hotline 0395 151 151'. | Hệ thống hiển thị preview thẻ FAQ hiển thị cho Caregiver. |
-| | 5 | Bác sĩ bấm 'Lưu FAQ'. | Frontend gửi `POST /api/v1/templates/{id}/faqs`, backend lưu dữ liệu và trả về HTTP 201 Created. |
+| | 5 | Bác sĩ bấm 'Lưu FAQ'. | Hệ thống tiếp nhận tình huống hỏi đáp FAQ lâm sàng và lưu trữ vào ngân hàng hỗ trợ. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | **Chỉnh sửa hoặc xóa FAQ** | 1 | Người dùng bấm nút sửa/xóa trên từng câu hỏi FAQ. | Frontend gửi request `PUT` hoặc `DELETE` tương ứng để cập nhật dữ liệu. |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
@@ -1985,12 +1985,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 > **Mô tả nhóm nghiệp vụ:** Quản trị vòng đời tài khoản người dùng nội bộ bệnh viện (Bác sĩ, Điều dưỡng, CSKH, GCMO, Admin). Phân rã thành 4 Use Case CRUD nhằm kiểm soát chặt chẽ quy trình tạo tài khoản, tra cứu danh sách, phân quyền vai trò (Role-Based Access Control) và khóa tài khoản thu hồi quyền hạn ngay lập tức khi nhân sự thay đổi hoặc nghỉ việc (BR26).
 
-#### UC-026.1: Khởi Tạo Tài Khoản Nhân Viên Y Tế & Gán Chi Nhánh (Create Staff Account — POST /api/v1/staff)
+#### UC-026.1: Khởi Tạo Tài Khoản Nhân Viên Y Tế & Gán Chi Nhánh (Create Staff Account)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-026.1** | | |
-| **Tên Use Case (Use Case Name)** | Khởi Tạo Tài Khoản Nhân Viên Y Tế & Gán Chi Nhánh (Create Staff Account — POST /api/v1/staff) | | |
+| **Tên Use Case (Use Case Name)** | Khởi Tạo Tài Khoản Nhân Viên Y Tế & Gán Chi Nhánh (Create Staff Account) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Quản trị viên hệ thống - System Admin (ACT-006) | | |
@@ -2006,7 +2006,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | | 2 | Admin nhập Họ tên nhân viên, Email công vụ (đuôi `@visi.vn`), Số điện thoại di động (10 chữ số). | Hệ thống kiểm tra tính hợp lệ và duy nhất của Email và SĐT. |
 | | 3 | Admin chọn Vai trò chuyên môn: `DOCTOR` (Bác sĩ điều trị), `NURSE` (Điều dưỡng lưu viện), `CSKH` (Chăm sóc khách hàng), `GCMO` (Giám đốc Lâm sàng), `ADMIN` (Quản trị viên). | Hệ thống gán ma trận quyền hạn tương ứng. |
 | | 4 | Admin chọn Cơ sở công tác trực thuộc: Cơ sở 1 đến Cơ sở 5 của Tập đoàn VISI (hoặc 'Toàn Hệ Thống' nếu là GCMO/Ban Giám đốc). | Hệ thống gán `facility_id` để thiết lập ranh giới dữ liệu an toàn (BR26). |
-| | 5 | Admin bấm 'Khởi Tạo Tài Khoản & Gửi Kích Hoạt'. | Frontend gửi `POST /api/v1/staff`, backend lưu dữ liệu, sinh token kích hoạt an toàn và gửi SMS/Email tới nhân viên. |
+| | 5 | Admin bấm 'Khởi Tạo Tài Khoản & Gửi Kích Hoạt'. | Hệ thống tiếp nhận thông tin tài khoản nhân sự, kiểm tra tính duy nhất, cấp mã bảo mật và gửi thông báo kích hoạt. |
 | | 6 | Hệ thống ghi nhận Audit Log `CREATE_STAFF_ACCOUNT`. | Trả về HTTP 201 Created và hiển thị thông báo thành công. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | Không có | - | Luồng thực hiện chuẩn không rẽ nhánh | - |
@@ -2018,12 +2018,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-026.2: Xem Danh Sách & Lọc Nhân Viên Theo Cơ Sở (Read/List Staff — GET /api/v1/staff)
+#### UC-026.2: Xem Danh Sách & Lọc Nhân Viên Theo Cơ Sở (Read/List Staff)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-026.2** | | |
-| **Tên Use Case (Use Case Name)** | Xem Danh Sách & Lọc Nhân Viên Theo Cơ Sở (Read/List Staff — GET /api/v1/staff) | | |
+| **Tên Use Case (Use Case Name)** | Xem Danh Sách & Lọc Nhân Viên Theo Cơ Sở (Read/List Staff) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Quản trị viên hệ thống (ACT-006), Ban Giám đốc (ACT-005) | | |
@@ -2035,7 +2035,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Điều kiện tiên quyết (Pre-conditions)** | Người dùng đã đăng nhập với vai trò ADMIN hoặc HOSPITAL_DIRECTOR. | | |
 | **Điều kiện sau (Post-conditions)** | Bảng danh sách nhân viên hiển thị đầy đủ thông tin phân trang. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Admin mở menu 'Quản trị Nhân sự'. | Frontend gửi request `GET /api/v1/staff?page=1&limit=20`. |
+| | 1 | Admin mở menu 'Quản trị Nhân sự'. | Frontend gửi yêu cầu tải danh sách nhân viên y tế theo bộ lọc cơ sở và phân quyền hệ thống. |
 | | 2 | Backend truy vấn kết hợp bảng `accounts` và `doctor_profiles`. | Hệ thống trả về danh sách nhân viên kèm cơ sở và vai trò. |
 | | 3 | Giao diện hiển thị bảng dữ liệu nhân sự: | Cột: Họ tên, Email, SĐT, Vai trò RBAC, Cơ sở công tác, Trạng thái (`ACTIVE` xanh, `PENDING` vàng, `LOCKED` đỏ), Nút thao tác. |
 | | 4 | Admin chọn bộ lọc Chi nhánh (ví dụ: 'Cơ sở 2 - Hải Phòng') hoặc tìm theo tên bác sĩ. | Bảng dữ liệu cập nhật kết quả lọc tức thì. |
@@ -2048,12 +2048,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-026.3: Chỉnh Sửa Thông Tin & Vai Trò RBAC Nhân Viên (Update Staff — PUT /api/v1/staff/{id})
+#### UC-026.3: Chỉnh Sửa Thông Tin & Vai Trò RBAC Nhân Viên (Update Staff)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-026.3** | | |
-| **Tên Use Case (Use Case Name)** | Chỉnh Sửa Thông Tin & Vai Trò RBAC Nhân Viên (Update Staff — PUT /api/v1/staff/{id}) | | |
+| **Tên Use Case (Use Case Name)** | Chỉnh Sửa Thông Tin & Vai Trò RBAC Nhân Viên (Update Staff) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Quản trị viên hệ thống (ACT-006) | | |
@@ -2067,7 +2067,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | | 1 | Admin bấm nút 'Sửa' trên nhân viên cần cập nhật. | Hệ thống mở modal chỉnh sửa với thông tin hiện tại. |
 | | 2 | Admin thay đổi Chi nhánh công tác từ 'Cơ sở 1' sang 'Cơ sở 3' (Điều chuyển nhân sự). | Hệ thống ghi nhận sự thay đổi cơ sở dữ liệu. |
-| | 3 | Admin bấm 'Lưu Thay Đổi'. | Frontend gửi `PUT /api/v1/staff/{id}`, backend cập nhật CSDL. |
+| | 3 | Admin bấm 'Lưu Thay Đổi'. | Hệ thống tiếp nhận thông tin cập nhật phân quyền nhân sự, kiểm tra tính hợp lệ và lưu vào cơ sở dữ liệu. |
 | | 4 | Backend kích hoạt cơ chế thu hồi phiên làm việc (Session Revocation): | Vô hiệu hóa toàn bộ refresh token và access token hiện tại của nhân viên đó để ngăn rò rỉ quyền cũ. |
 | | 5 | Hệ thống ghi nhật ký kiểm toán `UPDATE_STAFF_ROLE_FACILITY`. | Trả về HTTP 200 OK kèm thông báo thành công. |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
@@ -2079,12 +2079,12 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-#### UC-026.4: Khóa / Vô Hiệu Hóa Tài Khoản Nhân Viên (Deactivate/Lock Staff — DELETE /api/v1/staff/{id})
+#### UC-026.4: Khóa / Vô Hiệu Hóa Tài Khoản Nhân Viên (Deactivate/Lock Staff)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
 | **Mã Use Case (Use Case ID)** | **UC-026.4** | | |
-| **Tên Use Case (Use Case Name)** | Khóa / Vô Hiệu Hóa Tài Khoản Nhân Viên (Deactivate/Lock Staff — DELETE /api/v1/staff/{id}) | | |
+| **Tên Use Case (Use Case Name)** | Khóa / Vô Hiệu Hóa Tài Khoản Nhân Viên (Deactivate/Lock Staff) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
 | **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Phân rã CRUD) |
 | **Tác nhân chính (Primary Actor)** | Quản trị viên hệ thống (ACT-006) | | |
@@ -2097,7 +2097,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 | **Điều kiện sau (Post-conditions)** | Trường `status` chuyển thành `'LOCKED'`, nhân viên bị văng ra khỏi hệ thống ngay lập tức; ghi log kiểm toán cấp độ bảo mật cao nhất. | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | | 1 | Admin bấm nút 'Khóa Tài Khoản' trên nhân viên. | Hệ thống hiển thị modal cảnh báo an ninh màu đỏ: 'CẢNH BÁO: Thao tác này sẽ ngắt toàn bộ phiên làm việc của nhân viên trên mọi thiết bị ngay lập tức. Bạn có chắc chắn muốn khóa tài khoản này?'. |
-| | 2 | Admin nhập lý do khóa tài khoản (ví dụ: 'Nhân viên chấm dứt hợp đồng lao động ngày 15/09/2026') và xác nhận. | Frontend gửi request `DELETE /api/v1/staff/{id}` kèm lý do. |
+| | 2 | Admin nhập lý do khóa tài khoản (ví dụ: 'Nhân viên chấm dứt hợp đồng lao động ngày 15/09/2026') và xác nhận. | Frontend gửi yêu cầu khóa tài khoản nhân viên kèm lý do khóa tài khoản vào nhật ký kiểm toán. |
 | | 3 | Backend cập nhật `status = 'LOCKED'`, `locked_at = CURRENT_TIMESTAMP`. | Đồng thời đẩy toàn bộ `user_id` vào Redis token blacklist để ngắt kết nối websocket/API tức thì. |
 | | 4 | Ghi nhật ký kiểm toán nghiêm ngặt `LOCK_STAFF_ACCOUNT` kèm IP và danh tính Admin thực hiện. | Hệ thống trả về HTTP 200 OK. |
 | | 5 | Giao diện cập nhật huy hiệu nhân viên sang màu Đỏ 'ĐÃ KHÓA'. | Hiển thị thông báo hoàn tất thao tác an ninh. |
