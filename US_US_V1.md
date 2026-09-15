@@ -66,21 +66,130 @@ Tài liệu này là phiên bản nâng cấp chuẩn hóa (**US_US_V1**) từ p
 
 ---
 
-## 3. DANH SÁCH TÁC NHÂN HỆ THỐNG (ACTOR LIST)
-*Được sắp xếp nghiêm ngặt theo Actor ID từ ACT-001 đến ACT-010*
+## 3. DANH SÁCH TÁC NHÂN HỆ THỐNG (ACTOR LIST) & PHÂN ĐỊNH TRÁCH NHIỆM
 
-| Actor ID | Tên Actor | Mô tả vai trò và trách nhiệm | Bản chất trong hệ thống |
+### 3.1 Bảng Phân Loại Tác Nhân Chuẩn Hóa
+
+| Actor ID | Tên Actor | Mô tả vai trò và chức năng cốt lõi | Bản chất trong hệ thống |
 | :--- | :--- | :--- | :--- |
-| **ACT-001** | **Người Chăm Sóc (Caregiver)** | Người thân trực tiếp ở cạnh chăm sóc bệnh nhân (con cái, vợ/chồng, người nuôi hộ). Chịu trách nhiệm vận hành chính trên ứng dụng di động: đăng nhập OTP, quét mã QR bàn giao, theo dõi lịch thuốc, nhỏ thuốc đúng kỹ thuật, canh timer giãn cách 5–10 phút, nộp Recovery Check và gọi hotline khi có Red Flag. | **Primary Human Actor** *(External User)* |
-| **ACT-002** | **Bác Sĩ Phẫu Thuật / Điều Trị (Ophthalmic Surgeon / Doctor)** | Bác sĩ chuyên khoa mắt thực hiện phẫu thuật hoặc quản lý bệnh phòng. Chịu trách nhiệm lâm sàng cao nhất: cấu hình danh mục thuốc mẫu, phê duyệt/tùy biến Care Plan cho các ca bệnh phức tạp, theo dõi tiến trình hồi phục và ra quyết định can thiệp khi có biến chứng. | **Primary Human Actor** *(Internal Staff)* |
-| **ACT-003** | **Điều Dưỡng Xuất Viện / Phòng Mổ (Discharge / Clinical Nurse)** | Điều dưỡng phụ trách phòng lưu viện hoặc quầy bàn giao xuất viện. Thao tác kích hoạt nhanh Care Plan cho bệnh nhân từ Master Template (<30 giây), bấm in Phiếu xuất viện kèm mã QR, trực tiếp hướng dẫn Caregiver quét mã và xác nhận hoàn tất bàn giao lâm sàng. | **Primary Human Actor** *(Internal Staff)* |
-| **ACT-004** | **Nhân Viên CSKH / Giám Sát Lâm Sàng (Customer Care / Medical Monitor)** | Nhân viên bộ phận Chăm sóc khách hàng hoặc Điều dưỡng trực tổng đài cơ sở. Thường trực giám sát Dashboard, tiếp nhận tín hiệu cảnh báo Red Flag, chủ động gọi điện can thiệp trong <5 phút, ghi nhận nhật ký cuộc gọi và kết nối bác sĩ cấp cứu khi cần. | **Supporting Human Actor** *(Internal Staff)* |
-| **ACT-005** | **Người Phê Duyệt Lâm Sàng (Clinical Approver / GCMO)** | Giám đốc Chuyên môn Tập đoàn (BS.CKII Trần Bá Kiền) hoặc Hội đồng Y khoa VISI. Thẩm định, chuẩn hóa và ký duyệt điện tử các phiên bản Master Template (thuốc, câu hỏi Recovery Check, tiêu chí Red Flag) trước khi ban hành áp dụng toàn chuỗi 5 bệnh viện. | **Supporting Human Actor** *(Clinical Leader)* |
-| **ACT-006** | **Bệnh Nhân Hậu Phẫu (Post-Op Patient / Care Recipient)** | Đối tượng trực tiếp thụ hưởng phẫu thuật mắt (mổ Phaco, SILK, Lasik...). Trong 24–48h đầu mắt bị băng/mờ nên đóng vai trò tác nhân thụ động; từ ngày thứ 3 trở đi có thể tự sử dụng chế độ Trợ năng (Accessibility) để nghe thuyết minh âm thanh hoặc xem lịch tái khám. | **Supporting Human Actor** *(Beneficiary / External)* |
-| **ACT-007** | **Quản Trị Viên Hệ Thống (System Administrator)** | Chuyên viên CNTT chịu trách nhiệm quản trị hệ thống: cấp phát và phân quyền tài khoản nhân viên y tế theo chi nhánh, giám sát nhật ký kiểm toán (Audit Log), cấu hình tham số hệ thống và bảo đảm an toàn dữ liệu theo Nghị định 13/2023/NĐ-CP. | **Administrative Actor** *(Internal Staff)* |
-| **ACT-008** | **Đội Cấp Cứu Y Tế / Cơ Sở Tiếp Nhận Ngoài (External Emergency Support)** | Đội cấp cứu ngoại viện 115 hoặc bệnh viện đa khoa địa phương tiếp nhận bệnh nhân trong trường hợp biến chứng cấp cứu ngoài giờ làm việc hoặc bệnh nhân ở quá xa cơ sở VISI đã mổ. | **Supporting Human Actor** *(Proposed – Needs validation)* |
-| **ACT-009** | **Cổng Dịch Vụ Viễn Thông (SMS / OTP / ZNS Gateway Service)** | Dịch vụ viễn thông bên thứ ba cung cấp hạ tầng gửi mã OTP xác thực đăng nhập không mật khẩu, gửi tin nhắn SMS Brandname và Zalo ZNS nhắc cữ thuốc và lịch tái khám tự động. | **External Service Actor** *(Supporting System)* |
-| **ACT-010** | **Hệ Thống Thông Tin Bệnh Viện Nội Bộ (Hospital Information System - HIS)** | Phần mềm Quản lý Bệnh viện hiện hữu của VISI đang kết nối cổng giám định BHYT. Trong tương lai (Phase 2), RemiCare sẽ tích hợp qua API để tự động đồng bộ danh sách ca mổ hoàn thành và đơn thuốc xuất viện. | **External System Actor** *(Supporting System – Phase 2)* |
+| **ACT-001** | **Giám Đốc Bệnh Viện (Hospital Director / GCMO)** | Lãnh đạo bệnh viện / Giám đốc Chuyên môn: xem báo cáo vận hành, xử lý trường hợp cần đánh giá chuyên môn cấp cao (Escalated Review), theo dõi cảnh báo nghiêm trọng, xem hồ sơ bệnh nhân theo quyền được cấp, giám sát Bác sĩ/Điều dưỡng, phê duyệt Care Plan quan trọng. | **Clinical Executive Actor** *(Internal Leader)* |
+| **ACT-002** | **Bác Sĩ Điều Trị / Phẫu Thuật (Ophthalmic Doctor / Surgeon)** | Bác sĩ chuyên khoa nhãn khoa: CRUD Medical Record, tạo/cập nhật Care Plan, cấu hình Medication, tạo/quản lý Learning Path, thiết lập Recovery Check, Red Flags, Do/Don't, lịch tái khám, theo dõi tiến trình chăm sóc và xử lý cảnh báo. | **Primary Clinical Actor** *(Internal Staff)* |
+| **ACT-003** | **Điều Dưỡng Lưu Viện / Xuất Viện (Discharge / Clinical Nurse)** | Điều dưỡng phụ trách lưu viện: xem Medical Record theo quyền được cấp, nhập thông tin bệnh nhân (<30s), tạo Care Plan ban đầu theo hướng dẫn/mẫu được Bác sĩ phê duyệt, xuất QR bàn giao, theo dõi cữ thuốc, gửi cảnh báo đến Bác sĩ. | **Primary Nursing Actor** *(Internal Staff)* |
+| **ACT-004** | **Chăm Sóc Khách Hàng (Customer Care - CSKH)** | Nhân viên CSKH: tra cứu thông tin tài khoản, hỗ trợ đăng ký/đăng nhập/liên kết QR, ghi nhận phản hồi/khiếu nại, hướng dẫn sử dụng, chuyển vấn đề kỹ thuật cho IT và chuyển vấn đề y tế cho Bác sĩ/Điều dưỡng. *Chỉ xem thông tin tài khoản, không tự ý xem toàn bộ hồ sơ y tế.* | **Supporting Service Actor** *(Internal Staff)* |
+| **ACT-005** | **Người Chăm Sóc (Caregiver)** | Thân nhân trực tiếp chăm sóc: đăng ký/đăng nhập OTP, quét QR liên kết, xem Care Plan được cấp quyền, xem danh sách bệnh nhân đang chăm sóc, học cẩm nang, làm Recovery Check, xác nhận cho uống thuốc, canh bộ đếm ngược 5-10p, nhận thông báo tái khám và cảnh báo Red Flag (quản lý tối đa 03 Caregiver). | **Primary End-User Actor** *(External User)* |
+| **ACT-006** | **Quản Trị Viên Hệ Thống (System Administrator - Admin)** | Kỹ sư CNTT: CRUD tài khoản người dùng, quản lý vai trò và quyền truy cập RBAC, khóa/mở khóa tài khoản, CRUD Audit Log, xem lịch sử hoạt động hệ thống, quản lý cấu hình hệ thống an toàn thông tin theo NĐ 13/2023. | **Administrative Actor** *(Internal Staff)* |
+| **ACT-007** | **Bệnh Nhân Hậu Phẫu (Care Recipient / Patient)** | Người trực tiếp thụ hưởng điều trị: đăng ký/đăng nhập OTP, xem thông tin cá nhân & hồ sơ y tế của bản thân, xem Care Plan được cấp quyền, xem danh sách thuốc & đếm ngược, tự xác nhận đã dùng thuốc, làm Recovery Check, cập nhật sức khỏe, nhận cảnh báo Red Flag, tải ảnh mắt lên nếu được cấp quyền. | **Primary Beneficiary Actor** *(External User)* |
+| **ACT-008** | **Đội Cấp Cứu Y Tế Ngoại Viện (External Emergency Support)** | Đội cấp cứu 115 hoặc bệnh viện đa khoa địa phương tiếp nhận bệnh nhân trong trường hợp biến chứng cấp cứu ngoài giờ làm việc hoặc bệnh nhân ở xa cơ sở VISI. | **External Supporting Actor** *(Emergency)* |
+| **ACT-009** | **Cổng Dịch Vụ Viễn Thông (SMS / OTP / ZNS Gateway)** | Dịch vụ viễn thông bên thứ ba gửi mã OTP xác thực, tin nhắn SMS Brandname và Zalo ZNS nhắc cữ thuốc và lịch tái khám tự động. | **External Service Actor** *(System)* |
+| **ACT-010** | **Hệ Thống Thông Tin Bệnh Viện (HIS Core Gateway)** | Hệ thống HIS nội bộ của VISI; trong Phase 2 RemiCare sẽ tích hợp qua API để tự động đồng bộ danh sách ca mổ và đơn thuốc xuất viện. | **External System Actor** *(Phase 2)* |
+
+---
+
+### 3.2 Ma Trận Trách Nhiệm Chi Tiết Của 7 Nhóm Tác Nhân Cốt Lõi
+
+#### 1. Giám đốc Bệnh viện
+* Xem báo cáo vận hành.
+* Xử lý các trường hợp cần đánh giá chuyên môn cấp cao (Escalated Review).
+* Theo dõi các cảnh báo y tế nghiêm trọng.
+* Xem hồ sơ bệnh nhân theo phạm vi được phân quyền. *(Lưu ý: Không mặc định cho Giám đốc xem mọi hồ sơ nếu chưa có quy định phân quyền. Hệ thống chỉ cho phép xem hồ sơ bệnh nhân theo đúng quyền được cấp).*
+* Quản lý và giám sát Bác sĩ, Điều dưỡng.
+* Phê duyệt các Care Plan quan trọng.
+* Theo dõi chất lượng và hiệu quả chăm sóc.
+* Xem lịch sử hoạt động chuyên môn và báo cáo tổng hợp.
+
+#### 2. Bác sĩ
+* CRUD Medical Record.
+* Tạo và cập nhật Care Plan: Có quyền **sao chép (clone) Master Template** để tạo và cá nhân hóa Care Plan cho 1 bệnh nhân cụ thể tùy theo thể trạng, cơ địa và đáp ứng lâm sàng của họ.
+* Cấu hình và điều chỉnh liều lượng Medication trong Care Plan theo thể trạng bệnh nhân.
+* Cấu hình Medication trong Care Plan.
+* Tạo và quản lý Learning Path.
+* Thiết lập Recovery Check.
+* Thiết lập Red Flags.
+* Thiết lập hướng dẫn Do & Don’t.
+* Thiết lập lịch Follow-up / Tái khám.
+* Xuất bản hoặc gửi Care Plan để phê duyệt.
+* Theo dõi tiến trình chăm sóc của bệnh nhân.
+* Xem kết quả Recovery Check và các cảnh báo từ Điều dưỡng/Caregiver.
+* Xử lý các trường hợp được Điều dưỡng hoặc hệ thống chuyển cấp.
+
+#### 3. Điều dưỡng
+* Xem Medical Record theo quyền được cấp.
+* Xem Care Plan.
+* Nhập thông tin bệnh nhân vào hệ thống: **Chỉ được nhập thông tin cơ bản của bệnh nhân** (Họ tên, năm sinh, giới tính, SĐT, mắt mổ, ngày mổ trong <30 giây).
+* Tạo Care Plan ban đầu theo hướng dẫn hoặc mẫu được Bác sĩ phê duyệt (**Tuyệt đối không được chỉnh sửa liều lượng thuốc**).
+* Xuất QR để Caregiver liên kết với bệnh nhân.
+* Theo dõi việc thực hiện nhiệm vụ chăm sóc.
+* Cập nhật tình trạng bệnh nhân.
+* Ghi nhận Recovery Check.
+* Theo dõi các dấu hiệu bất thường.
+* Gửi cảnh báo đến Bác sĩ.
+* Cấp lại hoặc vô hiệu hóa mã QR khi QR bị mất hoặc có nguy cơ bị lộ.
+* Hỗ trợ hướng dẫn Caregiver.
+* Theo dõi danh sách Caregiver đã liên kết với bệnh nhân.
+* > [!IMPORTANT]
+  > **Lưu ý về quyền tạo Care Plan:** Bác sĩ là người có quyền chuyên môn tối cao tạo, chỉnh sửa và phê duyệt nội dung y tế, có quyền sao chép Master Template để tùy biến liều lượng thuốc theo thể trạng bệnh nhân. Điều dưỡng **chỉ được nhập thông tin cơ bản của bệnh nhân** và thiết lập Care Plan theo mẫu Bác sĩ cho phép, **tuyệt đối không được chỉnh sửa liều lượng thuốc**, danh mục thuốc, tiêu chí Red Flags hoặc hướng dẫn điều trị.
+
+#### 4. Chăm sóc khách hàng (CSKH)
+* Tra cứu thông tin tài khoản.
+* Hỗ trợ đăng ký và đăng nhập.
+* Hỗ trợ vấn đề liên kết QR.
+* Ghi nhận phản hồi và khiếu nại.
+* Theo dõi trạng thái yêu cầu hỗ trợ.
+* Hướng dẫn người dùng sử dụng hệ thống.
+* Chuyển các vấn đề kỹ thuật đến Admin hoặc bộ phận kỹ thuật.
+* Chuyển các vấn đề liên quan đến y tế cho Điều dưỡng/Bác sĩ.
+* > [!CAUTION]
+  > **Giới hạn quyền bảo mật:** CSKH chỉ được xem thông tin tài khoản và trạng thái hỗ trợ cần thiết; không được tự ý truy cập toàn bộ hồ sơ y tế chuyên sâu của người bệnh.
+
+#### 5. Caregiver (Người Chăm Sóc / Thân Nhân)
+* Đăng ký và đăng nhập bằng số điện thoại/OTP.
+* Quét QR để liên kết với bệnh nhân.
+* Xem danh sách bệnh nhân đang chăm sóc.
+* Xem Care Plan được cấp quyền.
+* Xem Learning Path.
+* Học các bài hướng dẫn chăm sóc.
+* Thực hiện Recovery Check.
+* Xác nhận đã cho bệnh nhân uống thuốc.
+* Xem lịch dùng thuốc.
+* Nhận thông báo khi đến giờ uống thuốc.
+* Xem bộ đếm ngược thời gian dùng thuốc nhỏ mắt (Buffer Timer 5–10 phút).
+* Xem lịch tái khám.
+* Nhận cảnh báo Red Flag.
+* Gửi phản hồi hoặc ghi chú chăm sóc.
+* Cập nhật tình trạng thực hiện nhiệm vụ chăm sóc.
+* Theo dõi lịch sử chăm sóc của bệnh nhân.
+* Quản lý tối đa 03 Caregiver cho mỗi bệnh nhân nếu được cấp quyền.
+* Xem lịch sử các bệnh nhân đã từng chăm sóc.
+
+#### 6. Admin (Quản Trị Viên Hệ Thống)
+* CRUD tài khoản người dùng.
+* Quản lý vai trò và quyền truy cập RBAC.
+* Khóa / mở khóa tài khoản.
+* CRUD Audit Log.
+* Xem lịch sử hoạt động hệ thống.
+* Quản lý cấu hình hệ thống.
+
+#### 7. Care Recipient (Bệnh Nhân / Người Thụ Hưởng Chăm Sóc)
+* Đăng ký và đăng nhập bằng số điện thoại/OTP.
+* Xem thông tin cá nhân và hồ sơ y tế của bản thân.
+* Xem Care Plan được Bác sĩ hoặc Điều dưỡng cấp quyền.
+* Xem danh sách thuốc và hướng dẫn sử dụng thuốc.
+* Nhận thông báo khi đến giờ uống thuốc.
+* Xác nhận bản thân đã uống thuốc hoặc sử dụng thuốc nhỏ mắt.
+* Xem bộ đếm ngược thời gian dùng thuốc nhỏ mắt (Buffer Timer 5–10 phút chống rửa trôi thuốc).
+* Xem lịch tái khám.
+* Nhận thông báo và nhắc lịch tái khám.
+* Xem Learning Path.
+* Học các bài hướng dẫn chăm sóc.
+* Thực hiện Recovery Check.
+* Cập nhật tình trạng sức khỏe hằng ngày.
+* Gửi ghi chú về triệu chứng hoặc tình trạng bất thường.
+* Nhận cảnh báo Red Flag.
+* Gửi phản hồi hoặc yêu cầu hỗ trợ.
+* Xem lịch sử chăm sóc và quá trình điều trị của bản thân.
+* Xem tiến độ hoàn thành nhiệm vụ chăm sóc.
+* Cập nhật thông tin cá nhân trong phạm vi được phép.
+* Tải lên hình ảnh hoặc tài liệu y tế của bản thân nếu được cấp quyền.
 
 ---
 

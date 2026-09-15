@@ -13,18 +13,27 @@
 
 Tài liệu này đặc tả chi tiết toàn bộ **35 User Stories** của nền tảng RemiCare, được liên kết chặt chẽ với danh mục **28 Features (F-001 đến F-028)**, **10 Tác nhân (ACT-001 đến ACT-010)** và **31 Use Cases (UC-001 đến UC-028)** đã được chuẩn hóa trong [US_US_V1.md](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/US_US_V1.md).
 
-### 1.1 Nguyên tắc thiết kế nghiệp vụ nhãn khoa VISI:
-1. **Phân định 3 tầng trách nhiệm y tế rõ ràng:**
-   * **Bác sĩ (ACT-002):** Thiết lập và tùy biến Master Template chuyên môn, xử lý ngoại lệ lâm sàng và kiểm tra đáp ứng phẫu thuật khi tái khám.
-   * **Điều dưỡng xuất viện (ACT-003):** Thực hiện quy trình bàn giao lâm sàng tại phòng lưu viện trong <30 giây (Clinical Setup 3 bước), in phiếu xuất viện kèm mã QR sắc nét.
-   * **Nhân viên CSKH / Giám sát lâm sàng (ACT-004):** Thường trực Dashboard theo dõi bệnh nhân toàn chi nhánh, tiếp nhận và xử lý cảnh báo Red Flag <5 phút, ghi nhận nhật ký cuộc gọi.
-2. **Loại bỏ Mini Quiz trong MVP (F-014, US-022):** Chuyển dịch toàn bộ kiến thức sang dạng Infographic tĩnh tinh gọn nhằm tránh gây phiền toái, quá tải thông tin cho người nhà bệnh nhân. Các bảng dữ liệu liên quan đến Quiz được bảo lưu ở trạng thái mở rộng Phase 2.
-3. **Chống nhầm lẫn và rửa trôi thuốc mắt (F-009, F-010, US-015 đến US-018):** Tự động kích hoạt bộ đếm thời gian giãn cách 5–10 phút (Drop Interval Buffer Timer) ngay sau khi nhỏ lọ thuốc thứ nhất, tạm khóa nút xác nhận lọ thứ hai.
-4. **Cấp cứu Red Flag 1 chạm (F-017, US-024):** Chuyển giao diện cảnh báo đỏ toàn màn hình, cung cấp nút gọi tức thì tới Hotline VISI `0395 151 151` và tự động leo thang (Escalate) sau 15 phút nếu chưa được can thiệp.
+### 1.1 Nguyên Tắc Thiết Kế Nghiệp Vụ & Phân Định Ranh Giới 7 Vai Trò:
+
+Hệ thống xác lập ma trận chức năng, thẩm quyền và giới hạn nhiệm vụ cụ thể cho 7 nhóm người dùng:
+1. **Giám đốc Bệnh viện (Hospital Director / GCMO):** Xem báo cáo vận hành, xử lý trường hợp cần đánh giá chuyên môn cấp cao (Escalated Review), theo dõi cảnh báo y tế nghiêm trọng, xem hồ sơ bệnh nhân theo quyền được cấp, quản lý/giám sát Bác sĩ & Điều dưỡng, phê duyệt Care Plan quan trọng, theo dõi chất lượng chăm sóc, xem lịch sử hoạt động và báo cáo tổng hợp. *(Lưu ý: Không mặc định xem mọi hồ sơ; chỉ xem theo quyền được cấp).*
+2. **Bác sĩ (Ophthalmic Doctor / Surgeon):** CRUD Medical Record, sao chép (clone) Master Template để tạo và cập nhật Care Plan cho từng bệnh nhân cụ thể tùy theo thể trạng của họ, tùy biến liều lượng thuốc, tạo/quản lý Learning Path, thiết lập Recovery Check, Red Flags, Do/Don't, lịch Follow-up/Tái khám, xuất bản hoặc gửi Care Plan phê duyệt, theo dõi tiến trình chăm sóc, xem kết quả khảo sát & cảnh báo, xử lý ca chuyển cấp.
+3. **Điều dưỡng (Discharge / Clinical Nurse):** Xem Medical Record theo quyền được cấp, xem Care Plan, chỉ nhập thông tin cơ bản của bệnh nhân (<30s), tạo Care Plan ban đầu theo mẫu Bác sĩ duyệt (tuyệt đối không được chỉnh sửa liều lượng thuốc), xuất QR liên kết, theo dõi nhiệm vụ chăm sóc, cập nhật tình trạng, ghi nhận Recovery Check, theo dõi dấu hiệu bất thường, gửi cảnh báo đến Bác sĩ, cấp lại/vô hiệu hóa QR, hỗ trợ hướng dẫn Caregiver, theo dõi danh sách Caregiver liên kết. *(Lưu ý: Bác sĩ quyết định chuyên môn y tế; Bác sĩ có quyền sao chép template để tùy biến liều lượng theo thể trạng bệnh nhân; Điều dưỡng chỉ nhập thông tin cơ bản của bệnh nhân và áp dụng mẫu đã duyệt, tuyệt đối không được chỉnh sửa liều lượng thuốc, Red Flags hoặc hướng dẫn điều trị).*
+4. **Chăm sóc khách hàng (Customer Care - CSKH):** Tra cứu thông tin tài khoản, hỗ trợ đăng ký/đăng nhập, hỗ trợ liên kết QR, ghi nhận phản hồi/khiếu nại, theo dõi trạng thái yêu cầu, hướng dẫn sử dụng, chuyển vấn đề kỹ thuật cho IT/Admin, chuyển vấn đề y tế cho Điều dưỡng/Bác sĩ. *(Lưu ý: CSKH chỉ được xem thông tin tài khoản và trạng thái hỗ trợ cần thiết; không được tự ý truy cập toàn bộ hồ sơ y tế chuyên sâu).*
+5. **Caregiver (Người Chăm Sóc / Thân Nhân):** Đăng ký/đăng nhập OTP, quét QR liên kết, xem danh sách bệnh nhân đang chăm sóc, xem Care Plan được cấp quyền, xem Learning Path, học cẩm nang, làm Recovery Check, xác nhận đã cho uống thuốc, xem lịch thuốc, nhận thông báo giờ uống thuốc, xem bộ đếm ngược 5-10p, xem lịch tái khám, nhận cảnh báo Red Flag, gửi phản hồi/ghi chú, cập nhật tình trạng chăm sóc, theo dõi lịch sử chăm sóc, quản lý tối đa 03 Caregiver cho mỗi bệnh nhân, xem lịch sử các bệnh nhân đã từng chăm sóc.
+6. **Admin (Quản Trị Viên Hệ Thống):** CRUD tài khoản người dùng, quản lý vai trò và quyền truy cập RBAC, khóa/mở khóa tài khoản, CRUD Audit Log, xem lịch sử hoạt động hệ thống, quản lý cấu hình hệ thống an toàn dữ liệu NĐ 13/2023.
+7. **Care Recipient (Bệnh Nhân / Người Thụ Hưởng Chăm Sóc):** Đăng ký/đăng nhập OTP, xem thông tin cá nhân & hồ sơ y tế của bản thân, xem Care Plan được cấp quyền, xem danh sách thuốc & hướng dẫn, nhận thông báo giờ uống thuốc, xác nhận bản thân đã uống thuốc/nhỏ mắt, xem bộ đếm ngược thời gian dùng thuốc nhỏ mắt (5-10 phút chống rửa trôi thuốc), xem lịch tái khám & nhận nhắc hẹn, xem Learning Path, học hướng dẫn chăm sóc, làm Recovery Check, cập nhật sức khỏe hằng ngày, gửi ghi chú triệu chứng bất thường, nhận cảnh báo Red Flag, gửi phản hồi/hỗ trợ, xem lịch sử chăm sóc của bản thân, xem tiến độ hoàn thành, cập nhật thông tin cá nhân trong phạm vi cho phép, tải ảnh/tài liệu y tế của bản thân nếu được cấp quyền.
 
 ---
 
-### 1.2 Bảng Tổng Hợp 35 User Stories
+### 1.2 Nguyên Tắc Kỹ Thuật & Lâm Sàng Cốt Lõi:
+1. **Loại bỏ Mini Quiz trong MVP (F-014, US-022):** Chuyển dịch toàn bộ kiến thức sang dạng Infographic tĩnh tinh gọn nhằm tránh gây phiền toái, quá tải thông tin cho người nhà bệnh nhân. Các bảng dữ liệu liên quan đến Quiz được bảo lưu ở trạng thái mở rộng Phase 2.
+2. **Chống nhầm lẫn và rửa trôi thuốc mắt (F-009, F-010, US-015 đến US-018):** Tự động kích hoạt bộ đếm thời gian giãn cách 5–10 phút (Drop Interval Buffer Timer) ngay sau khi nhỏ lọ thuốc thứ nhất, tạm khóa nút xác nhận lọ thứ hai.
+3. **Cấp cứu Red Flag 1 chạm (F-017, US-024):** Chuyển giao diện cảnh báo đỏ toàn màn hình, cung cấp nút gọi tức thì tới Hotline VISI `0395 151 151` và tự động leo thang (Escalate) sau 15 phút nếu chưa được can thiệp.
+
+---
+
+### 1.3 Bảng Tổng Hợp 35 User Stories
 
 | Story ID | Feature ID | Actor | Tóm tắt mục tiêu User Story | Priority | Ca sử dụng liên quan |
 | :--- | :--- | :--- | :--- | :---: | :--- |

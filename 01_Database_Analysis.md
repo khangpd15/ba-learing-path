@@ -454,12 +454,38 @@ Ký hiệu: **C** = Create (Tạo mới), **R** = Read (Đọc/Xem), **U** = Upd
 | **UC-001** | Đăng ký & Đăng nhập Caregiver qua OTP | `accounts`, `caregiver_profiles`, `otp_verifications` | **C, R, U** | Đọc tài khoản, tạo mã OTP mới, cập nhật `is_used = TRUE`; cấp phiên JWT an toàn NĐ 13. |
 | **UC-002** | Đăng nhập Nhân viên Y tế & 2FA | `accounts`, `doctor_profiles` | **R** | Đối chiếu thông tin đăng nhập, xác thực 2FA, cấp phiên làm việc theo cơ sở bệnh viện. |
 | **UC-003** | Quét QR Bàn Giao Liên Kết Bệnh Nhân | `caregiver_patient_links`, `patient_care_plans`, `patients` | **R, C** | Đọc & xác thực `qr_token`, kiểm tra Care Plan active, tạo mới liên kết (tối đa 3 Caregiver). |
-| **UC-004** | Quản lý Hồ sơ Định danh Bệnh Nhân | `patients` | **C, R, U** | Lưu bệnh nhân mới (<30s), lưu tên viết tắt bảo mật theo NĐ 13, cập nhật và lưu trữ `ARCHIVED`. |
-| **UC-005** | Quản lý Danh mục Master Template | `care_plan_templates`, các bảng `template_*` | **C, R, U** | Khởi tạo và quản lý phiên bản (v1.0, v1.1) các gói phác đồ chuẩn theo loại mổ (Phaco, SILK). |
+| **UC-004.1**| Tạo Mới Hồ Sơ Bệnh Nhân (Create) | `patients` | **C** | Lưu bệnh nhân mới (<30s), sinh `patient_id` UUIDv4, lưu tên viết tắt bảo mật NĐ 13/2023. |
+| **UC-004.2**| Tra Cứu & Lọc Bệnh Nhân (Read/List) | `patients` | **R** | Truy vấn danh sách bệnh nhân phân trang theo chi nhánh cơ sở (`facility_id`), lọc theo loại mổ. |
+| **UC-004.3**| Chi Tiết Hồ Sơ & Timeline (Read/Detail)| `patients`, `patient_care_plans` | **R** | Tải hồ sơ bệnh án 360 độ: tiến trình dùng thuốc, lịch sử nộp khảo sát, Caregiver liên kết. |
+| **UC-004.4**| Cập Nhật Thông Tin Bệnh Nhân (Update) | `patients` | **U** | Cập nhật SĐT, ghi chú dị ứng; khóa loại phẫu thuật nếu Care Plan đã kích hoạt bàn giao. |
+| **UC-004.5**| Lưu Trữ / Vô Hiệu Hóa (Archive/Soft Delete)| `patients` | **D** | Chuyển `status = 'ARCHIVED'` (xóa mềm), thu hồi mã QR chưa kích hoạt, bảo toàn dữ liệu y khoa. |
+| **UC-005.1**| Tạo Mới Master Template (Create) | `care_plan_templates` | **C** | Khởi tạo khung phác đồ mẫu ở trạng thái `DRAFT` v1.0 gắn với loại phẫu thuật chuẩn hóa (BR16). |
+| **UC-005.2**| Xem Danh Sách Template (Read/List) | `care_plan_templates` | **R** | Đọc danh mục toàn bộ các gói phác đồ mẫu, hỗ trợ lọc theo loại mổ và trạng thái vòng đời. |
+| **UC-005.3**| Xem Chi Tiết Cấu Hình (Read/Detail) | `care_plan_templates`, các bảng `template_*` | **R** | Tải toàn bộ cấu hình: thuốc mẫu, mốc câu hỏi recovery check, red flag, cẩm nang 24h & Do/Don't. |
+| **UC-005.4**| Chỉnh Sửa Thông Tin Chung (Update) | `care_plan_templates` | **U** | Sửa tên, mô tả y khoa; tự động nhân bản v1.1 nếu template đã duyệt ACTIVE (BR15). |
+| **UC-005.5**| Kích Hoạt / Lưu Trữ Template (Status)| `care_plan_templates` | **U** | Cập nhật trạng thái `PENDING_APPROVAL`, `ACTIVE`, `INACTIVE` theo thẩm quyền GCMO. |
 | **UC-006** | Phê Duyệt Lâm Sàng Master Template | `care_plan_templates`, `system_audit_logs` | **U, C** | GCMO ký duyệt điện tử ban hành áp dụng toàn chuỗi 5 bệnh viện VISI, ghi nhật ký kiểm toán. |
-| **UC-007** | Cấu Hình Thuốc Mẫu & Buffer Timer | `template_medications` | **C, R, U, D** | Cài đặt danh mục thuốc mẫu, số giọt, ảnh nhận diện nắp lọ và thời gian đệm 5–10 phút. |
-| **UC-008** | Cấu Hình Recovery Check & Red Flag | `template_recovery_milestones`, `template_recovery_questions`, `template_red_flags` | **C, R, U, D** | Cài đặt các mốc theo dõi, bộ 3–5 câu hỏi phân loại 3 mức và tiêu chí kích hoạt Red Flag. |
-| **UC-009** | Cấu Hình Cẩm Nang 24h, Do/Don't & FAQ | `template_learning_modules`, `template_do_dont_items` | **C, R, U, D** | Thiết lập cẩm nang 24h sống còn, bảng 2 cột Nên làm / Cần tránh và ngân hàng FAQ lâm sàng. |
+| **UC-007.1**| Thêm Thuốc Mẫu & Timer Đệm (Create) | `template_medications` | **C** | Thêm thuốc mẫu, đặt số giọt, cữ dùng và cài đặt thời gian đệm 5–10 phút chống rửa trôi (BR23). |
+| **UC-007.2**| Xem Danh Sách Thuốc Mẫu (Read/List) | `template_medications` | **R** | Đọc danh sách thuốc, thứ tự nhỏ mắt ưu tiên (nước trước, mỡ sau) và thời gian đệm giữa các lọ. |
+| **UC-007.3**| Chỉnh Sửa Thuốc Mẫu & Đệm (Update) | `template_medications` | **U** | Điều chỉnh liều lượng, số cữ hoặc tinh chỉnh thời gian đệm giãn cách an toàn giữa các lần nhỏ. |
+| **UC-007.4**| Xóa Thuốc Mẫu Khỏi Template (Delete)| `template_medications` | **D** | Xóa bản ghi thuốc mẫu không còn phù hợp khỏi phác đồ nháp đang xây dựng. |
+| **UC-008.1**| Thêm Mốc & Câu Hỏi Recovery Check (Create)| `template_recovery_milestones`, `template_recovery_questions` | **C** | Thiết lập mốc theo dõi định kỳ (Ngày 1, 3, 7, 14, 30) kèm bộ câu hỏi phân loại 3 màu (BR24). |
+| **UC-008.2**| Xem Danh Sách Mốc & Câu Hỏi (Read) | `template_recovery_milestones`, `template_recovery_questions` | **R** | Đọc danh sách mốc khảo sát và ma trận câu hỏi đánh giá phục hồi thị lực. |
+| **UC-008.3**| Chỉnh Sửa Mốc & Câu Hỏi (Update) | `template_recovery_milestones`, `template_recovery_questions` | **U** | Cập nhật văn phong câu hỏi, đổi ngày áp dụng hoặc tinh chỉnh mức độ phân loại màu cảnh báo. |
+| **UC-008.4**| Xóa Mốc / Câu Hỏi Check (Delete) | `template_recovery_milestones`, `template_recovery_questions` | **D** | Xóa mốc khảo sát hoặc câu hỏi thừa khỏi cấu hình template nháp. |
+| **UC-008.5**| Thêm Tiêu Chí Red Flag & Hotline (Create)| `template_red_flags` | **C** | Cài đặt dấu hiệu biến chứng khẩn cấp gắn cố định Hotline 0395 151 151 và SLA <5p (BR11, BR12). |
+| **UC-008.6**| Xem Danh Sách Tiêu Chí Red Flag (Read)| `template_red_flags` | **R** | Đọc danh mục các dấu hiệu nguy hiểm kèm hướng dẫn sơ cứu tức thì cho người nhà. |
+| **UC-008.7**| Chỉnh Sửa Tiêu Chí Red Flag (Update)| `template_red_flags` | **U** | Hiệu chỉnh mô tả triệu chứng hoặc bổ sung lời dặn xử trí cấp cứu tức thì. |
+| **UC-008.8**| Xóa Tiêu Chí Red Flag (Delete) | `template_red_flags` | **D** | Xóa tiêu chí Red Flag khỏi template draft; ràng buộc giữ lại ≥1 tiêu chí (BR11). |
+| **UC-009.1**| Thêm Cẩm Nang 24h & Infographic (Create)| `template_learning_modules` | **C** | Thêm bài học đồ họa tĩnh, gắn cờ cẩm nang 24h sống còn và lưu URL ảnh Infographic tối ưu CDN. |
+| **UC-009.2**| Xem Danh Mục Cẩm Nang (Read/List) | `template_learning_modules` | **R** | Đọc danh mục bài học Infographic tĩnh theo thứ tự lộ trình chăm sóc phục hồi. |
+| **UC-009.3**| Chỉnh Sửa Bài Học Cẩm Nang (Update) | `template_learning_modules` | **U** | Cập nhật tiêu đề, thay đổi ảnh Infographic hoặc hiệu chỉnh tóm tắt y khoa 3 gạch đầu dòng. |
+| **UC-009.4**| Xóa Bài Học Khỏi Lộ Trình (Delete) | `template_learning_modules` | **D** | Gỡ bỏ bài học khỏi template nháp và sắp xếp lại thứ tự bài học còn lại. |
+| **UC-009.5**| Thêm Quy Tắc Do/Don't 2 Cột Màu (Create)| `template_do_dont_items` | **C** | Thêm quy tắc sinh hoạt vào Cột Xanh (DO) hoặc Cột Đỏ (DON'T) phân theo nhóm (BR16). |
+| **UC-009.6**| Xem Danh Sách Quy Tắc Do/Don't (Read)| `template_do_dont_items` | **R** | Đọc bảng ma trận 2 cột màu trực quan phân theo các nhóm sinh hoạt: Ăn uống, Vệ sinh, Vận động. |
+| **UC-009.7**| Chỉnh Sửa Quy Tắc Do/Don't (Update) | `template_do_dont_items` | **U** | Cập nhật mô tả quy tắc hoặc bổ sung giải thích lý do y khoa ngăn biến chứng lệch vạt giác mạc. |
+| **UC-009.8**| Xóa Quy Tắc Do/Don't Khỏi Template (Delete)| `template_do_dont_items` | **D** | Xóa một quy tắc sinh hoạt không còn áp dụng khỏi phác đồ mẫu. |
+| **UC-009.9**| Quản Lý Ngân Hàng FAQ Lâm Sàng (All CRUD)| `template_do_dont_items` | **C, R, U, D** | Quản trị kho tình huống hỏi đáp khẩn cấp (dính nước, quên nhỏ thuốc) hiển thị nhanh trên app. |
 | **UC-010** | Khởi Tạo & Cá Nhân Hóa Care Plan | `patient_care_plans`, `patient_medications`, `patient_followup_appointments` | **C, U** | Nhân bản Master Template thành Care Plan thực tế trong <30s; tùy biến liều lượng độc lập (BR18). |
 | **UC-010b**| Thực Hiện Bàn Giao Phòng Lưu Viện | `patient_care_plans`, `patients` | **R, U** | Điều dưỡng dán khiên mắt bảo hộ, trao phiếu QR, hướng dẫn quét mã tại phòng lưu viện. |
 | **UC-010c**| Xác Nhận Hoàn Tất Bàn Giao Lâm Sàng | `caregiver_patient_links`, `patient_care_plans` | **U** | Chuyển trạng thái Care Plan sang `ACTIVE` toàn diện, đẩy hồ sơ lên Dashboard CSKH. |
@@ -479,6 +505,9 @@ Ký hiệu: **C** = Create (Tạo mới), **R** = Read (Đọc/Xem), **U** = Upd
 | **UC-023** | Ghi Nhận Nhật Ký Cuộc Gọi Can Thiệp | `call_intervention_logs`, `red_flag_incidents` | **C, U** | Ghi nhận chi tiết kết quả cuộc gọi hỗ trợ, lời dặn y tế và trạng thái ca bệnh. |
 | **UC-024** | Tra Cứu FAQ Tình Huống Khẩn Cấp | `template_do_dont_items` | **R** | Tra cứu nhanh chỉ dẫn chuẩn y khoa theo tình huống tại nhà (dính nước, quên nhỏ thuốc). |
 | **UC-025** | Kích Hoạt Chế Độ Trợ Năng Nhãn Khoa | `caregiver_profiles` | **U, R** | Cấu hình cỡ chữ to (≥18pt), tương phản cao High Contrast và Audio Guide đọc tiếng Việt. |
-| **UC-026** | Quản Lý Nhân Viên & Phân Quyền Cơ Sở | `accounts`, `doctor_profiles` | **C, R, U, D** | Khởi tạo tài khoản nhân viên y tế và kiểm soát phạm vi truy cập theo 5 chi nhánh VISI. |
+| **UC-026.1**| Khởi Tạo Tài Khoản Nhân Viên (Create) | `accounts`, `doctor_profiles` | **C** | Tạo tài khoản nhân sự mới, gán vai trò RBAC (`DOCTOR`, `NURSE`, `CSKH`, `GCMO`) và cơ sở (BR26). |
+| **UC-026.2**| Xem Danh Sách Nhân Viên (Read/List) | `accounts`, `doctor_profiles` | **R** | Tra cứu, lọc danh bạ nhân sự y tế phân trang theo 5 chi nhánh VISI và trạng thái hoạt động. |
+| **UC-026.3**| Chỉnh Sửa Thông Tin & Vai Trò (Update)| `accounts`, `doctor_profiles` | **U** | Điều chuyển cơ sở làm việc, cập nhật quyền hạn; kích hoạt cơ chế thu hồi phiên làm việc cũ. |
+| **UC-026.4**| Khóa / Vô Hiệu Hóa Tài Khoản (Lock) | `accounts` | **D** | Khóa tài khoản (`status = 'LOCKED'`), ngắt phiên làm việc tức thì trên mọi thiết bị (BR26). |
 | **UC-027** | Tra Cứu Nhật Ký Kiểm Toán Hệ Thống | `system_audit_logs` | **R** | Truy vấn nhật ký bất biến phục vụ kiểm tra an toàn thông tin và thanh tra pháp lý y tế. |
 | **UC-028** | Kết Xuất Báo Cáo Vận Hành KPI | `patient_care_plans`, `medication_logs`, `patient_followup_appointments` | **R** | Tổng hợp các chỉ số KPIs: tỷ lệ kích hoạt QR, tỷ lệ tuân thủ thuốc đúng giờ toàn chuỗi. |
