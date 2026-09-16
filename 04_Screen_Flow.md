@@ -37,12 +37,20 @@ Tài liệu này đặc tả kiến trúc luồng giao diện người dùng (Sc
 * **Các thành phần UI chính:** Ô nhập Số điện thoại di động Việt Nam; Nút 'Tiếp tục'; Ô nhập mã OTP 6 chữ số đếm ngược 5 phút; Nút 'Gửi lại mã OTP'; Thông báo điều khoản bảo mật theo NĐ 13/2023.
 * **Luồng điều hướng & Hành vi:** Xác thực OTP thành công -> Điều hướng sang `SCR-CG-02` (Trang chủ) hoặc `SCR-CG-03` (nếu xuất phát từ việc quét mã QR trực tiếp bằng camera điện thoại).
 
-#### `SCR-CG-02`: Trang chủ & Danh sách bệnh nhân (Caregiver Dashboard)
+#### `SCR-CG-02`: Trang chủ, Lựa chọn Care Recipient & Lịch sử Chăm sóc (Caregiver Dashboard)
 * **Mã Use Case liên kết:** UC-001, UC-003
 * **Tính năng liên quan:** F-003, F-004
 * **Tác nhân vận hành:** ACT-001 (Caregiver)
-* **Các thành phần UI chính:** Thẻ thông tin bệnh nhân đang chăm sóc (Họ tên viết tắt, Mắt mổ, Loại mổ, Ngày hậu phẫu: Day X); Nút chuyển đổi hồ sơ bệnh nhân (hỗ trợ chăm sóc nhiều người); Nút 'Quét mã QR bệnh nhân mới'; Danh mục lối tắt: Lịch thuốc, Tái khám, Đánh giá hồi phục, Cẩm nang 24h, Hotline 0395 151 151.
-* **Luồng điều hướng & Hành vi:** Nhấn thẻ bệnh nhân -> Điều hướng sang `SCR-CG-04`; Nhấn 'Quét QR mới' -> Điều hướng sang `SCR-CG-03`; Nhấn Hotline -> Gọi điện khẩn cấp.
+* **Các thành phần UI chính:**
+  * **Thanh Tab phân loại 2 tầng:**
+    * *Tab 1: "Đang chăm sóc" (Active Care Recipients):* Danh sách thẻ bệnh nhân đang có phác đồ điều trị hoạt động. Mỗi thẻ hiển thị: Tên viết tắt (`display_name`), Năm sinh, Mắt phẫu thuật (MP/MT), Loại phẫu thuật (Phaco/SILK), Ngày hậu phẫu (`Day X`), Tỷ lệ hoàn thành cữ thuốc trong ngày và Cảnh báo triệu chứng (nếu có cờ Vàng/Đỏ).
+    * *Tab 2: "Lịch sử chăm sóc" (Past Patients / Archive):* Danh sách các ca phẫu thuật đã hoàn thành đợt theo dõi 30 ngày; cho phép bấm vào xem lại toàn bộ hồ sơ cũ (IOL đã đặt, bác sĩ mổ, đơn thuốc cũ, lịch sử phục hồi) để chuẩn bị cho ca mổ mắt thứ hai hoặc tái khám định kỳ.
+  * Nút lớn 'Quét mã QR liên kết bệnh nhân mới' (`SCR-CG-03`).
+  * Danh mục lối tắt nhanh: Lịch thuốc cữ kế tiếp, Đánh giá hồi phục hôm nay, Cẩm nang 24h, Lịch tái khám, Hotline cấp cứu `0395 151 151`.
+* **Luồng điều hướng & Hành vi:**
+  * Nhấn vào thẻ bệnh nhân đang chăm sóc -> Đặt bệnh nhân làm Ngữ cảnh kích hoạt (`Active Context`) và chuyển sang `SCR-CG-04`.
+  * Nhấn vào thẻ bệnh nhân trong Tab Lịch sử -> Chuyển sang `SCR-CG-04` ở chế độ *Xem hồ sơ lưu trữ (Read-only)*.
+  * Nhấn 'Quét QR mới' -> Điều hướng sang `SCR-CG-03`.
 
 #### `SCR-CG-03`: Quét mã QR liên kết bệnh nhân (QR Scanner)
 * **Mã Use Case liên kết:** UC-003
@@ -53,10 +61,17 @@ Tài liệu này đặc tả kiến trúc luồng giao diện người dùng (Sc
 
 #### `SCR-CG-04`: Trung tâm Kế Hoạch Chăm Sóc Bệnh Nhân (Patient Care Plan Hub)
 * **Mã Use Case liên kết:** UC-003, UC-014, UC-016
-* **Tính năng liên quan:** F-004, F-008, F-009, F-012, F-013
+* **Tính năng liên quan:** F-003, F-004, F-008, F-009, F-012, F-013
 * **Tác nhân vận hành:** ACT-001 (Caregiver)
-* **Các thành phần UI chính:** Banner nổi bật: Cẩm nang 24h đầu sống còn (Day 0–1); Thanh tiến trình hồi phục theo ngày (Day 1 -> Day 30); Tiện ích cữ thuốc tiếp theo kèm đồng hồ đếm lùi; Nút 'Làm bài kiểm tra phục hồi hôm nay' (nếu chưa nộp); Nút gọi 1 chạm Hotline VISI 0395 151 151.
-* **Luồng điều hướng & Hành vi:** Nhấn cữ thuốc -> Sang `SCR-CG-09`; Nhấn khảo sát -> Sang `SCR-CG-11`; Nhấn Cẩm nang 24h -> Sang `SCR-CG-08`; Nhấn Học viện Caregiver -> Sang `SCR-CG-05`.
+* **Các thành phần UI chính:**
+  * **Header Care Recipient Switcher:** Nút dropdown 1 chạm hiển thị Tên bệnh nhân đang chọn kèm avatar mắt mổ; cho phép Caregiver đổi nhanh sang bệnh nhân khác ngay tại chỗ mà không cần quay lại trang chủ.
+  * Banner nổi bật: Cẩm nang 24h đầu sống còn (Day 0–1);
+  * Thanh tiến trình hồi phục theo ngày (Day 1 -> Day 30);
+  * Tiện ích cữ thuốc tiếp theo kèm đồng hồ đếm lùi;
+  * Nút 'Làm bài kiểm tra phục hồi hôm nay' (nếu chưa nộp);
+  * **Lối tắt 'Dòng Thời Gian Lịch Sử Chăm Sóc' (Care History Timeline):** Cho phép xem chi tiết từng cữ thuốc đã uống (thời điểm, thuốc gì, ai trong số 3 Caregiver đã cho uống), lịch sử các bài khảo sát Recovery Check các ngày trước và nhật ký tư vấn của CSKH;
+  * Nút gọi 1 chạm Hotline VISI `0395 151 151`.
+* **Luồng điều hướng & Hành vi:** Nhấn cữ thuốc -> Sang `SCR-CG-09`; Nhấn khảo sát -> Sang `SCR-CG-11`; Nhấn Cẩm nang 24h -> Sang `SCR-CG-08`; Nhấn Học viện Caregiver -> Sang `SCR-CG-05`; Nhấn Switcher -> Đổi bệnh nhân đang chọn.
 
 #### `SCR-CG-05`: Lộ trình bài học Học Viện Caregiver (Caregiver Academy Module List)
 * **Mã Use Case liên kết:** UC-017

@@ -257,6 +257,124 @@ WHERE patient_id = :patient_id;
 COMMIT;
 ```
 
+#### UC-003: Quét QR Liên Kết, Lựa Chọn Care Recipient & Lịch Sử Chăm Sóc (F-003, F-004)
+```sql
+-- 1. Quét QR liên kết Caregiver với Bệnh nhân (Kiểm soát tối đa 03 Caregiver theo BR5)
+BEGIN;
+
+DO $$
+DECLARE
+  current_caregiver_count INT;
+  target_patient_id VARCHAR(30);
+BEGIN
+  -- Lấy patient_id từ token QR hợp lệ
+  SELECT pcp.patient_id INTO target_patient_id
+  FROM patient_qr_codes pqr
+  JOIN patient_care_plans pcp ON pqr.care_plan_id = pcp.care_plan_id
+  WHERE pqr.qr_token = :qr_token 
+    AND pqr.status = 'ISSUED' 
+    AND pqr.expires_at > CURRENT_TIMESTAMP;
+
+  IF target_patient_id IS NULL THEN
+    RAISE EXCEPTION 'Mã QR không hợp lệ, đã hết hạn hoặc đã bị thu hồi';
+  END IF;
+
+  -- Đếm số lượng Caregiver đang liên kết
+  SELECT COUNT(*) INTO current_caregiver_count
+  FROM caregiver_patient_links
+  WHERE patient_id = target_patient_id AND status = 'ACTIVE';
+
+  IF current_caregiver_count >= 3 THEN
+    RAISE EXCEPTION 'Hồ sơ bệnh nhân đã đạt giới hạn tối đa 03 Người chăm sóc (BR5)';
+  END IF;
+
+  -- Tạo liên kết mới
+  INSERT INTO caregiver_patient_links (link_id, caregiver_id, patient_id, relationship, role, status, linked_at)
+  VALUES (gen_random_uuid(), :caregiver_id, target_patient_id, :relationship, 'SECONDARY_CAREGIVER', 'ACTIVE', CURRENT_TIMESTAMP)
+  ON CONFLICT (caregiver_id, patient_id) DO UPDATE 
+  SET status = 'ACTIVE', linked_at = CURRENT_TIMESTAMP;
+END $$;
+
+COMMIT;
+
+-- 2. Truy vấn danh sách Care Recipients của Caregiver (Tab Đang chăm sóc vs Tab Lịch sử)
+SELECT 
+  p.patient_id, p.display_name, p.birth_year, p.surgery_eye, p.surgery_type, p.surgery_date,
+  f.facility_name, f.hotline AS facility_hotline,
+  cpl.relationship, cpl.role AS caregiver_role, cpl.linked_at,
+  pcp.care_plan_id, pcp.status AS plan_status,
+  CASE 
+    WHEN pcp.status = 'ACTIVE' THEN 'ACTIVE'
+    ELSE 'COMPLETED'
+  END AS recipient_group,
+  CURRENT_DATE - p.surgery_date AS post_op_days,
+  -- Tỷ lệ hoàn thành cữ thuốc hôm nay
+  (
+    SELECT COUNT(*) 
+    FROM medication_logs ml
+    WHERE ml.care_plan_id = pcp.care_plan_id 
+      AND ml.actual_taken_at::DATE = CURRENT_DATE
+  ) AS today_taken_doses,
+  -- Mức cảnh báo gần nhất
+  COALESCE(
+    (SELECT alert_level FROM recovery_check_submissions rcs 
+     WHERE rcs.care_plan_id = pcp.care_plan_id 
+     ORDER BY rcs.submitted_at DESC LIMIT 1),
+    'GREEN'
+  ) AS latest_alert_level
+FROM caregiver_patient_links cpl
+JOIN patients p ON cpl.patient_id = p.patient_id
+JOIN facilities f ON p.facility_id = f.facility_id
+LEFT JOIN patient_care_plans pcp ON p.patient_id = pcp.patient_id AND pcp.status IN ('ACTIVE', 'COMPLETED', 'ARCHIVED')
+WHERE cpl.caregiver_id = :caregiver_id 
+  AND cpl.status = 'ACTIVE'
+ORDER BY 
+  CASE WHEN pcp.status = 'ACTIVE' THEN 0 ELSE 1 END,
+  p.surgery_date DESC;
+
+-- 3. Truy vấn Dòng thời gian Lịch sử Chăm sóc Chi tiết (Care History Timeline - F-003, F-009, F-016)
+-- Kết hợp lịch sử dùng thuốc (kèm tên người đã cho uống) và lịch sử khảo sát phục hồi
+WITH med_history AS (
+  SELECT 
+    ml.actual_taken_at AS event_time,
+    'MEDICATION_TAKEN' AS event_type,
+    'Đã dùng thuốc: ' || pms.medication_name AS event_title,
+    jsonb_build_object(
+      'medication_name', pms.medication_name,
+      'dosage_form', pms.dosage_form,
+      'dose_amount', pms.dose_amount,
+      'target_eye', pms.target_eye,
+      'scheduled_time', ml.scheduled_time,
+      'confirmed_by_role', ml.confirmed_by_role,
+      'confirmed_by_name', COALESCE(cp.full_name, 'Bệnh nhân tự xác nhận')
+    ) AS event_details
+  FROM medication_logs ml
+  JOIN patient_medication_schedules pms ON ml.schedule_id = pms.schedule_id
+  LEFT JOIN caregiver_profiles cp ON ml.confirmed_by_user_id = cp.caregiver_id
+  WHERE ml.care_plan_id = :care_plan_id
+),
+survey_history AS (
+  SELECT 
+    rcs.submitted_at AS event_time,
+    'RECOVERY_CHECK' AS event_type,
+    'Khảo sát phục hồi: Mức ' || rcs.alert_level AS event_title,
+    jsonb_build_object(
+      'submission_id', rcs.submission_id,
+      'alert_level', rcs.alert_level,
+      'answers_count', (SELECT COUNT(*) FROM recovery_check_answers rca WHERE rca.submission_id = rcs.submission_id)
+    ) AS event_details
+  FROM recovery_check_submissions rcs
+  WHERE rcs.care_plan_id = :care_plan_id
+)
+SELECT event_time, event_type, event_title, event_details
+FROM med_history
+UNION ALL
+SELECT event_time, event_type, event_title, event_details
+FROM survey_history
+ORDER BY event_time DESC
+LIMIT :limit OFFSET :offset;
+```
+
 ---
 
 ### 2.3 Phân Hệ Cấu Hình Master Care Plan Template (Templates CRUD)
