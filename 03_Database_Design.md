@@ -23,38 +23,63 @@
 
 ### PHÂN HỆ I: NGƯỜI DÙNG & ĐỊNH DANH (AUTHENTICATION & USERS)
 
+#### 0. Bảng `facilities` (Cơ sở / Chi nhánh Y tế VISI)
+Quản lý thông tin định danh và hoạt động của 5 chi nhánh bệnh viện thuộc Tập đoàn Y khoa VISI (BR26).
+
+| Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
+|---|---|---|---|---|
+| `facility_id` | `UUID` | **PK**, Not Null | `gen_random_uuid()` | Khóa chính định danh cơ sở y tế |
+| `facility_code` | `VARCHAR(20)` | Unique, Not Null | — | Mã viết tắt cơ sở (`VISI-HN`, `VISI-DN`, `VISI-HCM-Q1`...) |
+| `facility_name` | `VARCHAR(150)` | Not Null | — | Tên đầy đủ cơ sở (ví dụ: *Bệnh viện Mắt VISI Hà Nội*) |
+| `address` | `TEXT` | Not Null | — | Địa chỉ trụ sở bệnh viện / phòng khám |
+| `hotline` | `VARCHAR(20)` | Not Null | `'0395 151 151'` | Số điện thoại đường dây nóng cấp cứu 24/7 |
+| `status` | `VARCHAR(20)` | Not Null | `'ACTIVE'` | ENUM: `'ACTIVE'`, `'INACTIVE'` |
+| `created_at` | `TIMESTAMPTZ` | Not Null | `CURRENT_TIMESTAMP` | Thời điểm tạo bản ghi |
+| `updated_at` | `TIMESTAMPTZ` | Not Null | `CURRENT_TIMESTAMP` | Thời điểm cập nhật cuối cùng |
+
+* **Chỉ mục (Indexes):**
+  * `idx_facilities_code` (Unique) trên `facility_code`: Tìm kiếm cơ sở theo mã chi nhánh.
+
+---
+
 #### 1. Bảng `accounts` (Tài khoản người dùng tập trung)
-Lưu trữ thông tin xác thực cho Caregiver, Doctor và Quản trị viên `[FUTURE / ADMIN]`.
+Lưu trữ thông tin xác thực cho Caregiver, Care Recipient, Bác sĩ, Điều dưỡng, CSKH, GCMO và Quản trị viên (RBAC 7 vai trò).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
 | `account_id` | `UUID` | **PK**, Not Null | `gen_random_uuid()` | Khóa chính định danh tài khoản duy nhất |
-| `phone_number` | `VARCHAR(20)` | Unique, Nullable | NULL | Số điện thoại dùng đăng nhập OTP (Caregiver/Doctor) |
-| `username` | `VARCHAR(50)` | Unique, Nullable | NULL | Tên đăng nhập (Bác sĩ, `[FUTURE / ADMIN]: Admin`) |
+| `facility_id` | `UUID` | **FK** -> `facilities(facility_id)`, Nullable | NULL | Chi nhánh trực thuộc (Bắt buộc với Staff chi nhánh, NULL với GCMO/Caregiver) (BR26) |
+| `phone_number` | `VARCHAR(20)` | Unique, Nullable | NULL | Số điện thoại dùng đăng nhập OTP (Caregiver/Staff) |
+| `username` | `VARCHAR(50)` | Unique, Nullable | NULL | Tên đăng nhập nhân sự y tế / quản trị |
 | `email` | `VARCHAR(100)` | Unique, Nullable | NULL | Email liên hệ công vụ |
-| `password_hash` | `VARCHAR(255)` | Nullable | NULL | Mật khẩu mã hóa BCrypt/Argon2 (Bác sĩ, Admin) |
-| `role` | `VARCHAR(20)` | Not Null | `'CAREGIVER'` | ENUM: `'CAREGIVER'`, `'DOCTOR'`, `'ADMIN'` `[FUTURE / ADMIN]` |
+| `password_hash` | `VARCHAR(255)` | Nullable | NULL | Mật khẩu mã hóa BCrypt/Argon2 (Bác sĩ, Điều dưỡng, CSKH, Admin) |
+| `role` | `VARCHAR(20)` | Not Null | `'CAREGIVER'` | ENUM: `'CAREGIVER'`, `'CARE_RECIPIENT'`, `'DOCTOR'`, `'NURSE'`, `'CSKH'`, `'GCMO'`, `'ADMIN'` |
 | `status` | `VARCHAR(20)` | Not Null | `'ACTIVE'` | ENUM: `'ACTIVE'`, `'LOCKED'`, `'INACTIVE'` (BR3, BR14) |
 | `created_at` | `TIMESTAMPTZ` | Not Null | `CURRENT_TIMESTAMP` | Thời điểm tạo tài khoản |
 | `updated_at` | `TIMESTAMPTZ` | Not Null | `CURRENT_TIMESTAMP` | Thời điểm cập nhật cuối cùng |
 
 * **Chỉ mục (Indexes):**
   * `idx_accounts_phone` (B-Tree) trên `phone_number`: Tối ưu hóa đăng nhập OTP (UC-001).
-  * `idx_accounts_username` (B-Tree) trên `username`: Tối ưu hóa đăng nhập Bác sĩ (UC-002).
+  * `idx_accounts_username` (B-Tree) trên `username`: Tối ưu hóa đăng nhập Nhân sự y tế (UC-002).
+  * `idx_accounts_facility` (B-Tree) trên `facility_id`: Lọc nhân sự theo chi nhánh (BR26).
 
 ---
 
-#### 2. Bảng `doctor_profiles` (Hồ sơ Bác sĩ điều trị)
-Thông tin chuyên môn của Bác sĩ phụ trách lâm sàng.
+#### 2. Bảng `doctor_profiles` (Hồ sơ Bác sĩ & Nhân viên Y tế)
+Thông tin chuyên môn của Bác sĩ / Điều dưỡng phụ trách lâm sàng.
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
 | `doctor_id` | `UUID` | **PK**, **FK** -> `accounts(account_id)` | — | Khóa chính đồng thời là khóa ngoại trỏ về `accounts` |
-| `full_name` | `VARCHAR(100)` | Not Null | — | Họ và tên Bác sĩ |
-| `license_number` | `VARCHAR(50)` | Unique, Not Null | — | Số chứng chỉ hành nghề y khoa `[ASSUMPTION]` |
-| `department` | `VARCHAR(100)` | Not Null | `'Khoa Mắt'` | Chuyên khoa công tác (Khúc xạ, Đục thủy tinh thể...) |
+| `facility_id` | `UUID` | **FK** -> `facilities(facility_id)`, Not Null | — | Chi nhánh bệnh viện công tác (BR26) |
+| `full_name` | `VARCHAR(100)` | Not Null | — | Họ và tên Bác sĩ / Nhân sự y tế |
+| `license_number` | `VARCHAR(50)` | Unique, Not Null | — | Số chứng chỉ hành nghề y khoa |
+| `department` | `VARCHAR(100)` | Not Null | `'Khoa Mắt'` | Chuyên khoa công tác (Khúc xạ, Đục thủy tinh thể, Hậu phẫu...) |
 | `hospital_name` | `VARCHAR(150)` | Not Null | — | Tên bệnh viện / trung tâm y tế |
 | `phone_number` | `VARCHAR(20)` | Nullable | — | Số điện thoại liên hệ chuyên môn |
+
+* **Chỉ mục (Indexes):**
+  * `idx_doctor_facility` (B-Tree) trên `facility_id`: Tối ưu tra cứu danh sách bác sĩ/nhân sự theo cơ sở (UC-026.2).
 
 ---
 
@@ -95,6 +120,7 @@ Quản lý thông tin định danh, bệnh lý và các trường lâm sàng tù
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
 | `patient_id` | `VARCHAR(30)` | **PK**, Not Null | — | Mã bệnh nhân duy nhất (ví dụ: `BN-2026-00012`) (BR15) |
+| `facility_id` | `UUID` | **FK** -> `facilities(facility_id)`, Not Null | — | Chi nhánh bệnh viện tiếp nhận điều trị (BR26) |
 | `full_name` | `VARCHAR(100)` | Not Null | — | Họ và tên bệnh nhân (BR15) |
 | `date_of_birth` | `DATE` | Not Null | — | Ngày tháng năm sinh (BR15) |
 | `gender` | `VARCHAR(10)` | Not Null | — | ENUM: `'MALE'`, `'FEMALE'`, `'OTHER'` (BR15) |
@@ -124,6 +150,7 @@ Quản lý thông tin định danh, bệnh lý và các trường lâm sàng tù
 * **Chỉ mục (Indexes):**
   * `idx_patients_search` trên `(full_name, phone_number)`: Tìm kiếm nhanh bệnh nhân (UC-004).
   * `idx_patients_status_type` trên `(status, surgery_type)`: Lọc theo trạng thái và loại phẫu thuật.
+  * `idx_patients_facility` trên `(facility_id, status)`: Phân vùng dữ liệu đa chi nhánh (BR26).
 
 ---
 
@@ -136,6 +163,7 @@ Lưu quan hệ ủy quyền sau khi quét mã QR thành công (UC-003).
 | `caregiver_id` | `UUID` | **FK** -> `caregiver_profiles(caregiver_id)`, Not Null | — | Người chăm sóc được phân quyền |
 | `patient_id` | `VARCHAR(30)` | **FK** -> `patients(patient_id)`, Not Null | — | Bệnh nhân được chăm sóc |
 | `care_plan_id` | `UUID` | **FK** -> `patient_care_plans(care_plan_id)`, Not Null | — | Care Plan đang hoạt động của bệnh nhân |
+| `role` | `VARCHAR(20)` | Not Null | `'PRIMARY'` | ENUM: `'PRIMARY'`, `'SECONDARY'` (BR5: tối đa 3 Caregiver) |
 | `linked_at` | `TIMESTAMPTZ` | Not Null | `CURRENT_TIMESTAMP` | Mốc thời gian quét QR thành công (BR5) |
 | `status` | `VARCHAR(20)` | Not Null | `'ACTIVE'` | ENUM: `'ACTIVE'`, `'REVOKED'` |
 | `revoked_at` | `TIMESTAMPTZ` | Nullable | NULL | Mốc thời gian hủy quyền liên kết nếu có |
@@ -148,7 +176,7 @@ Lưu quan hệ ủy quyền sau khi quét mã QR thành công (UC-003).
 ### PHÂN HỆ III: MASTER CARE PLAN TEMPLATE (CẤU HÌNH MẪU CHUẨN)
 
 #### 7. Bảng `care_plan_templates` (Master Care Plan Template)
-Gói phác đồ mẫu gốc gắn với loại phẫu thuật (UC-005).
+Gói phác đồ mẫu gốc gắn với loại phẫu thuật (UC-005, UC-006).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
@@ -156,8 +184,12 @@ Gói phác đồ mẫu gốc gắn với loại phẫu thuật (UC-005).
 | `template_name` | `VARCHAR(150)` | Not Null | — | Tên gói template chuẩn (BR16) |
 | `surgery_type` | `VARCHAR(50)` | Not Null | — | Loại phẫu thuật liên kết duy nhất (BR16) |
 | `clinical_description`| `TEXT` | Nullable | NULL | Mô tả mục tiêu lâm sàng |
-| `status` | `VARCHAR(20)` | Not Null | `'DRAFT'` | ENUM: `'DRAFT'`, `'ACTIVE'`, `'INACTIVE'` |
+| `version` | `VARCHAR(10)` | Not Null | `'1.0'` | Phiên bản phác đồ mẫu (v1.0, v1.1...) (BR15) |
+| `parent_template_id` | `UUID` | **FK** -> `care_plan_templates(template_id)`, Nullable | NULL | Tham chiếu bản gốc khi sửa template đã duyệt |
+| `status` | `VARCHAR(20)` | Not Null | `'DRAFT'` | ENUM: `'DRAFT'`, `'PENDING_APPROVAL'`, `'ACTIVE'`, `'INACTIVE'`, `'ARCHIVED'` |
 | `created_by_doctor_id`| `UUID` | **FK** -> `doctor_profiles(doctor_id)`, Not Null | — | Bác sĩ cấu hình gói mẫu |
+| `approved_by` | `UUID` | **FK** -> `accounts(account_id)`, Nullable | NULL | Bác sĩ Trưởng khoa / GCMO ký duyệt (UC-006) |
+| `approved_at` | `TIMESTAMPTZ` | Nullable | NULL | Thời điểm phê duyệt lâm sàng |
 | `created_at` | `TIMESTAMPTZ` | Not Null | `CURRENT_TIMESTAMP` | Thời điểm tạo |
 | `updated_at` | `TIMESTAMPTZ` | Not Null | `CURRENT_TIMESTAMP` | Thời điểm cập nhật cuối |
 
@@ -300,11 +332,12 @@ Danh mục hành vi sinh hoạt được phép và cấm kỵ hậu phẫu (UC-0
 ### PHÂN HỆ IV: THỰC THỂ KẾ HOẠCH BỆNH NHÂN (PATIENT CARE PLAN INSTANCE)
 
 #### 15. Bảng `patient_care_plans` (Kế hoạch chăm sóc bệnh nhân thực tế)
-Bản thể hiện độc lập được kích hoạt cho từng bệnh nhân cụ thể (UC-010).
+Bản thể hiện độc lập được kích hoạt cho từng bệnh nhân cụ thể theo chi nhánh (UC-010, BR26).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
 | `care_plan_id` | `UUID` | **PK**, Not Null | `gen_random_uuid()` | Khóa chính Care Plan bệnh nhân |
+| `facility_id` | `UUID` | **FK** -> `facilities(facility_id)`, Not Null | — | Cơ sở y tế quản lý kế hoạch (BR26) |
 | `patient_id` | `VARCHAR(30)` | **FK** -> `patients(patient_id)`, Not Null | — | Gắn với hồ sơ bệnh nhân cụ thể |
 | `source_template_id` | `UUID` | **FK** -> `care_plan_templates(template_id)`, Not Null | — | Template gốc được nhân bản |
 | `surgery_type` | `VARCHAR(50)` | Not Null | — | Loại phẫu thuật thực hiện |
@@ -322,6 +355,8 @@ Bản thể hiện độc lập được kích hoạt cho từng bệnh nhân c�
   WHERE status = 'ACTIVE';
   ```
   *(Đảm bảo trong 1 thời điểm mỗi bệnh nhân chỉ có duy nhất tối đa 1 Care Plan đang hoạt động).*
+* **Chỉ mục phân vùng chi nhánh (Indexes):**
+  * `idx_careplans_facility_status` trên `(facility_id, status)`: Tối ưu tra cứu danh sách kế hoạch chăm sóc theo cơ sở (BR26).
 
 ---
 
@@ -373,7 +408,7 @@ Token QR mã hóa gắn liền với phiếu xuất viện (UC-003, UC-011).
 | `qr_id` | `UUID` | **PK**, Not Null | `gen_random_uuid()` | Khóa chính bản ghi QR |
 | `care_plan_id` | `UUID` | **FK** -> `patient_care_plans(care_plan_id)`, Unique, On Delete Cascade | — | Gắn với Care Plan (tỷ lệ 1 : 1) |
 | `qr_token` | `VARCHAR(255)` | Unique, Not Null | — | Token mã hóa ngẫu nhiên chống giả mạo (BR20) |
-| `issued_by_doctor_id`| `UUID` | **FK** -> `doctor_profiles(doctor_id)`, Not Null | — | Bác sĩ cấp phát |
+| `issued_by_account_id`| `UUID` | **FK** -> `accounts(account_id)`, Not Null | — | Bác sĩ hoặc Điều dưỡng phát hành mã QR (UC-011) |
 | `issued_at` | `TIMESTAMPTZ` | Not Null | `CURRENT_TIMESTAMP` | Thời điểm tạo mã |
 | `status` | `VARCHAR(20)` | Not Null | `'ACTIVE'` | ENUM: `'ACTIVE'`, `'REVOKED'` (BR4) |
 | `print_count` | `INT` | Not Null | `1` | Số lần in ấn / tạo lại phiếu (UC-012, UC-013) |
@@ -456,7 +491,7 @@ Lưu đáp án từng câu hỏi trong bảng kiểm phục hồi (UC-019, UC-02
 ---
 
 #### 23. Bảng `red_flag_incidents` (Sự kiện cảnh báo khẩn cấp)
-Theo dõi các tình huống khẩn cấp xảy ra với bệnh nhân (UC-020, UC-022).
+Theo dõi các tình huống khẩn cấp xảy ra với bệnh nhân (UC-020, UC-022, UC-022b).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|
@@ -470,14 +505,63 @@ Theo dõi các tình huống khẩn cấp xảy ra với bệnh nhân (UC-020, U
 | `call_initiated_at` | `TIMESTAMPTZ` | Nullable | NULL | Thời điểm bấm gọi |
 | `acknowledged_by_doctor_id`| `UUID` | **FK** -> `doctor_profiles(...)`, Nullable | NULL | Bác sĩ tiếp nhận ca cấp cứu |
 | `acknowledged_at` | `TIMESTAMPTZ` | Nullable | NULL | Thời điểm tiếp nhận |
+| `escalated_at` | `TIMESTAMPTZ` | Nullable | NULL | Thời điểm kích hoạt tự động leo thang cấp 2 sau 15p (UC-022b) |
+| `escalation_level` | `INT` | Not Null | `1` | Cấp độ leo thang (1: CSKH, 2: Bác sĩ trực, 3: Lãnh đạo) |
 | `clinical_resolution` | `TEXT` | Nullable | NULL | Kết luận và hướng xử trí lâm sàng |
+
+* **Chỉ mục (Indexes):**
+  * `idx_incidents_escalation` trên `(acknowledged_at, escalation_level, triggered_at)`: Tối ưu daemon quét cảnh báo quá hạn 15 phút (UC-022b).
 
 ---
 
-### PHÂN HỆ VI: MỞ RỘNG QUẢN TRỊ `[FUTURE / ADMIN]`
+#### 24. Bảng `call_intervention_logs` (Nhật ký cuộc gọi can thiệp y tế)
+Ghi nhận kết quả cuộc gọi của CSKH/Điều dưỡng xử lý cảnh báo trong cam kết SLA <5 phút (UC-023, BR12).
 
-#### 24. Bảng `audit_logs` (Nhật ký kiểm toán hệ thống) `[FUTURE / ADMIN]`
-Sẵn sàng hỗ trợ tính năng CRUD Audit Log của Admin trong tương lai (BR5, BR20).
+| Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
+|---|---|---|---|---|
+| `log_id` | `UUID` | **PK**, Not Null | `gen_random_uuid()` | Khóa chính cuộc gọi can thiệp |
+| `incident_id` | `UUID` | **FK** -> `red_flag_incidents(incident_id)`, On Delete Cascade, Not Null | — | Gắn với sự cố cảnh báo nào |
+| `patient_id` | `VARCHAR(30)` | **FK** -> `patients(patient_id)`, Not Null | — | Bệnh nhân cần can thiệp |
+| `caller_account_id` | `UUID` | **FK** -> `accounts(account_id)`, Not Null | — | Nhân viên CSKH / Điều dưỡng gọi điện |
+| `call_time` | `TIMESTAMPTZ` | Not Null | `CURRENT_TIMESTAMP` | Thời điểm thực hiện cuộc gọi |
+| `duration_seconds` | `INT` | Not Null | `0` | Thời lượng cuộc gọi (giây) |
+| `call_status` | `VARCHAR(20)` | Not Null | — | ENUM: `'ANSWERED'`, `'NO_ANSWER'`, `'BUSY'`, `'FAILED'` |
+| `notes` | `TEXT` | Not Null | — | Chi tiết trao đổi và tình trạng bệnh nhân |
+| `next_action` | `VARCHAR(50)` | Not Null | — | ENUM: `'CONTINUE_MONITORING'`, `'REQUIRE_HOSPITAL_EXAM'`, `'EMERGENCY_DISPATCH'`, `'RECALL_IN_15M'` |
+| `created_at` | `TIMESTAMPTZ` | Not Null | `CURRENT_TIMESTAMP` | Thời điểm ghi nhận hệ thống |
+
+* **Chỉ mục (Indexes):**
+  * `idx_call_logs_incident` trên `(incident_id, call_time)`: Tra cứu lịch sử gọi theo sự cố.
+  * `idx_call_logs_patient` trên `(patient_id, call_time)`: Tra cứu lịch sử gọi theo hồ sơ bệnh nhân.
+
+---
+
+### PHÂN HỆ VI: THÔNG BÁO ĐA KÊNH & MỞ RỘNG QUẢN TRỊ
+
+#### 25. Bảng `notifications` (Lịch sử gửi thông báo đa kênh)
+Lưu vết toàn bộ thông báo gửi qua SMS Brandname VISI, ZNS Zalo, Push App và In-App Web (UC-018, UC-022b, BR24).
+
+| Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
+|---|---|---|---|---|
+| `notification_id` | `UUID` | **PK**, Not Null | `gen_random_uuid()` | Khóa chính thông báo |
+| `recipient_account_id`| `UUID` | **FK** -> `accounts(account_id)`, Nullable | NULL | Tài khoản nhận thông báo app (nếu có) |
+| `patient_id` | `VARCHAR(30)` | **FK** -> `patients(patient_id)`, Not Null | — | Hồ sơ bệnh nhân liên quan |
+| `channel` | `VARCHAR(20)` | Not Null | — | ENUM: `'SMS'`, `'ZNS'`, `'PUSH'`, `'IN_APP'` |
+| `title` | `VARCHAR(200)` | Not Null | — | Tiêu đề thông báo |
+| `body` | `TEXT` | Not Null | — | Nội dung chi tiết tin nhắn |
+| `status` | `VARCHAR(20)` | Not Null | `'PENDING'` | ENUM: `'PENDING'`, `'SENT'`, `'DELIVERED'`, `'FAILED'` |
+| `sent_at` | `TIMESTAMPTZ` | Nullable | NULL | Thời điểm gửi qua đối tác Gateway |
+| `read_at` | `TIMESTAMPTZ` | Nullable | NULL | Thời điểm người dùng đọc thông báo |
+| `created_at` | `TIMESTAMPTZ` | Not Null | `CURRENT_TIMESTAMP` | Thời điểm tạo lệnh thông báo |
+
+* **Chỉ mục (Indexes):**
+  * `idx_notifications_patient_status` trên `(patient_id, status, created_at)`: Tra cứu các thông báo của bệnh nhân.
+  * `idx_notifications_recipient` trên `(recipient_account_id, read_at)`: Lấy thông báo chưa đọc của người dùng.
+
+---
+
+#### 26. Bảng `audit_logs` (Nhật ký kiểm toán hệ thống) `[FUTURE / ADMIN]`
+Sẵn sàng hỗ trợ tính năng CRUD Audit Log của Admin trong tương lai (BR5, BR20, BR21).
 
 | Tên Cột (Column) | Kiểu Dữ Liệu | Ràng Buộc | Giá Trị Mặc Định | Diễn Giải & Quy Tắc Nghiệp Vụ |
 |---|---|---|---|---|

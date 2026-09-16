@@ -80,6 +80,43 @@
 }
 ```
 
+### 1.4 Đặc Tả Giới Hạn Tần Suất Truy Cập (Rate Limiting Specification)
+Áp dụng cơ chế Token Bucket / Sliding Window tại API Gateway (Redis-backed) nhằm chống tấn công Brute-force, Spam SMS OTP và DoS:
+
+| Phạm Vi Áp Dụng | Ngưỡng Giới Hạn (Threshold) | Cơ Chế Phạt Khi Vi Phạm | Căn Cứ Nghiệp Vụ |
+|:---|:---|:---|:---|
+| **Yêu cầu OTP (`/auth/otp/request`)** | Tối đa **5 OTP / SĐT / giờ**<br>Tối đa **10 OTP / Địa chỉ IP / giờ** | Trả về HTTP 429 `TOO_MANY_REQUESTS`, khóa gửi OTP tạm thời 60 phút | Chống spam SMS Brandname và cạn kiệt chi phí viễn thông (BR-NEW-04) |
+| **Xác thực OTP (`/auth/otp/verify`)** | Tối đa **5 lần nhập sai liên tiếp** | Khóa phiên OTP hiện tại, hủy mã, yêu cầu chờ 15 phút mới được xin mã mới | Chống tấn công dò mã 6 số (BR2, UC-001) |
+| **Đăng nhập Nhân viên (`/auth/staff/login`)** | Tối đa **5 lần sai mật khẩu liên tiếp** | Khóa tạm thời tài khoản 15 phút (`status = 'LOCKED'`), gửi cảnh báo email | Chống brute-force mật khẩu nhân sự y tế (BR-NEW-05) |
+| **API Nghiệp vụ chung (Authenticated)** | **120 requests / phút / Account** | HTTP 429, Header `Retry-After: <seconds>` | Bảo vệ tài nguyên máy chủ cơ sở dữ liệu |
+| **Báo động Red Flag (`/alerts/red-flag`)** | **Không giới hạn (Unthrottled)** | Không chặn cuộc gọi cấp cứu | Đảm bảo tính mạng người bệnh tuyệt đối |
+
+### 1.5 Đặc Tả Giao Tiếp Thời Gian Thực (WebSocket & SSE Specification)
+Phục vụ bảng điều khiển trực quan tại phòng trực điều dưỡng và bàn CSKH cơ sở (UC-021, UC-022, UC-022b):
+
+* **Giao thức:** WebSocket (`wss://api.remicare.visi.vn/ws/v1`) hoặc Server-Sent Events (`GET /api/v1/stream/alerts`).
+* **Endpoint kết nối chi nhánh:**
+  ```http
+  wss://api.remicare.visi.vn/ws/v1/facilities/{facility_id}/alerts?token=<JWT_ACCESS_TOKEN>
+  ```
+* **Sự kiện phát sóng (Broadcast Events):**
+  1. `RED_FLAG_TRIGGERED`: Kích hoạt ngay khi bệnh nhân nộp bảng kiểm có câu Đỏ hoặc bấm nút SOS tại nhà. Frontend lập tức phát chuông báo động cấp 1 và chớp đỏ màn hình.
+     ```json
+     {
+       "event": "RED_FLAG_TRIGGERED",
+       "facility_id": "fac-001-uuid",
+       "incident_id": "inc-0091-uuid",
+       "patient_id": "BN-2026-00012",
+       "patient_name_masked": "Ng. V. An",
+       "surgery_type": "PHACO",
+       "triggered_at": "2026-09-15T08:15:30Z",
+       "sla_countdown_seconds": 300,
+       "emergency_hotline": "0395 151 151"
+     }
+     ```
+  2. `ESCALATION_TRIGGERED`: Tự động kích hoạt sau 15 phút sự cố không có người tiếp nhận. Frontend nâng mức chuông cảnh báo cấp 2 (UC-022b).
+  3. `ALERT_CLAIMED`: Khi một nhân viên CSKH/Bác sĩ bấm "Tiếp nhận ca", chuông ngừng kêu trên toàn bộ các máy trạm khác cùng chi nhánh.
+
 ---
 
 ## 2. DANH MỤC API CHI TIẾT THEO PHÂN HỆ NGHIỆP VỤ
@@ -200,6 +237,39 @@
 * **Quyền hạn:** `ADMIN`
 * **Request Body:** `{"reason": "Nhân viên nghỉ việc"}`
 * **Response (200 OK):** Chuyển `status = 'LOCKED'` và đẩy token vào blacklist.
+
+#### [GET] `/api/v1/facilities` — Danh Sách Cơ Sở / Chi Nhánh Y Tế VISI (BR26)
+* **Quyền hạn:** Public / Authenticated
+* **Mô tả:** Lấy danh sách 5 cơ sở thuộc Hệ thống Bệnh viện Mắt VISI phục vụ bộ lọc đa chi nhánh, chọn cơ sở xuất viện hoặc hiển thị hotline cấp cứu địa phương.
+* **Query Params:** `is_active` (boolean, mặc định `true`)
+* **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "Lấy danh sách cơ sở y tế thành công",
+    "data": [
+      {
+        "facility_id": "fac-001-thu-duc",
+        "facility_code": "VISI-TD",
+        "facility_name": "Bệnh viện Mắt Kỹ thuật cao VISI Thủ Đức",
+        "address": "215 Võ Văn Ngân, P. Linh Chiểu, TP. Thủ Đức, TP. HCM",
+        "phone": "028 3896 1234",
+        "hotline": "0395 151 151",
+        "is_active": true
+      },
+      {
+        "facility_id": "fac-002-hai-phong",
+        "facility_code": "VISI-HP",
+        "facility_name": "Bệnh viện Mắt VISI Hải Phòng",
+        "address": "45 Lạch Tray, Ngô Quyền, Hải Phòng",
+        "phone": "0225 385 5678",
+        "hotline": "0395 151 152",
+        "is_active": true
+      }
+    ]
+  }
+  ```
 
 ---
 
@@ -322,13 +392,36 @@
 * **Quyền hạn:** `GCMO`
 * **Request Body:** `{"status": "ACTIVE"}`
 
-#### [POST] `/api/v1/templates/{id}/approve` — Phê Duyệt Lâm Sàng Ban Hành (UC-006)
-* **Quyền hạn:** `GCMO`
+#### [POST] `/api/v1/templates/{id}/submit-approval` — Gửi Yêu Cầu Phê Duyệt Phác Đồ Mẫu (UC-006.1)
+* **Quyền hạn:** `DOCTOR`
+* **Mô tả:** Bác sĩ soạn thảo xong template ở trạng thái `DRAFT` gửi lên Ban Giám Đốc Chuyên Môn (GCMO) thẩm định.
+* **Validation:** Kiểm tra bắt buộc có ít nhất 1 loại thuốc mẫu và 1 mốc khảo sát Recovery Check (BR15).
+* **Response (200 OK):** Chuyển `status = 'PENDING_APPROVAL'`.
+
+#### [POST] `/api/v1/templates/{id}/approve` — Phê Duyệt Lâm Sàng Ban Hành (UC-006.2)
+* **Quyền hạn:** `GCMO` (Giám Đốc Chuyên Môn / Trưởng Khoa Mắt)
+* **Mô tả:** Thẩm định nội dung y khoa, ký duyệt số hóa để chính thức đưa template vào danh mục áp dụng (`ACTIVE`).
 * **Request Body:**
   ```json
   {
+    "approval_action": "APPROVE",
     "approval_notes": "Đã thẩm định chuẩn y khoa theo tiêu chuẩn Bộ Y tế",
     "digital_signature_pin": "992811"
+  }
+  ```
+* **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "Phác đồ mẫu đã được phê duyệt và kích hoạt thành công",
+    "data": {
+      "template_id": "tpl-8812-uuid",
+      "version": "v1.0",
+      "status": "ACTIVE",
+      "approved_by": "acc-gcmo-uuid",
+      "approved_at": "2026-09-15T09:00:00Z"
+    }
   }
   ```
 
@@ -537,6 +630,27 @@
   ```
 * **Response (201 Created):** Phân loại tự động: Xanh (Bình thường), Vàng (CSKH gọi tư vấn), Đỏ (Tự động kích hoạt Red Flag).
 
+#### [POST] `/api/v1/recovery-checks/upload-image` — Tải Ảnh Chụp Mắt Hậu Phẫu (UC-019)
+* **Quyền hạn:** `CAREGIVER`, `CARE_RECIPIENT`
+* **Mô tả:** Tải lên hình ảnh chụp mắt thực tế (vết mổ, tình trạng cương tụ, xuất huyết hoặc tiết dịch) để đính kèm vào phiếu khảo sát triệu chứng hàng ngày hoặc gửi bác sĩ đánh giá từ xa.
+* **Content-Type:** `multipart/form-data`
+* **Request Payload:**
+  - `file`: File ảnh (PNG, JPEG, HEIC, tối đa 10MB, tự động nén & tạo thumbnail WebP).
+  - `care_plan_id`: UUID phác đồ chăm sóc.
+  - `milestone_id`: UUID mốc khảo sát tương ứng.
+* **Response (201 Created):**
+  ```json
+  {
+    "success": true,
+    "code": 201,
+    "data": {
+      "image_url": "https://storage.visi.vn/patient-recovery/pat-7712/eye_day1_1726482910.webp",
+      "thumbnail_url": "https://storage.visi.vn/patient-recovery/pat-7712/eye_day1_1726482910_thumb.webp",
+      "uploaded_at": "2026-09-15T08:20:00Z"
+    }
+  }
+  ```
+
 #### [POST] `/api/v1/alerts/red-flag` — Kích Hoạt Cấp Cứu Red Flag Khẩn Cấp (UC-020)
 * **Quyền hạn:** `CAREGIVER`, `CARE_RECIPIENT`
 * **Request Body:**
@@ -591,16 +705,70 @@
 * **Quyền hạn:** Daemon Hệ Thống (`SYSTEM_DAEMON`)
 * **Mô tả:** Tự động kích hoạt sau 15 phút chưa xử lý (BR12). Bắn SMS khẩn cấp tới Bác sĩ trực cơ sở.
 
-#### [POST] `/api/v1/call-logs` — Ghi Nhận Nhật Ký Cuộc Gọi Can Thiệp (UC-023)
-* **Quyền hạn:** `CSKH`, `DOCTOR`
+#### [POST] `/api/v1/incidents/{incident_id}/call-logs` — Ghi Nhận Nhật Ký Cuộc Gọi Can Thiệp (UC-023)
+* **Quyền hạn:** `CSKH`, `NURSE`, `DOCTOR`
+* **Mô tả:** CSKH hoặc Điều dưỡng ghi nhận kết quả liên lạc với bệnh nhân/người chăm sóc sau khi tiếp nhận cảnh báo Red Flag/Yellow Flag (BR10, BR11, SLA <5 phút).
 * **Request Body:**
   ```json
   {
-    "incident_id": "inc-0091-uuid",
+    "call_status": "ANSWERED",
     "call_duration_seconds": 180,
-    "patient_condition": "Đau nhẹ do bụi bay vào, đã rửa nước mắt nhân tạo và đỡ đau",
-    "clinical_advice": "Theo dõi tiếp, nếu đau tăng trở lại đưa ngay tới viện",
-    "resolution_status": "RESOLVED"
+    "contact_phone": "0987654321",
+    "patient_condition": "Đau nhẹ do dị vật bay vào mắt, đã rửa nước mắt nhân tạo, hiện tại thị lực ổn định",
+    "clinical_advice": "Tiếp tục tra thuốc kháng sinh theo lịch, nếu đau buốt lan nửa đầu quay lại viện ngay",
+    "resolution_action": "RESOLVED_REMOTE"
+  }
+  ```
+* **Response (201 Created):**
+  ```json
+  {
+    "success": true,
+    "code": 201,
+    "data": {
+      "log_id": "call-log-0012-uuid",
+      "incident_id": "inc-0091-uuid",
+      "caller_id": "acc-nurse-uuid",
+      "call_time": "2026-09-15T08:18:25Z",
+      "sla_compliance": true,
+      "incident_new_status": "RESOLVED"
+    }
+  }
+  ```
+
+#### [GET] `/api/v1/incidents/{incident_id}/call-logs` — Xem Lịch Sử Các Cuộc Gọi Can Thiệp (UC-023)
+* **Quyền hạn:** `CSKH`, `NURSE`, `DOCTOR`, `ADMIN`
+* **Mô tả:** Truy xuất toàn bộ lịch sử các cuộc gọi xử lý sự cố (bao gồm cả các cuộc gọi nhỡ `NO_ANSWER`, bận máy `BUSY` hoặc thành công `ANSWERED`) để phục vụ kiểm toán lâm sàng và đánh giá chất lượng phản hồi cấp cứu.
+* **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "data": [
+      {
+        "log_id": "call-log-0011-uuid",
+        "incident_id": "inc-0091-uuid",
+        "caller_name": "ĐD. Nguyễn Hoàng Nam",
+        "caller_role": "NURSE",
+        "call_time": "2026-09-15T08:16:10Z",
+        "call_status": "NO_ANSWER",
+        "call_duration_seconds": 30,
+        "patient_condition": null,
+        "clinical_advice": "Bệnh nhân không nhấc máy lần 1, tiến hành gọi lại lần 2 sau 1 phút",
+        "resolution_action": "CONTINUE_MONITORING"
+      },
+      {
+        "log_id": "call-log-0012-uuid",
+        "incident_id": "inc-0091-uuid",
+        "caller_name": "ĐD. Nguyễn Hoàng Nam",
+        "caller_role": "NURSE",
+        "call_time": "2026-09-15T08:18:25Z",
+        "call_status": "ANSWERED",
+        "call_duration_seconds": 180,
+        "patient_condition": "Đau nhẹ do dị vật bay vào mắt, đã rửa nước mắt nhân tạo, hiện tại thị lực ổn định",
+        "clinical_advice": "Tiếp tục tra thuốc kháng sinh theo lịch, nếu đau buốt lan nửa đầu quay lại viện ngay",
+        "resolution_action": "RESOLVED_REMOTE"
+      }
+    ]
   }
   ```
 

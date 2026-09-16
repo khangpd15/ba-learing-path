@@ -25,13 +25,14 @@ Dựa trên phân tích 21 nhóm Use Case, hệ thống được cấu trúc th�
 
 | STT | Nhóm Thực Thể | Tên Thực Thể (Entity) | Diễn Giải Nghiệp Vụ | Căn Cứ Use Case |
 |---|---|---|---|---|
-| **I** | **Người dùng & Xác thực** | `UserAccount` | Tài khoản người dùng tập trung (Caregiver, Doctor, Nurse, CSKH, Admin) | UC-001, UC-002, UC-026 |
+| **I** | **Người dùng & Xác thực** | `Facility` | Quản lý hệ sinh thái 5 cơ sở/chi nhánh y tế VISI (BR26) | UC-002, UC-026, BR26 |
+| | | `UserAccount` | Tài khoản người dùng tập trung (Caregiver, Care Recipient, Doctor, Nurse, CSKH, GCMO, Admin) | UC-001, UC-002, UC-026 |
 | | | `DoctorProfile` | Thông tin định danh chuyên môn Bác sĩ/Điều dưỡng/CSKH theo chi nhánh | UC-002, UC-004, UC-005, UC-026 |
 | | | `CaregiverProfile` | Thông tin người chăm sóc bệnh nhân | UC-001, UC-003, UC-025 |
 | | | `OtpVerification` | Mã OTP và phiên xác thực đăng nhập số điện thoại | UC-001 |
 | **II** | **Hồ sơ Bệnh nhân & Liên kết** | `PatientProfile` | Hồ sơ hành chính và đặc điểm lâm sàng tối thiểu của bệnh nhân (NĐ 13) | UC-004 |
-| | | `CaregiverPatientLink` | Quan hệ ủy quyền liên kết Caregiver - Bệnh nhân qua mã QR (tối đa 3) | UC-003, UC-004, UC-010c |
-| **III** | **Master Care Plan Template** | `CarePlanTemplate` | Gói phác đồ chăm sóc mẫu gắn với loại phẫu thuật (Phaco, SILK) | UC-005, UC-006 |
+| | | `CaregiverPatientLink` | Quan hệ ủy quyền liên kết Caregiver - Bệnh nhân qua mã QR (tối đa 3, phân vai Chính/Phụ) | UC-003, UC-004, UC-010c |
+| **III** | **Master Care Plan Template** | `CarePlanTemplate` | Gói phác đồ chăm sóc mẫu gắn với loại phẫu thuật (Phaco, SILK), quản lý phiên bản và duyệt chuyên môn | UC-005, UC-006 |
 | | | `TemplateLearningModule` | Bài học hướng dẫn & Infographic trong lộ trình mẫu | UC-009, UC-017 |
 | | | `TemplateQuizQuestion` | Câu hỏi trắc nghiệm Mini Quiz (Mở rộng Phase 2 theo F-014) | UC-017 (Phase 2) |
 | | | `TemplateMedication` | Thuốc mẫu kèm nhận diện trực quan và Drop Interval Timer 5–10p | UC-007 |
@@ -39,16 +40,18 @@ Dựa trên phân tích 21 nhóm Use Case, hệ thống được cấu trúc th�
 | | | `TemplateRecoveryQuestion` | Câu hỏi khảo sát triệu chứng (3–5 câu) và tiêu chí 3 mức Xanh/Vàng/Đỏ | UC-008 |
 | | | `TemplateRedFlag` | Tiêu chí dấu hiệu nguy hiểm khẩn cấp và Hotline 0395 151 151 | UC-008, UC-020 |
 | | | `TemplateDoDontItem` | Hướng dẫn hành vi Nên làm / Cần tránh 2 cột màu trong sinh hoạt | UC-009, UC-016 |
-| **IV** | **Kế Hoạch Chăm Sóc Bệnh Nhân** | `PatientCarePlan` | Bản sao thực tế được kích hoạt và cá nhân hóa cho từng bệnh nhân (<30s) | UC-010, UC-010b, UC-010c |
+| **IV** | **Kế Hoạch Chăm Sóc Bệnh Nhân** | `PatientCarePlan` | Bản sao thực tế được kích hoạt và cá nhân hóa cho từng bệnh nhân (<30s) theo chi nhánh | UC-010, UC-010b, UC-010c |
 | | | `PatientMedication` | Đơn thuốc thực tế được Bác sĩ tùy biến liều lượng cho bệnh nhân | UC-010, UC-014, UC-015 |
 | | | `PatientFollowupAppointment` | Lịch hẹn tái khám thực tế 5 mốc chuẩn VISI của bệnh nhân | UC-010, UC-018 |
-| | | `PatientQRCode` | Mã QR token bảo mật gắn với Care Plan của bệnh nhân | UC-003, UC-011, UC-012, UC-013 |
+| | | `PatientQRCode` | Mã QR token bảo mật gắn với Care Plan của bệnh nhân (Bác sĩ/Điều dưỡng cấp) | UC-003, UC-011, UC-012, UC-013 |
 | **V** | **Giao Dịch & Sự Kiện Lâm Sàng** | `MedicationLog` | Nhật ký Caregiver xác nhận uống/nhỏ thuốc theo cữ (kèm timestamp) | UC-015 |
 | | | `CaregiverQuizSubmission` | Lịch sử làm bài trắc nghiệm Mini Quiz của Caregiver (Phase 2) | UC-017 (Phase 2) |
 | | | `RecoveryCheckSubmission` | Lượt nộp bảng kiểm phục hồi định kỳ của Caregiver | UC-019, UC-021 |
 | | | `RecoveryCheckAnswer` | Chi tiết câu trả lời cho từng câu hỏi phục hồi 3 mức | UC-019, UC-021 |
-| | | `RedFlagIncident` | Sự kiện kích hoạt cảnh báo khẩn cấp hoặc gọi Hotline 0395 151 151 | UC-020, UC-022, UC-022b |
-| **VI** | **Mở Rộng Quản Trị & Kiểm Toán** | `AuditLog` | Nhật ký kiểm toán bất biến các thao tác dữ liệu trọng yếu (Audit Trail) | UC-027, F-024, BR21 |
+| | | `RedFlagIncident` | Sự kiện kích hoạt cảnh báo khẩn cấp hoặc gọi Hotline 0395 151 151, hỗ trợ leo thang tự động | UC-020, UC-022, UC-022b |
+| | | `CallInterventionLog` | Nhật ký can thiệp cuộc gọi CSKH/Điều dưỡng xử lý cảnh báo y tế (SLA <5p) | UC-023, BR12 |
+| **VI** | **Mở Rộng Quản Trị, Giao Tiếp & Kiểm Toán** | `Notification` | Nhật ký gửi thông báo đa kênh (SMS, ZNS, Push, In-App) cho bệnh nhân & người chăm sóc | UC-018, UC-022b, BR24 |
+| | | `AuditLog` | Nhật ký kiểm toán bất biến các thao tác dữ liệu trọng yếu (Audit Trail) | UC-027, F-024, BR21 |
 
 ---
 
@@ -56,26 +59,39 @@ Dựa trên phân tích 21 nhóm Use Case, hệ thống được cấu trúc th�
 
 ### 3.1 Phân Hệ Người Dùng & Định Danh
 
-#### 1. Thực thể `UserAccount` (`accounts`)
-* **Mục đích:** Quản lý danh tính đăng nhập tập trung cho toàn bộ hệ thống.
+#### 0. Thực thể `Facility` (`facilities`)
+* **Mục đích:** Quản lý thông tin định danh 5 cơ sở/chi nhánh bệnh viện trực thuộc Tập đoàn Y khoa VISI, làm nền tảng kiểm soát dữ liệu đa chi nhánh (BR26).
 * **Thuộc tính:**
-  * `account_id` (PK, UUID/INT): Định danh tài khoản duy nhất.
-  * `phone_number` (VARCHAR(20), Unique, Nullable): Số điện thoại dùng đăng nhập OTP (Caregiver) hoặc liên hệ (Doctor).
-  * `username` (VARCHAR(50), Unique, Nullable): Tên đăng nhập (Bác sĩ, `[FUTURE / ADMIN]: Admin`).
+  * `facility_id` (PK, UUID): Định danh duy nhất của chi nhánh/bệnh viện.
+  * `facility_code` (VARCHAR(20), Unique, Not Null): Mã viết tắt cơ sở (ví dụ: `VISI-HN`, `VISI-DN`, `VISI-HCM-Q1`, `VISI-HCM-Q7`, `VISI-CT`).
+  * `facility_name` (VARCHAR(150), Not Null): Tên cơ sở y tế đầy đủ (ví dụ: *Bệnh viện Mắt Quốc tế VISI Hà Nội*).
+  * `address` (TEXT, Not Null): Địa chỉ thực tế của bệnh viện/phòng khám.
+  * `hotline` (VARCHAR(20), Not Null, Default: `'0395 151 151'`): Số hotline cấp cứu 24/7 của cơ sở.
+  * `status` (ENUM: `'ACTIVE'`, `'INACTIVE'`, Default: `'ACTIVE'`): Trạng thái hoạt động của cơ sở.
+  * `created_at`, `updated_at` (TIMESTAMP): Dấu thời gian hệ thống.
+
+#### 1. Thực thể `UserAccount` (`accounts`)
+* **Mục đích:** Quản lý danh tính đăng nhập tập trung cho toàn bộ hệ thống (Caregiver, Care Recipient, Bác sĩ, Điều dưỡng, CSKH, GCMO, Admin).
+* **Thuộc tính:**
+  * `account_id` (PK, UUID): Định danh tài khoản duy nhất.
+  * `facility_id` (FK -> `facilities.facility_id`, Nullable): Cơ sở y tế trực thuộc (Bắt buộc với nhân viên chi nhánh; NULL với GCMO cấp tập đoàn và Caregiver/Bệnh nhân) (BR26).
+  * `phone_number` (VARCHAR(20), Unique, Nullable): Số điện thoại dùng đăng nhập OTP (Caregiver) hoặc liên hệ (Doctor/Staff).
+  * `username` (VARCHAR(50), Unique, Nullable): Tên đăng nhập (Bác sĩ, Điều dưỡng, CSKH, GCMO, Admin).
   * `email` (VARCHAR(100), Unique, Nullable): Hòm thư công vụ.
-  * `password_hash` (VARCHAR(255), Nullable): Mật khẩu băm an toàn (BCrypt/Argon2) cho Bác sĩ và Quản trị viên.
-  * `role` (ENUM: `'CAREGIVER'`, `'DOCTOR'`, `'[FUTURE / ADMIN]: ADMIN'`): Vai trò tài khoản.
-  * `status` (ENUM: `'ACTIVE'`, `'LOCKED'`, `'INACTIVE'`): Trạng thái tài khoản.
+  * `password_hash` (VARCHAR(255), Nullable): Mật khẩu băm an toàn (BCrypt/Argon2) cho nhân viên y tế và quản trị viên.
+  * `role` (ENUM: `'CAREGIVER'`, `'CARE_RECIPIENT'`, `'DOCTOR'`, `'NURSE'`, `'CSKH'`, `'GCMO'`, `'ADMIN'`): Vai trò tài khoản theo phân quyền RBAC 7 cấp.
+  * `status` (ENUM: `'ACTIVE'`, `'LOCKED'`, `'INACTIVE'`): Trạng thái tài khoản (BR3, BR14).
   * `created_at`, `updated_at` (TIMESTAMP): Dấu thời gian hệ thống.
 
 #### 2. Thực thể `DoctorProfile` (`doctor_profiles`)
-* **Mục đích:** Lưu trữ hồ sơ hành chính chuyên môn của Bác sĩ.
+* **Mục đích:** Lưu trữ hồ sơ hành chính chuyên môn của Bác sĩ / Nhân sự lâm sàng.
 * **Thuộc tính:**
-  * `doctor_id` (PK, FK -> `accounts.account_id`): Mã bác sĩ.
-  * `full_name` (VARCHAR(100), Not Null): Họ và tên Bác sĩ.
-  * `license_number` (VARCHAR(50), Unique): Số chứng chỉ hành nghề y tế `[ASSUMPTION]`.
-  * `department` (VARCHAR(100)): Khoa chuyên môn (Khoa Mắt, Khúc xạ, Glaucoma...).
-  * `hospital_name` (VARCHAR(150)): Tên bệnh viện / cơ sở y tế.
+  * `doctor_id` (PK, FK -> `accounts.account_id`): Mã bác sĩ / nhân sự y tế.
+  * `facility_id` (FK -> `facilities.facility_id`, Not Null): Chi nhánh bệnh viện công tác (BR26).
+  * `full_name` (VARCHAR(100), Not Null): Họ và tên Bác sĩ / Nhân sự y tế.
+  * `license_number` (VARCHAR(50), Unique): Số chứng chỉ hành nghề y tế.
+  * `department` (VARCHAR(100)): Khoa chuyên môn (Khoa Mắt, Khúc xạ, Glaucoma, Hậu phẫu...).
+  * `hospital_name` (VARCHAR(150)): Tên bệnh viện / cơ sở y tế trực thuộc.
   * `phone_number` (VARCHAR(20)): Số điện thoại công vụ.
 
 #### 3. Thực thể `CaregiverProfile` (`caregiver_profiles`)
@@ -91,7 +107,7 @@ Dựa trên phân tích 21 nhóm Use Case, hệ thống được cấu trúc th�
   * `otp_id` (PK, UUID): Định danh phiên OTP.
   * `phone_number` (VARCHAR(20), Not Null): Số điện thoại nhận OTP.
   * `otp_code` (VARCHAR(10), Not Null): Mã OTP sinh ngẫu nhiên.
-  * `expired_at` (TIMESTAMP, Not Null): Thời điểm hết hạn (BR2).
+  * `expired_at` (TIMESTAMP, Not Null): Thời điểm hết hạn (BR2: 5 phút).
   * `is_used` (BOOLEAN, Default: FALSE): Trạng thái đã xác thực hay chưa.
   * `attempt_count` (INT, Default: 0): Số lần nhập sai (chống brute-force).
   * `created_at` (TIMESTAMP): Thời gian gửi mã.
@@ -101,9 +117,10 @@ Dựa trên phân tích 21 nhóm Use Case, hệ thống được cấu trúc th�
 ### 3.2 Phân Hệ Hồ Sơ Bệnh Nhân & Liên Kết
 
 #### 5. Thực thể `PatientProfile` (`patients`)
-* **Mục đích:** Lưu thông tin nhân thân, hành chính và bệnh lý của người bệnh (UC-004).
+* **Mục đích:** Lưu thông tin nhân thân, hành chính và bệnh lý của người bệnh (UC-004, NĐ 13).
 * **Thuộc tính:**
   * `patient_id` (PK, VARCHAR(30)): Mã bệnh nhân duy nhất (ví dụ: `BN-202609-001`).
+  * `facility_id` (FK -> `facilities.facility_id`, Not Null): Chi nhánh bệnh viện tiếp nhận mổ và điều trị (BR26).
   * `full_name` (VARCHAR(100), Not Null): Họ và tên đầy đủ (BR15).
   * `date_of_birth` (DATE, Not Null): Ngày tháng năm sinh (BR15).
   * `gender` (ENUM: `'MALE'`, `'FEMALE'`, `'OTHER'`, Not Null): Giới tính (BR15).
@@ -125,6 +142,7 @@ Dựa trên phân tích 21 nhóm Use Case, hệ thống được cấu trúc th�
   * `caregiver_id` (FK -> `caregiver_profiles.caregiver_id`, Not Null): Người chăm sóc.
   * `patient_id` (FK -> `patients.patient_id`, Not Null): Bệnh nhân được chăm sóc.
   * `care_plan_id` (FK -> `patient_care_plans.care_plan_id`, Not Null): Kế hoạch chăm sóc cụ thể được gán.
+  * `role` (ENUM: `'PRIMARY'`, `'SECONDARY'`, Default: `'PRIMARY'`): Phân loại người chăm sóc chính hay phụ (BR5: tối đa 3 Caregiver/bệnh nhân).
   * `linked_at` (TIMESTAMP, Not Null): Thời điểm quét mã xác nhận thành công.
   * `status` (ENUM: `'ACTIVE'`, `'REVOKED'`, Default: `'ACTIVE'`): Trạng thái liên kết (BR5).
   * `revoked_at` (TIMESTAMP, Nullable): Thời điểm hủy quyền nếu có.
@@ -134,14 +152,18 @@ Dựa trên phân tích 21 nhóm Use Case, hệ thống được cấu trúc th�
 ### 3.3 Phân Hệ Master Care Plan Template (Cấu Hình Mẫu Chuẩn)
 
 #### 7. Thực thể `CarePlanTemplate` (`care_plan_templates`)
-* **Mục đích:** Gói cấu hình quy trình mẫu do bác sĩ/bệnh viện thiết lập theo bệnh học (UC-005).
+* **Mục đích:** Gói cấu hình quy trình mẫu do bác sĩ/bệnh viện thiết lập theo bệnh học (UC-005, UC-006).
 * **Thuộc tính:**
   * `template_id` (PK, UUID): Định danh mẫu.
   * `template_name` (VARCHAR(150), Not Null): Tên mẫu (ví dụ: *Phác đồ Chăm sóc Hậu phẫu Phaco Chuẩn Quốc Tế*).
   * `surgery_type` (VARCHAR(50), Not Null): Loại phẫu thuật liên kết duy nhất (BR16).
   * `clinical_description` (TEXT, Nullable): Mô tả mục tiêu lâm sàng và hướng dẫn tổng quan.
-  * `status` (ENUM: `'DRAFT'`, `'ACTIVE'`, `'INACTIVE'`, Default: `'DRAFT'`): Trạng thái vòng đời template.
+  * `version` (VARCHAR(10), Default: `'1.0'`): Phiên bản của phác đồ mẫu (v1.0, v1.1...) phục vụ copy-on-write khi sửa template đã ban hành (BR15).
+  * `parent_template_id` (FK -> `care_plan_templates.template_id`, Nullable): Tham chiếu template gốc khi tạo bản sao phiên bản mới.
+  * `status` (ENUM: `'DRAFT'`, `'PENDING_APPROVAL'`, `'ACTIVE'`, `'INACTIVE'`, `'ARCHIVED'`, Default: `'DRAFT'`): Trạng thái vòng đời template (UC-005, UC-006).
   * `created_by_doctor_id` (FK -> `doctor_profiles.doctor_id`, Not Null): Bác sĩ phụ trách cấu hình.
+  * `approved_by` (FK -> `accounts.account_id`, Nullable): Bác sĩ Trưởng khoa / GCMO ký duyệt ban hành lâm sàng (UC-006).
+  * `approved_at` (TIMESTAMP, Nullable): Thời điểm phê duyệt lâm sàng.
   * `created_at`, `updated_at` (TIMESTAMP): Dấu thời gian.
 
 #### 8. Thực thể `TemplateLearningModule` (`template_learning_modules`)
@@ -243,14 +265,15 @@ Dựa trên phân tích 21 nhóm Use Case, hệ thống được cấu trúc th�
 ### 3.4 Phân Hệ Kế Hoạch Chăm Sóc Bệnh Nhân Thực Tế (Patient Care Plan Instance)
 
 #### 15. Thực thể `PatientCarePlan` (`patient_care_plans`)
-* **Mục đích:** Thể hiện Kế hoạch chăm sóc độc lập được nhân bản từ Template để gán riêng cho từng bệnh nhân (UC-010, BR18, BR19).
+* **Mục đích:** Thể hiện Kế hoạch chăm sóc độc lập được nhân bản từ Template để gán riêng cho từng bệnh nhân theo cơ sở (UC-010, BR18, BR19, BR26).
 * **Thuộc tính:**
   * `care_plan_id` (PK, UUID): Định danh Care Plan của bệnh nhân.
+  * `facility_id` (FK -> `facilities.facility_id`, Not Null): Chi nhánh bệnh viện quản lý điều trị (BR26).
   * `patient_id` (FK -> `patients.patient_id`, Not Null): Thuộc hồ sơ bệnh nhân nào.
   * `source_template_id` (FK -> `care_plan_templates.template_id`, Not Null): Template gốc được nhân bản.
   * `surgery_type` (VARCHAR(50), Not Null): Loại phẫu thuật tại thời điểm gán.
   * `status` (ENUM: `'DRAFT'`, `'ACTIVE'`, `'COMPLETED'`, `'ARCHIVED'`, Default: `'DRAFT'`): Trạng thái kế hoạch (BR19: tối đa 1 Active/bệnh nhân).
-  * `activated_at` (TIMESTAMP, Nullable): Mốc thời gian bác sĩ bấm kích hoạt Care Plan.
+  * `activated_at` (TIMESTAMP, Nullable): Mốc thời gian bác sĩ/điều dưỡng bấm kích hoạt Care Plan.
   * `completed_at` (TIMESTAMP, Nullable): Mốc thời gian hoàn thành đợt theo dõi.
   * `created_by_doctor_id` (FK -> `doctor_profiles.doctor_id`, Not Null): Bác sĩ chỉ định.
   * `created_at`, `updated_at` (TIMESTAMP).
@@ -293,7 +316,7 @@ Dựa trên phân tích 21 nhóm Use Case, hệ thống được cấu trúc th�
   * `qr_id` (PK, UUID): Định danh bản ghi mã QR.
   * `care_plan_id` (FK -> `patient_care_plans.care_plan_id`, Unique, Not Null): Gắn với Care Plan cụ thể.
   * `qr_token` (VARCHAR(255), Unique, Not Null): Chuỗi mã hóa token ngẫu nhiên bảo mật (HMAC/UUID).
-  * `issued_by_doctor_id` (FK -> `doctor_profiles.doctor_id`, Not Null): Bác sĩ phát hành.
+  * `issued_by_account_id` (FK -> `accounts.account_id`, Not Null): Bác sĩ hoặc Điều dưỡng phát hành mã QR (UC-011).
   * `issued_at` (TIMESTAMP, Not Null): Thời điểm sinh mã.
   * `status` (ENUM: `'ACTIVE'`, `'REVOKED'`, Default: `'ACTIVE'`): Trạng thái mã QR.
   * `print_count` (INT, Default: 1): Số lần in ấn lại phiếu (UC-012, UC-013).
@@ -347,7 +370,7 @@ Dựa trên phân tích 21 nhóm Use Case, hệ thống được cấu trúc th�
   * `flag_level` (ENUM: `'NORMAL'`, `'NEEDS_ATTENTION'`, `'RED_FLAG'`, Not Null): Mức độ cảnh báo tự động gắn cờ cho câu hỏi này (BR10).
 
 #### 23. Thực thể `RedFlagIncident` (`red_flag_incidents`)
-* **Mục đích:** Lưu vết các sự kiện khẩn cấp xảy ra với bệnh nhân để phục vụ y khoa và pháp lý (UC-020, UC-022).
+* **Mục đích:** Lưu vết các sự kiện khẩn cấp xảy ra với bệnh nhân để phục vụ y khoa và pháp lý (UC-020, UC-022, UC-022b).
 * **Thuộc tính:**
   * `incident_id` (PK, UUID): Định danh sự kiện khẩn cấp.
   * `care_plan_id` (FK -> `patient_care_plans.care_plan_id`, Not Null): Bệnh nhân liên quan.
@@ -359,14 +382,44 @@ Dựa trên phân tích 21 nhóm Use Case, hệ thống được cấu trúc th�
   * `call_initiated_at` (TIMESTAMP, Nullable): Thời gian bấm gọi.
   * `acknowledged_by_doctor_id` (FK -> `doctor_profiles.doctor_id`, Nullable): Bác sĩ tiếp nhận xử lý.
   * `acknowledged_at` (TIMESTAMP, Nullable): Mốc thời gian tiếp nhận.
+  * `escalated_at` (TIMESTAMP, Nullable): Mốc thời gian tự động kích hoạt leo thang cấp 2 sau 15 phút không tiếp nhận (UC-022b).
+  * `escalation_level` (INT, Default: 1): Cấp độ leo thang (1: Tiếp nhận CSKH cơ sở; 2: Leo thang Bác sĩ trực; 3: Ban Giám đốc cơ sở).
   * `clinical_resolution` (TEXT, Nullable): Kết luận xử trí y tế (ví dụ: *Bệnh nhân đã đến viện cấp cứu kịp thời*).
+
+#### 24. Thực thể `CallInterventionLog` (`call_intervention_logs`)
+* **Mục đích:** Ghi nhận nhật ký cuộc gọi can thiệp của CSKH/Điều dưỡng xử lý cảnh báo y tế theo cam kết SLA <5 phút (UC-023, BR12).
+* **Thuộc tính:**
+  * `log_id` (PK, UUID): Định danh bản ghi cuộc gọi can thiệp.
+  * `incident_id` (FK -> `red_flag_incidents.incident_id`, Not Null): Sự cố cảnh báo cần xử lý.
+  * `patient_id` (FK -> `patients.patient_id`, Not Null): Bệnh nhân liên quan.
+  * `caller_account_id` (FK -> `accounts.account_id`, Not Null): Nhân sự y tế/CSKH thực hiện cuộc gọi.
+  * `call_time` (TIMESTAMP, Not Null): Thời điểm bắt đầu gọi điện thoại.
+  * `duration_seconds` (INT, Default: 0): Thời lượng cuộc gọi tính bằng giây.
+  * `call_status` (ENUM: `'ANSWERED'`, `'NO_ANSWER'`, `'BUSY'`, `'FAILED'`, Not Null): Trạng thái kết nối cuộc gọi.
+  * `notes` (TEXT, Not Null): Nội dung trao đổi chuyên môn, tình trạng thực tế người bệnh tại nhà.
+  * `next_action` (ENUM: `'CONTINUE_MONITORING'`, `'REQUIRE_HOSPITAL_EXAM'`, `'EMERGENCY_DISPATCH'`, `'RECALL_IN_15M'`, Not Null): Hướng xử lý tiếp theo sau cuộc gọi.
+  * `created_at` (TIMESTAMP): Dấu thời gian ghi nhận.
 
 ---
 
-### 3.6 Phân Hệ Mở Rộng Quản Trị `[FUTURE / ADMIN]`
+### 3.6 Phân Hệ Quản Trị, Giao Tiếp Đa Kênh & Kiểm Toán
 
-#### 24. Thực thể `AuditLog` (`audit_logs`) `[FUTURE / ADMIN]`
-* **Mục đích:** Phục vụ tương lai cho Quản trị viên (Admin) quản lý nhật ký kiểm toán (CRUD Audit Log) và đảm bảo an toàn pháp lý y tế (BR5, BR20).
+#### 25. Thực thể `Notification` (`notifications`)
+* **Mục đích:** Lưu trữ lịch sử toàn bộ các thông báo đa kênh tự động (SMS Brandname VISI, ZNS Zalo, Mobile Push, In-App Web) phục vụ nhắc lịch thuốc, hẹn tái khám và cảnh báo khẩn cấp (UC-018, UC-022b, BR24).
+* **Thuộc tính:**
+  * `notification_id` (PK, UUID): Định danh thông báo.
+  * `recipient_account_id` (FK -> `accounts.account_id`, Nullable): Tài khoản nhận thông báo (nếu có).
+  * `patient_id` (FK -> `patients.patient_id`, Not Null): Bệnh nhân nhận thông báo / đối tượng liên quan.
+  * `channel` (ENUM: `'SMS'`, `'ZNS'`, `'PUSH'`, `'IN_APP'`, Not Null): Kênh truyền thông báo.
+  * `title` (VARCHAR(200), Not Null): Tiêu đề thông báo.
+  * `body` (TEXT, Not Null): Nội dung chi tiết tin nhắn / cảnh báo.
+  * `status` (ENUM: `'PENDING'`, `'SENT'`, `'DELIVERED'`, `'FAILED'`, Default: `'PENDING'`): Trạng thái gửi thông báo.
+  * `sent_at` (TIMESTAMP, Nullable): Mốc thời gian gửi đi qua Gateway đối tác.
+  * `read_at` (TIMESTAMP, Nullable): Mốc thời gian người dùng mở xem trên ứng dụng.
+  * `created_at` (TIMESTAMP): Thời gian tạo yêu cầu gửi thông báo.
+
+#### 26. Thực thể `AuditLog` (`audit_logs`) `[FUTURE / ADMIN]`
+* **Mục đích:** Phục vụ quản trị viên (Admin) quản lý nhật ký kiểm toán (CRUD Audit Log) và đảm bảo an toàn pháp lý y tế (BR5, BR20, BR21).
 * **Thuộc tính:**
   * `audit_id` (PK, BIGINT/UUID): Mã nhật ký kiểm toán.
   * `user_id` (FK -> `accounts.account_id`, Nullable): Ai thực hiện hành vi.
@@ -385,13 +438,19 @@ Dựa trên phân tích 21 nhóm Use Case, hệ thống được cấu trúc th�
 
 | Thực Thể 1 | Bản Số | Quan Hệ Nghiệp Vụ | Thực Thể 2 | Diễn Giải Chi Tiết |
 |---|:---:|---|---|---|
-| `UserAccount` | **1 : 1** | Có hồ sơ chuyên môn | `DoctorProfile` | Một tài khoản Bác sĩ gắn với duy nhất một hồ sơ bác sĩ |
+| `Facility` | **1 : N** | Quản lý nhân sự | `UserAccount` | Một chi nhánh bệnh viện có nhiều nhân viên y tế (Bác sĩ, Điều dưỡng, CSKH) |
+| `Facility` | **1 : N** | Tiếp nhận điều trị | `PatientProfile` | Một chi nhánh bệnh viện tiếp nhận mổ và quản lý hồ sơ nhiều bệnh nhân |
+| `Facility` | **1 : N** | Quản lý đợt chăm sóc | `PatientCarePlan` | Một chi nhánh bệnh viện vận hành nhiều kế hoạch chăm sóc bệnh nhân |
+| `UserAccount` | **1 : 1** | Có hồ sơ chuyên môn | `DoctorProfile` | Một tài khoản nhân viên gắn với duy nhất một hồ sơ chuyên môn |
 | `UserAccount` | **1 : 1** | Có hồ sơ người chăm sóc | `CaregiverProfile` | Một tài khoản Caregiver gắn với một hồ sơ người chăm sóc |
+| `UserAccount` | **1 : N** | Phát hành mã QR | `PatientQRCode` | Bác sĩ hoặc Điều dưỡng phát hành mã QR bàn giao cho người bệnh (UC-011) |
+| `UserAccount` | **0..1 : N** | Phê duyệt chuyên môn | `CarePlanTemplate` | GCMO hoặc Bác sĩ Trưởng khoa ký duyệt ban hành Master Template (UC-006) |
+| `UserAccount` | **1 : N** | Thực hiện cuộc gọi | `CallInterventionLog` | CSKH hoặc Điều dưỡng thực hiện các cuộc gọi can thiệp sự cố (UC-023) |
 | `DoctorProfile` | **1 : N** | Tiếp nhận & quản lý | `PatientProfile` | Một Bác sĩ tạo và quản lý nhiều hồ sơ bệnh nhân |
 | `DoctorProfile` | **1 : N** | Biên soạn | `CarePlanTemplate` | Một Bác sĩ có thể cấu hình nhiều Care Plan Template mẫu |
 | `DoctorProfile` | **1 : N** | Phụ trách khám lại | `PatientFollowupAppointment` | Một Bác sĩ có thể phụ trách nhiều buổi hẹn tái khám |
-| `DoctorProfile` | **1 : N** | Phát hành mã | `PatientQRCode` | Một Bác sĩ phát hành mã QR cho nhiều bệnh nhân |
 | `DoctorProfile` | **0..1 : N** | Tiếp nhận xử lý | `RedFlagIncident` | Bác sĩ tiếp nhận ca cấp cứu (có thể chưa có bác sĩ tiếp nhận) |
+| `CarePlanTemplate` | **0..1 : N** | Phiên bản kế thừa | `CarePlanTemplate` | Template tạo bản sao mới (copy-on-write v1.1) qua `parent_template_id` (BR15) |
 | `CarePlanTemplate` | **1 : N** | Chứa | `TemplateLearningModule` | Một template có nhiều bài học trong Learning Path |
 | `TemplateLearningModule` | **1 : N** (3 câu) | Có câu hỏi kiểm tra | `TemplateQuizQuestion` | Mỗi bài học chứa chính xác 3 câu hỏi trắc nghiệm Mini Quiz |
 | `CarePlanTemplate` | **1 : N** | Định nghĩa | `TemplateMedication` | Một template quy định danh mục thuốc mẫu cho loại mổ |
@@ -404,7 +463,7 @@ Dựa trên phân tích 21 nhóm Use Case, hệ thống được cấu trúc th�
 | `PatientCarePlan` | **1 : 1** | Được định danh bảo mật bởi | `PatientQRCode` | Mỗi Care Plan Active có duy nhất một token QR hợp lệ |
 | `PatientCarePlan` | **1 : N** | Kê đơn thực tế | `PatientMedication` | Mỗi Care Plan bệnh nhân có danh mục thuốc thực tế riêng |
 | `PatientCarePlan` | **1 : N** | Lên lịch hẹn | `PatientFollowupAppointment` | Mỗi Care Plan có một hoặc nhiều buổi hẹn tái khám |
-| `CaregiverProfile` | **N : M** | Chăm sóc & Theo dõi | `PatientProfile` | Một Caregiver có thể chăm sóc nhiều bệnh nhân (qua `CaregiverPatientLink`) |
+| `CaregiverProfile` | **N : M** | Chăm sóc & Theo dõi | `PatientProfile` | Một Caregiver có thể chăm sóc nhiều bệnh nhân (qua `CaregiverPatientLink`, tối đa 3) |
 | `PatientMedication` | **1 : N** | Ghi nhận lần uống | `MedicationLog` | Một loại thuốc được ghi nhận nhiều lần uống qua các ngày |
 | `CaregiverProfile` | **1 : N** | Xác nhận dùng thuốc | `MedicationLog` | Một Caregiver ghi nhận nhiều lượt xác nhận cữ thuốc |
 | `TemplateLearningModule` | **1 : N** | Đánh giá kiến thức | `CaregiverQuizSubmission` | Một bài học có thể nhận nhiều lượt nộp Quiz từ các Caregiver |
@@ -417,6 +476,10 @@ Dựa trên phân tích 21 nhóm Use Case, hệ thống được cấu trúc th�
 | `PatientCarePlan` | **1 : N** | Phát sinh sự kiện | `RedFlagIncident` | Một bệnh nhân có thể ghi nhận các sự cố khẩn cấp |
 | `CaregiverProfile` | **1 : N** | Báo cáo sự cố | `RedFlagIncident` | Một Caregiver có thể báo nhiều sự kiện khẩn cấp |
 | `TemplateRedFlag` | **0..1 : N** | Xác định dấu hiệu | `RedFlagIncident` | Mỗi sự kiện có thể khớp với dấu hiệu mẫu cụ thể |
+| `RedFlagIncident` | **1 : N** | Kích hoạt can thiệp | `CallInterventionLog` | Một sự cố khẩn cấp có thể có một hoặc nhiều cuộc gọi xử lý từ CSKH |
+| `PatientProfile` | **1 : N** | Nhận cuộc gọi | `CallInterventionLog` | Lịch sử các cuộc gọi can thiệp thoại tới bệnh nhân/người nhà |
+| `PatientProfile` | **1 : N** | Nhận thông báo | `Notification` | Lịch sử các thông báo đa kênh gửi cho bệnh nhân |
+| `UserAccount` | **0..1 : N** | Nhận thông báo app | `Notification` | Thông báo gửi tới tài khoản người dùng cụ thể |
 
 ---
 
@@ -425,22 +488,25 @@ Dựa trên phân tích 21 nhóm Use Case, hệ thống được cấu trúc th�
 | Mã Quy Tắc | Tên Quy Tắc Nghiệp Vụ | Ràng Buộc Dữ Liệu Cụ Thể (Database Constraints & Logic) |
 |---|---|---|
 | **BR1, BR2** | Xác thực SĐT & OTP | `OtpVerification`: `expired_at > NOW()`, `is_used = FALSE`, khóa tạm nếu `attempt_count > 5`. |
-| **BR4, BR20** | Tính hợp lệ & bảo mật QR | `patient_qr_codes.status = 'ACTIVE'` VÀ `patient_care_plans.status = 'ACTIVE'`. `qr_token` mã hóa ngẫu nhiên không thể đoán trước. |
-| **BR5** | Toàn vẹn Caregiver - Bệnh nhân | Bảng trung gian `caregiver_patient_links` lưu `caregiver_id`, `patient_id`, `linked_at` để truy vết ủy quyền rõ ràng. |
+| **BR4, BR20** | Tính hợp lệ & bảo mật QR | `patient_qr_codes.status = 'ACTIVE'` VÀ `patient_care_plans.status = 'ACTIVE'`. `qr_token` mã hóa ngẫu nhiên không thể đoán trước; `issued_by_account_id` cho phép Điều dưỡng hoặc Bác sĩ phát hành (UC-011). |
+| **BR5** | Toàn vẹn Caregiver - Bệnh nhân | Bảng trung gian `caregiver_patient_links` lưu `caregiver_id`, `patient_id`, `role` (`PRIMARY`/`SECONDARY`), `linked_at` để truy vết ủy quyền rõ ràng (tối đa 3 Caregiver/bệnh nhân). |
 | **BR6, BR7** | Nguồn gốc nội dung y khoa | Toàn bộ các bảng `template_*` và `patient_*` bắt buộc tham chiếu khóa ngoại đến `doctor_id` người tạo, không cho phép nội dung vô chủ (orphaned data). |
 | **BR8** | Quiz không chặn chức năng | Kết quả bài kiểm tra lưu ở `caregiver_quiz_submissions` độc lập, không đặt cờ khóa quyền truy cập của bệnh nhân. |
 | **BR9** | Bắt buộc hoàn thành 3–5 câu | Giao dịch nộp bảng kiểm chỉ hợp lệ khi số bản ghi `recovery_check_answers` bằng đúng số câu hỏi bắt buộc của mốc đó. |
 | **BR10** | Tự động phân loại lâm sàng | `overall_status` trong `recovery_check_submissions` được tính tự động dựa trên mức độ cảnh báo cao nhất của các câu trả lời (`RED_FLAG` > `NEEDS_ATTENTION` > `NORMAL`). |
-| **BR11** | Ưu tiên quy trình khẩn cấp | Khi `overall_status = 'RED_FLAG'`, hệ thống tự động sinh bản ghi trong `red_flag_incidents` và kích hoạt luồng khẩn cấp. |
-| **BR14** | Phân quyền bác sĩ | Ràng buộc khóa ngoại `created_by_doctor_id` phải trỏ về tài khoản có `role = 'DOCTOR'` và `status = 'ACTIVE'`. |
-| **BR15** | Thông tin bệnh nhân bắt buộc | Cột `full_name`, `date_of_birth`, `gender`, `surgery_type`, `operated_eye` đều mang ràng buộc `NOT NULL` tại bảng `patients`. |
+| **BR11, BR12** | Quy trình khẩn cấp & SLA CSKH | Khi `overall_status = 'RED_FLAG'`, hệ thống tự động sinh bản ghi trong `red_flag_incidents` và kích hoạt luồng khẩn cấp. CSKH tiếp nhận và ghi nhận nhật ký vào `call_intervention_logs` cam kết SLA <5 phút. |
+| **BR14** | Phân quyền RBAC nhân sự | Bảng `accounts.role` phân tách rõ: `DOCTOR`, `NURSE`, `CSKH`, `GCMO`, `ADMIN`, `CAREGIVER`, `CARE_RECIPIENT`. Chỉ `DOCTOR` mới được gán `created_by_doctor_id` trong Care Plan. |
+| **BR15** | Thông tin bệnh nhân bắt buộc | Cột `full_name`, `date_of_birth`, `gender`, `surgery_type`, `operated_eye`, `facility_id` đều mang ràng buộc `NOT NULL` tại bảng `patients`. |
 | **BR16** | Ràng buộc loại phẫu thuật | Cột `surgery_type` bắt buộc có giá trị xác định tại bảng `care_plan_templates` và các bảng cấu phần con. |
 | **BR17, BR18** | Tính cô lập của Care Plan | Phân chia thành 2 cấu trúc bảng riêng biệt: Master Template (`template_medications`, `template_recovery_questions`...) và Patient Care Plan (`patient_medications`...). Sửa đổi ở Master Template hoàn toàn không làm biến đổi bản ghi trong Patient Care Plan đã tạo. |
 | **BR19** | Duy nhất 1 Care Plan Active | Tạo chỉ mục độc nhất có điều kiện (Partial Unique Index) trên `patient_care_plans`: `UNIQUE(patient_id) WHERE status = 'ACTIVE'`. |
 | **BR22** | Danh mục Do & Don't | `template_do_dont_items.item_type` bắt buộc thuộc ENUM (`'DO'`, `'DONT'`) và có mốc thời gian áp dụng rõ ràng. |
 | **BR23** | Khoảng cách nhỏ mắt 5 phút | `patient_medications.clinical_cautions` lưu chỉ dẫn thao tác; giao diện căn cứ vào trường `drug_form = 'EYE_DROP'` và `order_index` để đếm lùi thời gian giãn cách giữa các thuốc nhỏ mắt. |
-| **BR24** | Nhắc hẹn tái khám 24h & 2h | Hai cờ `reminder_24h_sent` và `reminder_2h_sent` tại bảng `patient_followup_appointments` để điều khiển dịch vụ gửi thông báo đẩy. |
+| **BR24** | Nhắc hẹn tái khám 24h & 2h | Hai cờ `reminder_24h_sent` và `reminder_2h_sent` tại bảng `patient_followup_appointments` kết hợp với bảng `notifications` để điều khiển dịch vụ gửi tin nhắn đa kênh. |
 | **BR25** | Xóa mềm hồ sơ bệnh nhân | Bảng `patients` áp dụng `status = 'ARCHIVED'` (Soft Delete), ngăn chặn câu lệnh `DELETE` cứng nếu bệnh nhân đã phát sinh liên kết QR hoặc Care Plan. |
+| **BR26** | Cô lập dữ liệu đa chi nhánh | Thực thể `facilities` quản lý 5 chi nhánh. Mọi bảng cốt lõi (`accounts`, `patients`, `patient_care_plans`, `doctor_profiles`) đều mang khóa ngoại `facility_id` phục vụ cô lập dữ liệu theo từng cơ sở (ngoại trừ GCMO xem dữ liệu chuỗi). |
+| **BR-NEW-01** | Khóa quyền sửa thuốc của Điều dưỡng | Điều dưỡng (`role = 'NURSE'`) được cấp phát QR, hỗ trợ bệnh nhân nhưng TUYỆT ĐỐI không được sửa liều lượng thuốc `patient_medications` hoặc chỉ định phác đồ. |
+| **BR-NEW-02** | Cơ chế phiên bản Master Template | Template đang `ACTIVE` không được sửa trực tiếp; hệ thống tạo bản ghi mới (copy-on-write) với `version` tăng dần và `parent_template_id` trỏ về bản gốc, giữ nguyên các Care Plan đang chạy. |
 
 ---
 

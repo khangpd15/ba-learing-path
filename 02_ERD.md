@@ -23,12 +23,23 @@ Mô hình ERD được xây dựng nhằm chuẩn hóa dữ liệu cho hai phân
 ```mermaid
 erDiagram
     %% ========================================================
+    %% 0. PHÂN HỆ CƠ SỞ Y TẾ ĐA CHI NHÁNH (BR26)
+    %% ========================================================
+    FACILITIES ||--o{ ACCOUNTS : "manages_staff"
+    FACILITIES ||--o{ PATIENTS : "admits_and_manages"
+    FACILITIES ||--o{ PATIENT_CARE_PLANS : "operates_care_for"
+
+    %% ========================================================
     %% 1. PHÂN HỆ TÀI KHOẢN & ĐỊNH DANH
     %% ========================================================
     ACCOUNTS ||--o| DOCTOR_PROFILES : "extends"
     ACCOUNTS ||--o| CAREGIVER_PROFILES : "extends"
     ACCOUNTS ||--o{ AUDIT_LOGS : "logs_activity [FUTURE / ADMIN]"
     ACCOUNTS ||--o{ OTP_VERIFICATIONS : "authenticates_via"
+    ACCOUNTS ||--o{ PATIENT_QR_CODES : "issues"
+    ACCOUNTS ||--o{ CARE_PLAN_TEMPLATES : "approves"
+    ACCOUNTS ||--o{ CALL_INTERVENTION_LOGS : "conducts_call"
+    ACCOUNTS ||--o{ NOTIFICATIONS : "receives_app_notifications"
 
     %% ========================================================
     %% 2. PHÂN HỆ HỒ SƠ BỆNH NHÂN & LIÊN KẾT ỦY QUYỀN
@@ -37,14 +48,16 @@ erDiagram
     PATIENTS ||--o{ PATIENT_CARE_PLANS : "has_care_episodes"
     PATIENTS ||--o{ CAREGIVER_PATIENT_LINKS : "linked_with"
     CAREGIVER_PROFILES ||--o{ CAREGIVER_PATIENT_LINKS : "authorized_to_care"
+    PATIENTS ||--o{ CALL_INTERVENTION_LOGS : "receives_call"
+    PATIENTS ||--o{ NOTIFICATIONS : "sent_for_patient"
 
     %% ========================================================
     %% 3. PHÂN HỆ MASTER CARE PLAN TEMPLATE
     %% ========================================================
     DOCTOR_PROFILES ||--o{ CARE_PLAN_TEMPLATES : "authors"
     DOCTOR_PROFILES ||--o{ PATIENT_FOLLOWUP_APPOINTMENTS : "examines"
-    DOCTOR_PROFILES ||--o{ PATIENT_QR_CODES : "issues"
     DOCTOR_PROFILES ||--o{ RED_FLAG_INCIDENTS : "handles"
+    CARE_PLAN_TEMPLATES ||--o{ CARE_PLAN_TEMPLATES : "version_of"
     CARE_PLAN_TEMPLATES ||--o{ TEMPLATE_LEARNING_MODULES : "contains_modules"
     TEMPLATE_LEARNING_MODULES ||--o{ TEMPLATE_QUIZ_QUESTIONS : "has_3_quiz_questions"
     CARE_PLAN_TEMPLATES ||--o{ TEMPLATE_MEDICATIONS : "configures_medications"
@@ -80,11 +93,22 @@ erDiagram
     PATIENT_CARE_PLANS ||--o{ RED_FLAG_INCIDENTS : "triggers_emergency"
     TEMPLATE_RED_FLAGS ||--o{ RED_FLAG_INCIDENTS : "matches_sign"
     CAREGIVER_PROFILES ||--o{ RED_FLAG_INCIDENTS : "reported_by"
-    DOCTOR_PROFILES ||--o{ RED_FLAG_INCIDENTS : "handled_by"
+    RED_FLAG_INCIDENTS ||--o{ CALL_INTERVENTION_LOGS : "triggers_call"
 
     %% ========================================================
     %% THỰC THỂ CHI TIẾT
     %% ========================================================
+    FACILITIES {
+        uuid facility_id PK
+        string facility_code UK
+        string facility_name
+        text address
+        string hotline
+        string status "ACTIVE | INACTIVE"
+        timestamp created_at
+        timestamp updated_at
+    }
+
     OTP_VERIFICATIONS {
         uuid otp_id PK
         string phone_number
@@ -97,11 +121,12 @@ erDiagram
 
     ACCOUNTS {
         uuid account_id PK
+        uuid facility_id FK
         string phone_number UK
         string username UK
         string email UK
         string password_hash
-        string role "CAREGIVER | DOCTOR | ADMIN"
+        string role "CAREGIVER | CARE_RECIPIENT | DOCTOR | NURSE | CSKH | GCMO | ADMIN"
         string status "ACTIVE | LOCKED | INACTIVE"
         timestamp created_at
         timestamp updated_at
@@ -109,6 +134,7 @@ erDiagram
 
     DOCTOR_PROFILES {
         uuid doctor_id PK, FK
+        uuid facility_id FK
         string full_name
         string license_number UK
         string department
@@ -124,6 +150,7 @@ erDiagram
 
     PATIENTS {
         string patient_id PK
+        uuid facility_id FK
         string full_name
         date date_of_birth
         string gender
@@ -142,6 +169,7 @@ erDiagram
         uuid caregiver_id FK
         string patient_id FK
         uuid care_plan_id FK
+        string role "PRIMARY | SECONDARY"
         timestamp linked_at
         string status "ACTIVE | REVOKED"
     }
@@ -151,8 +179,12 @@ erDiagram
         string template_name
         string surgery_type
         string clinical_description
-        string status "DRAFT | ACTIVE | INACTIVE"
+        string version "1.0 | 1.1"
+        uuid parent_template_id FK
+        string status "DRAFT | PENDING_APPROVAL | ACTIVE | INACTIVE | ARCHIVED"
         uuid created_by_doctor_id FK
+        uuid approved_by FK
+        timestamp approved_at
         timestamp created_at
         timestamp updated_at
     }
@@ -242,6 +274,7 @@ erDiagram
 
     PATIENT_CARE_PLANS {
         uuid care_plan_id PK
+        uuid facility_id FK
         string patient_id FK
         uuid source_template_id FK
         string surgery_type
@@ -254,7 +287,7 @@ erDiagram
         uuid qr_id PK
         uuid care_plan_id FK, UK
         string qr_token UK
-        uuid issued_by_doctor_id FK
+        uuid issued_by_account_id FK
         timestamp issued_at
         string status "ACTIVE | REVOKED"
         int print_count
@@ -334,7 +367,35 @@ erDiagram
         timestamp triggered_at
         boolean call_initiated
         uuid acknowledged_by_doctor_id FK
+        timestamp escalated_at
+        int escalation_level
         text clinical_resolution
+    }
+
+    CALL_INTERVENTION_LOGS {
+        uuid log_id PK
+        uuid incident_id FK
+        string patient_id FK
+        uuid caller_account_id FK
+        timestamp call_time
+        int duration_seconds
+        string call_status "ANSWERED | NO_ANSWER | BUSY | FAILED"
+        text notes
+        string next_action
+        timestamp created_at
+    }
+
+    NOTIFICATIONS {
+        uuid notification_id PK
+        uuid recipient_account_id FK
+        string patient_id FK
+        string channel "SMS | ZNS | PUSH | IN_APP"
+        string title
+        text body
+        string status "PENDING | SENT | DELIVERED | FAILED"
+        timestamp sent_at
+        timestamp read_at
+        timestamp created_at
     }
 
     AUDIT_LOGS {
@@ -353,21 +414,26 @@ erDiagram
 
 ## 3. Phân Rã Sơ Đồ Theo Từng Phân Hệ Chức Năng
 
-### 3.1 Phân Hệ 1: Quản Lý Người Dùng & Ủy Quyền Liên Kết (Auth & Caregiver-Patient Links)
+### 3.1 Phân Hệ 1: Quản Lý Người Dùng, Cơ Sở & Ủy Quyền Liên Kết (Auth & Caregiver-Patient Links)
 
 ```mermaid
 erDiagram
-    ACCOUNTS ||--o| DOCTOR_PROFILES : "phân quyền DOCTOR"
+    FACILITIES ||--o{ ACCOUNTS : "thuộc chi nhánh (BR26)"
+    FACILITIES ||--o{ PATIENTS : "tiếp nhận điều trị (BR26)"
+    FACILITIES ||--o{ PATIENT_CARE_PLANS : "quản lý theo cơ sở (BR26)"
+    ACCOUNTS ||--o| DOCTOR_PROFILES : "phân quyền DOCTOR/NURSE/CSKH"
     ACCOUNTS ||--o| CAREGIVER_PROFILES : "phân quyền CAREGIVER"
+    ACCOUNTS ||--o{ PATIENT_QR_CODES : "bác sĩ/điều dưỡng phát hành QR (UC-011)"
     DOCTOR_PROFILES ||--o{ PATIENTS : "tiếp nhận & điều trị"
     PATIENTS ||--o{ CAREGIVER_PATIENT_LINKS : "được chăm sóc bởi"
-    CAREGIVER_PROFILES ||--o{ CAREGIVER_PATIENT_LINKS : "ủy quyền theo dõi"
+    CAREGIVER_PROFILES ||--o{ CAREGIVER_PATIENT_LINKS : "ủy quyền theo dõi (Chính/Phụ)"
     PATIENT_CARE_PLANS ||--o{ CAREGIVER_PATIENT_LINKS : "phân quyền truy cập"
     PATIENT_CARE_PLANS ||--|| PATIENT_QR_CODES : "quét mã QR để liên kết"
 ```
 
-* **Ý nghĩa:** Giải quyết trọn vẹn luồng [UC-001 (Đăng nhập Caregiver)](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/file_use_case_spec.md), [UC-003 (Quét mã QR liên kết)](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/file_use_case_spec.md) và [UC-002 (Đăng nhập Nhân viên Y tế)](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/file_use_case_spec.md).
+* **Ý nghĩa:** Giải quyết trọn vẹn luồng [UC-001 (Đăng nhập Caregiver)](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/file_use_case_spec.md), [UC-003 (Quét mã QR liên kết)](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/file_use_case_spec.md), [UC-002 (Đăng nhập Nhân viên Y tế)](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/file_use_case_spec.md) và [UC-011 (Phát hành mã QR)](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/file_use_case_spec.md).
 * Caregiver không cần tài khoản tạo trước, đăng nhập OTP tạo bản ghi trong `accounts` và `caregiver_profiles`. Khi quét QR của bệnh nhân, bảng `caregiver_patient_links` thiết lập quan hệ ràng buộc an toàn (BR5).
+* Quản lý đa chi nhánh thông qua thực thể `FACILITIES` áp dụng chặt chẽ cho toàn chuỗi bệnh viện VISI (BR26).
 
 ---
 
@@ -375,6 +441,8 @@ erDiagram
 
 ```mermaid
 erDiagram
+    CARE_PLAN_TEMPLATES ||--o{ CARE_PLAN_TEMPLATES : "Phiên bản mới copy-on-write v1.1 (BR15)"
+    ACCOUNTS ||--o{ CARE_PLAN_TEMPLATES : "GCMO/Trưởng khoa ký duyệt (UC-006)"
     CARE_PLAN_TEMPLATES ||--o{ TEMPLATE_LEARNING_MODULES : "Tab 1: Learning Path Infographic (UC-009, UC-017)"
     TEMPLATE_LEARNING_MODULES ||--o{ TEMPLATE_QUIZ_QUESTIONS : "Cuối bài: 3 câu Mini Quiz"
     CARE_PLAN_TEMPLATES ||--o{ TEMPLATE_MEDICATIONS : "Tab 2: Thuốc mẫu & Timer (UC-007)"
@@ -384,7 +452,7 @@ erDiagram
     CARE_PLAN_TEMPLATES ||--o{ TEMPLATE_DO_DONT_ITEMS : "Tab 5: Chỉ dẫn Do & Don't (UC-009)"
 ```
 
-* **Ý nghĩa:** Hỗ trợ không gian cấu hình 5 tab thành phần con trong [UC-005 (Quản lý Master Template)](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/file_use_case_spec.md).
+* **Ý nghĩa:** Hỗ trợ không gian cấu hình 5 tab thành phần con trong [UC-005 (Quản lý Master Template)](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/file_use_case_spec.md) và luồng phê duyệt lâm sàng [UC-006](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/file_use_case_spec.md).
 * Mọi cấu phần đều gắn liền với `template_id` và lưu trường `surgery_type` áp dụng theo đúng yêu cầu vừa chuẩn hóa.
 
 ---
@@ -412,12 +480,33 @@ erDiagram
 
 ---
 
+### 3.4 Phân Hệ 4: Can Thiệp Khẩn Cấp & Thông Báo Đa Kênh (Emergency Triaging & Multi-channel Alerts)
+
+```mermaid
+erDiagram
+    RED_FLAG_INCIDENTS ||--o{ CALL_INTERVENTION_LOGS : "Kích hoạt xử lý can thiệp SLA <5p (UC-023, BR12)"
+    ACCOUNTS ||--o{ CALL_INTERVENTION_LOGS : "CSKH/Điều dưỡng thực hiện cuộc gọi"
+    PATIENTS ||--o{ CALL_INTERVENTION_LOGS : "Hồ sơ tiếp nhận cuộc gọi"
+    PATIENTS ||--o{ NOTIFICATIONS : "Thông báo nhắc lịch, tái khám & cảnh báo"
+    ACCOUNTS ||--o{ NOTIFICATIONS : "Thông báo đẩy tài khoản người dùng"
+```
+
+* **Ý nghĩa:** Quản lý quy trình xử lý khẩn cấp [UC-022, UC-022b, UC-023](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/file_use_case_spec.md) và hệ thống giao tiếp đa kênh phục vụ chăm sóc liên tục.
+
+---
+
 ## 4. Bảng Tổng Hợp Khóa Ngoại & Hành Vi Xóa Dữ Liệu (Foreign Key & On Delete Actions)
 
 | Khóa Ngoại (Foreign Key) | Bảng Nguồn | Bảng Đích Tham Chiếu | Hành Vi ON DELETE | Lý Do Nghiệp Vụ Y Khoa |
 |---|---|---|:---:|---|
+| `facility_id` | `accounts` | `facilities(facility_id)` | **RESTRICT** | Không được xóa chi nhánh nếu còn tài khoản nhân sự đang trực thuộc (BR26) |
+| `facility_id` | `doctor_profiles` | `facilities(facility_id)` | **RESTRICT** | Bảo toàn định danh chi nhánh công tác của nhân sự y tế (BR26) |
+| `facility_id` | `patients` | `facilities(facility_id)` | **RESTRICT** | Không được xóa chi nhánh nếu có bệnh nhân đã tiếp nhận mổ (BR26) |
+| `facility_id` | `patient_care_plans` | `facilities(facility_id)` | **RESTRICT** | Đảm bảo tính toàn vẹn của kế hoạch chăm sóc theo cơ sở quản lý (BR26) |
 | `created_by_doctor_id` | `patients` | `doctor_profiles(doctor_id)` | **RESTRICT** | Không được xóa bác sĩ nếu đang phụ trách hồ sơ bệnh nhân |
 | `created_by_doctor_id` | `care_plan_templates` | `doctor_profiles(doctor_id)` | **RESTRICT** | Bảo toàn quyền tác giả và nguồn gốc y khoa (BR7) |
+| `approved_by` | `care_plan_templates` | `accounts(account_id)` | **SET NULL** | Nếu tài khoản người duyệt bị xóa/khóa, vẫn lưu vết template đã được duyệt |
+| `parent_template_id` | `care_plan_templates` | `care_plan_templates(template_id)` | **SET NULL** | Duy trì tính độc lập của template con nếu template gốc bị lưu trữ |
 | `template_id` | `template_learning_modules` | `care_plan_templates(template_id)` | **CASCADE** | Xóa template thì xóa toàn bộ bài học cấu phần |
 | `module_id` | `template_quiz_questions` | `template_learning_modules(module_id)` | **CASCADE** | Xóa bài học thì xóa 3 câu hỏi trắc nghiệm tương ứng |
 | `template_id` | `template_medications` | `care_plan_templates(template_id)` | **CASCADE** | Xóa template thì xóa danh mục thuốc mẫu đi kèm |
@@ -428,7 +517,13 @@ erDiagram
 | `patient_id` | `patient_care_plans` | `patients(patient_id)` | **RESTRICT** | Không được xóa bệnh nhân nếu đang có Care Plan (BR25) |
 | `source_template_id` | `patient_care_plans` | `care_plan_templates(template_id)` | **RESTRICT** | Không thể xóa template nếu đã có bệnh nhân đang áp dụng |
 | `care_plan_id` | `patient_qr_codes` | `patient_care_plans(care_plan_id)` | **CASCADE** | Mã QR luôn gắn liền với vòng đời Care Plan |
+| `issued_by_account_id` | `patient_qr_codes` | `accounts(account_id)` | **RESTRICT** | Lưu vết nhân sự y tế (Bác sĩ/Điều dưỡng) phát hành mã QR |
 | `care_plan_id` | `patient_medications` | `patient_care_plans(care_plan_id)` | **CASCADE** | Xóa Care Plan nháp thì xóa danh mục thuốc gắn với nó |
 | `care_plan_id` | `patient_followup_appointments`| `patient_care_plans(care_plan_id)` | **CASCADE** | Xóa Care Plan nháp thì xóa lịch hẹn đi kèm |
 | `care_plan_id` | `recovery_check_submissions` | `patient_care_plans(care_plan_id)` | **RESTRICT** | Không cho phép xóa kế hoạch nếu đã phát sinh dữ liệu lâm sàng |
 | `care_plan_id` | `red_flag_incidents` | `patient_care_plans(care_plan_id)` | **RESTRICT** | Dữ liệu sự cố khẩn cấp bắt buộc phải lưu trữ phục vụ pháp lý y tế |
+| `incident_id` | `call_intervention_logs` | `red_flag_incidents(incident_id)` | **CASCADE** | Xóa sự cố (chỉ xảy ra ở môi trường test) thì xóa nhật ký cuộc gọi liên quan |
+| `patient_id` | `call_intervention_logs` | `patients(patient_id)` | **RESTRICT** | Hồ sơ cuộc gọi can thiệp không được xóa mất nguồn bệnh nhân |
+| `caller_account_id` | `call_intervention_logs` | `accounts(account_id)` | **RESTRICT** | Bảo toàn định danh nhân sự đã can thiệp cuộc gọi |
+| `patient_id` | `notifications` | `patients(patient_id)` | **CASCADE** | Lưu vết thông báo theo hồ sơ người bệnh |
+| `recipient_account_id` | `notifications` | `accounts(account_id)` | **SET NULL** | Tài khoản nhận thông báo app |

@@ -53,7 +53,7 @@ Tài liệu này đặc tả kiến trúc luồng giao diện người dùng (Sc
 
 #### `SCR-CG-04`: Trung tâm Kế Hoạch Chăm Sóc Bệnh Nhân (Patient Care Plan Hub)
 * **Mã Use Case liên kết:** UC-003, UC-014, UC-016
-* **Tính năng liên quan:** F-004, F-008, F-009, F-012
+* **Tính năng liên quan:** F-004, F-008, F-009, F-012, F-013
 * **Tác nhân vận hành:** ACT-001 (Caregiver)
 * **Các thành phần UI chính:** Banner nổi bật: Cẩm nang 24h đầu sống còn (Day 0–1); Thanh tiến trình hồi phục theo ngày (Day 1 -> Day 30); Tiện ích cữ thuốc tiếp theo kèm đồng hồ đếm lùi; Nút 'Làm bài kiểm tra phục hồi hôm nay' (nếu chưa nộp); Nút gọi 1 chạm Hotline VISI 0395 151 151.
 * **Luồng điều hướng & Hành vi:** Nhấn cữ thuốc -> Sang `SCR-CG-09`; Nhấn khảo sát -> Sang `SCR-CG-11`; Nhấn Cẩm nang 24h -> Sang `SCR-CG-08`; Nhấn Học viện Caregiver -> Sang `SCR-CG-05`.
@@ -171,7 +171,7 @@ Tài liệu này đặc tả kiến trúc luồng giao diện người dùng (Sc
 * **Mã Use Case liên kết:** UC-005, UC-007, UC-008, UC-009
 * **Tính năng liên quan:** F-006, F-009, F-010, F-012, F-013, F-016, F-017, F-028
 * **Tác nhân vận hành:** ACT-002 (Bác sĩ), ACT-005 (GCMO)
-* **Các thành phần UI chính:** Thanh điều hướng 5 Tab chuyên môn: (Tab 1) Cẩm nang & Infographic Learning Path; (Tab 2) Danh mục thuốc mẫu & cài đặt Drop Interval Buffer Timer 5–10 phút; (Tab 3) Mốc thời gian & Bộ câu hỏi Recovery Check 3 mức; (Tab 4) Tiêu chí cảnh báo Red Flag & Cấu hình Hotline 0395 151 151; (Tab 5) Danh mục Do & Don't 2 cột màu và FAQ lâm sàng; Nút 'Lưu nháp'; Nút 'Gửi phê duyệt lâm sàng'.
+* **Các thành phần UI chính:** Thanh điều hướng 5 Tab chuyên môn: (Tab 1) Thông tin chung Master Template (UC-005.4); (Tab 2) Danh mục thuốc mẫu & cài đặt Drop Interval Buffer Timer 5–10 phút (UC-007.x); (Tab 3) Mốc thời gian & Bộ câu hỏi Recovery Check 3 mức + Tiêu chí cảnh báo Red Flag & Cấu hình Hotline 0395 151 151 (UC-008.x); (Tab 4) Cẩm nang & Infographic Learning Path + Danh mục Do & Don't 2 cột màu + FAQ lâm sàng (UC-009.x); Nút 'Lưu nháp'; Nút 'Gửi phê duyệt lâm sàng'.
 * **Luồng điều hướng & Hành vi:** Lưu nháp -> Cập nhật trạng thái `DRAFT`; Gửi phê duyệt -> Chuyển sang `PENDING_APPROVAL` (UC-006).
 
 #### `SCR-DOC-09`: Chi tiết & Vòng đời Phê Duyệt Template (Template Approval & Lifecycle)

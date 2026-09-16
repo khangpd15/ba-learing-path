@@ -18,6 +18,30 @@
 4. **Phân vùng dữ liệu đa chi nhánh (Multi-Branch Isolation):** Mọi truy vấn danh sách người bệnh hoặc phân quyền nhân sự bắt buộc phải có mệnh đề lọc `WHERE facility_id = :current_user_facility_id` (BR26), ngoại trừ tài khoản Ban Giám đốc / GCMO cấp tập đoàn.
 5. **Giao dịch Toàn vẹn (ACID Transactions):** Các luồng nghiệp vụ phức tạp như nhân bản Care Plan, sinh mã QR hoặc tiếp nhận cấp cứu Red Flag bắt buộc phải thực thi trong khối `BEGIN ... COMMIT` với mức cô lập `READ COMMITTED`.
 
+### 1.1 Dữ Liệu Khởi Tạo Cơ Sở Y Tế (Facilities Seed Data - 5 Chi Nhánh VISI)
+Khởi tạo danh mục 5 chi nhánh thuộc Hệ thống Bệnh viện Mắt VISI phục vụ cô lập dữ liệu theo BR26:
+
+```sql
+INSERT INTO facilities (facility_id, facility_code, facility_name, address, phone, hotline, is_active, created_at)
+VALUES 
+  ('fac-001-thu-duc', 'VISI-TD', 'Bệnh viện Mắt Kỹ thuật cao VISI Thủ Đức', '215 Võ Văn Ngân, P. Linh Chiểu, TP. Thủ Đức, TP. HCM', '028 3896 1234', '0395 151 151', TRUE, CURRENT_TIMESTAMP),
+  ('fac-002-hai-phong', 'VISI-HP', 'Bệnh viện Mắt VISI Hải Phòng', '45 Lạch Tray, Ngô Quyền, Hải Phòng', '0225 385 5678', '0395 151 152', TRUE, CURRENT_TIMESTAMP),
+  ('fac-003-da-nang', 'VISI-DN', 'Bệnh viện Mắt Quốc tế VISI Đà Nẵng', '128 Nguyễn Văn Linh, Q. Hải Châu, TP. Đà Nẵng', '0236 365 4321', '0395 151 153', TRUE, CURRENT_TIMESTAMP),
+  ('fac-004-can-tho', 'VISI-CT', 'Bệnh viện Mắt Sài Gòn - VISI Cần Thơ', '71 đường 30/4, P. An Phú, Q. Ninh Kiều, TP. Cần Thơ', '0292 373 8888', '0395 151 154', TRUE, CURRENT_TIMESTAMP),
+  ('fac-005-ha-noi', 'VISI-HN', 'Bệnh viện Mắt Công nghệ cao VISI Hà Nội', '19 Bà Triệu, P. Tràng Tiền, Q. Hoàn Kiếm, Hà Nội', '024 3936 9999', '0395 151 155', TRUE, CURRENT_TIMESTAMP)
+ON CONFLICT (facility_code) DO UPDATE 
+SET facility_name = EXCLUDED.facility_name,
+    address = EXCLUDED.address,
+    hotline = EXCLUDED.hotline,
+    updated_at = CURRENT_TIMESTAMP;
+
+-- Truy vấn danh sách cơ sở y tế đang hoạt động
+SELECT facility_id, facility_code, facility_name, address, phone, hotline
+FROM facilities
+WHERE is_active = TRUE
+ORDER BY facility_code ASC;
+```
+
 ---
 
 ## 2. DANH MỤC CÂU LỆNH TRUY VẤN CHI TIẾT THEO USE CASE
@@ -52,12 +76,15 @@ RETURNING caregiver_id, full_name, phone;
 #### UC-002: Xác Thực Nhân Viên Y Tế và Quyền Hạn Chi Nhánh
 ```sql
 -- Xác thực thông tin đăng nhập và kiểm tra trạng thái hoạt động
-SELECT a.account_id, a.username, a.password_hash, a.two_factor_secret, a.status,
-       dp.doctor_id, dp.full_name, dp.role, dp.facility_id
+SELECT a.account_id, a.phone, a.email, a.role, a.status, a.two_factor_secret, a.facility_id,
+       f.facility_name, f.facility_code,
+       dp.doctor_id, dp.title, dp.license_number, dp.department
 FROM accounts a
-JOIN doctor_profiles dp ON a.account_id = dp.account_id
-WHERE a.username = :username 
-  AND a.status = 'ACTIVE';
+LEFT JOIN facilities f ON a.facility_id = f.facility_id
+LEFT JOIN doctor_profiles dp ON a.account_id = dp.account_id
+WHERE (a.email = :username_or_email OR a.phone = :username_or_email)
+  AND a.status = 'ACTIVE'
+  AND a.role IN ('DOCTOR', 'NURSE', 'CSKH', 'GCMO', 'ADMIN');
 ```
 
 #### UC-026.1: Khởi Tạo Tài Khoản Nhân Viên Y Tế & Gán Chi Nhánh
@@ -65,16 +92,17 @@ WHERE a.username = :username
 BEGIN;
 
 -- 1. Thêm tài khoản xác thực
-INSERT INTO accounts (account_id, username, password_hash, status, created_at)
-VALUES (:new_account_id, :email, :hashed_temp_password, 'PENDING_ACTIVATION', CURRENT_TIMESTAMP);
+INSERT INTO accounts (account_id, email, phone, full_name, password_hash, role, facility_id, status, created_at)
+VALUES (:new_account_id, :email, :phone, :full_name, :hashed_temp_password, :role, :facility_id, 'PENDING_ACTIVATION', CURRENT_TIMESTAMP);
 
--- 2. Thêm hồ sơ định danh chuyên môn
-INSERT INTO doctor_profiles (doctor_id, account_id, full_name, role, phone, email, facility_id, created_at)
-VALUES (gen_random_uuid(), :new_account_id, :full_name, :role, :phone, :email, :facility_id, CURRENT_TIMESTAMP);
+-- 2. Nếu vai trò là Bác sĩ (DOCTOR) hoặc GCMO: Thêm hồ sơ định danh chuyên môn
+INSERT INTO doctor_profiles (doctor_id, account_id, facility_id, license_number, title, department, created_at)
+SELECT gen_random_uuid(), :new_account_id, :facility_id, :license_number, :title, :department, CURRENT_TIMESTAMP
+WHERE :role IN ('DOCTOR', 'GCMO');
 
 -- 3. Ghi nhật ký kiểm toán hệ thống
-INSERT INTO system_audit_logs (log_id, actor_id, action_type, entity_name, record_id, details, created_at)
-VALUES (gen_random_uuid(), :admin_id, 'CREATE_STAFF_ACCOUNT', 'accounts', :new_account_id, 
+INSERT INTO audit_logs (user_id, action_type, target_entity, target_id, new_data, timestamp)
+VALUES (:admin_id, 'CREATE_STAFF_ACCOUNT', 'accounts', :new_account_id::TEXT, 
         jsonb_build_object('email', :email, 'role', :role, 'facility_id', :facility_id), CURRENT_TIMESTAMP);
 
 COMMIT;
@@ -82,13 +110,16 @@ COMMIT;
 
 #### UC-026.2: Tra Cứu và Lọc Danh Sách Nhân Viên Theo Cơ Sở
 ```sql
-SELECT dp.doctor_id, dp.full_name, dp.role, dp.email, dp.phone, dp.facility_id, a.status, a.created_at
-FROM doctor_profiles dp
-JOIN accounts a ON dp.account_id = a.account_id
-WHERE (:facility_id IS NULL OR dp.facility_id = :facility_id)
-  AND (:role IS NULL OR dp.role = :role)
+SELECT a.account_id, a.full_name, a.role, a.email, a.phone, a.facility_id, f.facility_name, a.status, a.created_at,
+       dp.doctor_id, dp.license_number, dp.title
+FROM accounts a
+LEFT JOIN facilities f ON a.facility_id = f.facility_id
+LEFT JOIN doctor_profiles dp ON a.account_id = dp.account_id
+WHERE a.role IN ('DOCTOR', 'NURSE', 'CSKH', 'GCMO', 'ADMIN')
+  AND (:facility_id IS NULL OR a.facility_id = :facility_id)
+  AND (:role IS NULL OR a.role = :role)
   AND (:status IS NULL OR a.status = :status)
-ORDER BY dp.full_name ASC
+ORDER BY a.full_name ASC
 LIMIT :limit OFFSET :offset;
 ```
 
@@ -99,11 +130,11 @@ BEGIN;
 -- 1. Chuyển trạng thái tài khoản sang LOCKED
 UPDATE accounts 
 SET status = 'LOCKED', updated_at = CURRENT_TIMESTAMP 
-WHERE account_id = (SELECT account_id FROM doctor_profiles WHERE doctor_id = :doctor_id);
+WHERE account_id = :account_id;
 
 -- 2. Ghi nhật ký kiểm toán an ninh nghiêm ngặt
-INSERT INTO system_audit_logs (log_id, actor_id, action_type, entity_name, record_id, details, created_at)
-VALUES (gen_random_uuid(), :admin_id, 'LOCK_STAFF_ACCOUNT', 'doctor_profiles', :doctor_id, 
+INSERT INTO audit_logs (user_id, action_type, target_entity, target_id, new_data, timestamp)
+VALUES (:admin_id, 'LOCK_STAFF_ACCOUNT', 'accounts', :account_id::TEXT, 
         jsonb_build_object('reason', :reason, 'locked_at', CURRENT_TIMESTAMP), CURRENT_TIMESTAMP);
 
 COMMIT;
@@ -245,7 +276,7 @@ RETURNING template_id, version, status;
 
 #### UC-005.4: Chỉnh Sửa Hoặc Nhân Bản Phiên Bản Mới (Copy-on-Write BR15)
 ```sql
--- Nếu template đang DRAFT: cập nhật trực tiếp
+-- Trường hợp 1: Template đang ở trạng thái DRAFT -> Cho phép sửa trực tiếp
 UPDATE care_plan_templates
 SET template_name = :template_name,
     clinical_description = :clinical_description,
@@ -253,8 +284,58 @@ SET template_name = :template_name,
     updated_at = CURRENT_TIMESTAMP
 WHERE template_id = :template_id AND status = 'DRAFT';
 
--- Nếu template đang ACTIVE: nhân bản sang v1.1
--- (Thực hiện copy toàn bộ sub-tables: template_medications, template_recovery_milestones, template_red_flags, template_do_dont_items)
+-- Trường hợp 2: Template đang ACTIVE -> Cơ chế Copy-on-Write: Nhân bản sang phiên bản mới (v1.1)
+BEGIN;
+
+INSERT INTO care_plan_templates (
+  template_id, template_name, surgery_type, version, clinical_description,
+  followup_days, status, parent_template_id, created_by_doctor_id, created_at
+)
+SELECT 
+  :new_template_id, :template_name, surgery_type, 'v1.1', :clinical_description,
+  :followup_days, 'DRAFT', template_id, :doctor_id, CURRENT_TIMESTAMP
+FROM care_plan_templates
+WHERE template_id = :old_template_id AND status = 'ACTIVE';
+
+-- Sao chép thuốc mẫu sang phiên bản mới
+INSERT INTO template_medications (med_id, template_id, medication_name, dosage_form, dose_amount, target_eye, frequency_schedules, buffer_interval_minutes, cap_color, instructions, display_order)
+SELECT gen_random_uuid(), :new_template_id, medication_name, dosage_form, dose_amount, target_eye, frequency_schedules, buffer_interval_minutes, cap_color, instructions, display_order
+FROM template_medications WHERE template_id = :old_template_id;
+
+-- Sao chép các mốc khảo sát, tiêu chí Red Flag, bài học Do/Don't tương tự...
+COMMIT;
+```
+
+#### UC-006: Quy Trình Gửi Duyệt & Phê Duyệt Phác Đồ Mẫu (GCMO Approval BR15)
+```sql
+-- 1. Bác sĩ gửi yêu cầu phê duyệt sau khi hoàn thiện bản thảo DRAFT
+UPDATE care_plan_templates
+SET status = 'PENDING_APPROVAL',
+    updated_at = CURRENT_TIMESTAMP
+WHERE template_id = :template_id 
+  AND status = 'DRAFT'
+  -- Điều kiện tiên quyết: Phải có ít nhất 1 loại thuốc mẫu và 1 mốc khảo sát
+  AND EXISTS (SELECT 1 FROM template_medications WHERE template_id = :template_id)
+  AND EXISTS (SELECT 1 FROM template_recovery_milestones WHERE template_id = :template_id);
+
+-- 2. Giám đốc Chuyên môn (GCMO) thẩm định và ký duyệt số hóa đưa vào sử dụng
+BEGIN;
+
+UPDATE care_plan_templates
+SET status = 'ACTIVE',
+    approved_by = :gcmo_account_id,
+    approved_at = CURRENT_TIMESTAMP,
+    approval_notes = :approval_notes,
+    updated_at = CURRENT_TIMESTAMP
+WHERE template_id = :template_id 
+  AND status = 'PENDING_APPROVAL';
+
+-- Lưu vết kiểm toán hành động phê duyệt phác đồ
+INSERT INTO audit_logs (user_id, action_type, target_entity, target_id, new_data, timestamp)
+VALUES (:gcmo_account_id, 'APPROVE_CARE_PLAN_TEMPLATE', 'care_plan_templates', :template_id::TEXT,
+        jsonb_build_object('approval_notes', :approval_notes, 'approved_at', CURRENT_TIMESTAMP), CURRENT_TIMESTAMP);
+
+COMMIT;
 ```
 
 #### UC-005.5: Cập Nhật Trạng Thái Vòng Đời Template
@@ -355,13 +436,13 @@ WHERE p.patient_id = :patient_id;
 COMMIT;
 ```
 
-#### UC-011: Tạo và Phát Hành Mã QR Xuất Viện
+#### UC-011: Tạo và Phát Hành Mã QR Xuất Viện (Điều dưỡng / Bác sĩ UC-011)
 ```sql
 INSERT INTO patient_qr_codes (
-  qr_id, care_plan_id, qr_token, status, issued_at, expires_at
+  qr_id, care_plan_id, qr_token, status, issued_by_account_id, issued_at, expires_at
 )
 VALUES (
-  gen_random_uuid(), :care_plan_id, :generated_hmac_token, 'ISSUED', 
+  gen_random_uuid(), :care_plan_id, :generated_hmac_token, 'ISSUED', :staff_account_id,
   CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '30 days'
 )
 RETURNING qr_id, qr_token;
@@ -377,8 +458,8 @@ SET status = 'REVOKED', revoked_at = CURRENT_TIMESTAMP, revoke_reason = :reason
 WHERE care_plan_id = :care_plan_id AND status = 'ISSUED';
 
 -- 2. Sinh mã QR mới
-INSERT INTO patient_qr_codes (qr_id, care_plan_id, qr_token, status, issued_at, expires_at)
-VALUES (gen_random_uuid(), :care_plan_id, :new_qr_token, 'ISSUED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '30 days');
+INSERT INTO patient_qr_codes (qr_id, care_plan_id, qr_token, status, issued_by_account_id, issued_at, expires_at)
+VALUES (gen_random_uuid(), :care_plan_id, :new_qr_token, 'ISSUED', :staff_account_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '30 days');
 
 COMMIT;
 ```
@@ -490,8 +571,8 @@ ORDER BY
 ```sql
 UPDATE red_flag_incidents
 SET status = 'IN_PROGRESS',
-    claimed_by_staff_id = :staff_id,
-    claimed_at = CURRENT_TIMESTAMP
+    acknowledged_by_doctor_id = :staff_id,
+    acknowledged_at = CURRENT_TIMESTAMP
 WHERE incident_id = :incident_id 
   AND status = 'TRIGGERED';
 ```
@@ -504,39 +585,51 @@ SELECT incident_id, care_plan_id, triggered_at,
 FROM red_flag_incidents
 WHERE status = 'TRIGGERED'
   AND triggered_at < CURRENT_TIMESTAMP - INTERVAL '15 minutes'
-  AND is_escalated = FALSE;
+  AND acknowledged_at IS NULL
+  AND escalation_level = 1;
 
--- Cập nhật leo thang cảnh báo
+-- Cập nhật leo thang cảnh báo sang cấp 2 (Gửi SMS khẩn cấp tới Bác sĩ trực)
 UPDATE red_flag_incidents
-SET is_escalated = TRUE,
-    escalated_at = CURRENT_TIMESTAMP,
+SET escalated_at = CURRENT_TIMESTAMP,
     escalation_level = 2
 WHERE incident_id = :incident_id;
 ```
 
-#### UC-023: Ghi Nhận Nhật Ký Cuộc Gọi Can Thiệp Lâm Sàng
+#### UC-023: Ghi Nhận & Tra Cứu Nhật Ký Cuộc Gọi Can Thiệp Lâm Sàng
 ```sql
+-- 1. Lưu bản ghi cuộc gọi can thiệp của CSKH / Điều dưỡng
 BEGIN;
 
--- 1. Lưu log cuộc gọi
 INSERT INTO call_intervention_logs (
-  call_log_id, incident_id, staff_id, call_duration_seconds, 
-  patient_condition, clinical_advice, resolution_status, created_at
+  log_id, incident_id, patient_id, caller_account_id, call_time,
+  duration_seconds, call_status, notes, next_action, created_at
 )
 VALUES (
-  gen_random_uuid(), :incident_id, :staff_id, :duration,
-  :patient_condition, :clinical_advice, :resolution_status, CURRENT_TIMESTAMP
+  gen_random_uuid(), :incident_id, :patient_id, :caller_account_id, CURRENT_TIMESTAMP,
+  :duration_seconds, :call_status, :notes, :next_action, CURRENT_TIMESTAMP
 );
 
--- 2. Đóng sự cố Red Flag nếu giải quyết thành công
-IF :resolution_status = 'RESOLVED' THEN
-  UPDATE red_flag_incidents
-  SET status = 'RESOLVED',
-      resolved_at = CURRENT_TIMESTAMP
-  WHERE incident_id = :incident_id;
-END IF;
+-- 2. Nếu cuộc gọi giải quyết thành công hoặc yêu cầu tới viện: cập nhật sự cố
+UPDATE red_flag_incidents
+SET status = CASE 
+      WHEN :next_action = 'CONTINUE_MONITORING' THEN 'RESOLVED'
+      WHEN :next_action = 'REQUIRE_HOSPITAL_EXAM' THEN 'IN_PROGRESS'
+      ELSE status 
+    END,
+    clinical_resolution = :notes,
+    resolved_at = CASE WHEN :next_action = 'CONTINUE_MONITORING' THEN CURRENT_TIMESTAMP ELSE NULL END
+WHERE incident_id = :incident_id;
 
 COMMIT;
+
+-- 3. Truy xuất toàn bộ lịch sử các cuộc gọi can thiệp của một sự cố Red Flag
+SELECT cil.log_id, cil.call_time, cil.duration_seconds, cil.call_status,
+       cil.notes, cil.next_action, cil.created_at,
+       a.full_name AS caller_name, a.role AS caller_role
+FROM call_intervention_logs cil
+JOIN accounts a ON cil.caller_account_id = a.account_id
+WHERE cil.incident_id = :incident_id
+ORDER BY cil.call_time ASC;
 ```
 
 ---
@@ -545,13 +638,15 @@ COMMIT;
 
 #### UC-027: Lọc và Truy Vấn Nhật Ký Kiểm Toán (Audit Trail)
 ```sql
-SELECT log_id, actor_id, action_type, entity_name, record_id, details, ip_address, created_at
-FROM system_audit_logs
-WHERE (:actor_id IS NULL OR actor_id = :actor_id)
+SELECT audit_id, user_id, action_type, target_entity, target_id, 
+       old_data, new_data, ip_address, user_agent, timestamp
+FROM audit_logs
+WHERE (:user_id IS NULL OR user_id = :user_id)
   AND (:action_type IS NULL OR action_type = :action_type)
-  AND (:from_date IS NULL OR created_at >= :from_date)
-  AND (:to_date IS NULL OR created_at <= :to_date)
-ORDER BY created_at DESC
+  AND (:target_entity IS NULL OR target_entity = :target_entity)
+  AND (:from_date IS NULL OR timestamp >= :from_date)
+  AND (:to_date IS NULL OR timestamp <= :to_date)
+ORDER BY timestamp DESC
 LIMIT :limit OFFSET :offset;
 ```
 
