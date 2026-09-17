@@ -15,27 +15,32 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ### 1.1 Danh mục Các Nhóm Use Case Phân Rã CRUD Chi Tiết
 
-1. **Nhóm UC-004: Quản lý Hồ sơ Định danh Bệnh Nhân (Patient Profiles CRUD):**
+1. **Nhóm UC-003: Quản Lý Hồ Sơ Caregiver, Liên Kết QR & Lịch Sử Chăm Sóc (Caregiver Multi-Patient & Care History):**
+   * `UC-003.1`: Quét mã QR bàn giao liên kết hồ sơ bệnh nhân (Caregiver-Patient Linking via QR)
+   * `UC-003.2`: Xem & lựa chọn Care Recipient đang chăm sóc (Multi-Patient Care Recipient Selector & Switcher)
+   * `UC-003.3`: Xem dòng thời gian lịch sử chăm sóc & hồ sơ ca mổ cũ (Care Action Timeline & Past Care Recipients History)
+
+2. **Nhóm UC-004: Quản lý Hồ sơ Định danh Bệnh Nhân (Patient Profiles CRUD):**
    * `UC-004.1`: Tạo mới hồ sơ bệnh nhân
    * `UC-004.2`: Tra cứu và lọc danh sách hồ sơ bệnh nhân theo cơ sở
    * `UC-004.3`: Xem chi tiết hồ sơ bệnh nhân & Dòng thời gian phục hồi
    * `UC-004.4`: Cập nhật chỉnh sửa thông tin hồ sơ bệnh nhân
    * `UC-004.5`: Lưu trữ / Vô hiệu hóa hồ sơ bệnh nhân
 
-2. **Nhóm UC-005: Quản lý Danh mục Mẫu Kế Hoạch Chăm Sóc (Care Plan Master Templates CRUD):**
+3. **Nhóm UC-005: Quản lý Danh mục Mẫu Kế Hoạch Chăm Sóc (Care Plan Master Templates CRUD):**
    * `UC-005.1`: Tạo mới Master Template
    * `UC-005.2`: Xem danh sách & lọc Master Template theo loại phẫu thuật
    * `UC-005.3`: Xem chi tiết cấu hình Master Template
    * `UC-005.4`: Chỉnh sửa thông tin chung Master Template
    * `UC-005.5`: Kích hoạt / Lưu trữ Master Template
 
-3. **Nhóm UC-007: Cấu Hình Danh Mục Thuốc Mẫu Trong Template (Template Medications CRUD):**
+4. **Nhóm UC-007: Cấu Hình Danh Mục Thuốc Mẫu Trong Template (Template Medications CRUD):**
    * `UC-007.1`: Thêm thuốc mẫu vào Master Template & Cài đặt Timer đệm
    * `UC-007.2`: Xem danh sách thuốc mẫu trong Template
    * `UC-007.3`: Chỉnh sửa thuốc mẫu & thời gian đệm giãn cách
    * `UC-007.4`: Xóa thuốc mẫu khỏi Master Template
 
-4. **Nhóm UC-008: Cấu Hình Bộ Câu Hỏi Recovery Check & Red Flag (Recovery & Red Flags CRUD):**
+5. **Nhóm UC-008: Cấu Hình Bộ Câu Hỏi Recovery Check & Red Flag (Recovery & Red Flags CRUD):**
    * `UC-008.1`: Thêm mốc thời gian & câu hỏi Recovery Check
    * `UC-008.2`: Xem danh sách mốc & câu hỏi Recovery Check
    * `UC-008.3`: Chỉnh sửa mốc & câu hỏi Recovery Check
@@ -45,7 +50,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
    * `UC-008.7`: Chỉnh sửa tiêu chí Red Flag & Hướng xử trí lâm sàng
    * `UC-008.8`: Xóa tiêu chí Red Flag khỏi Template
 
-5. **Nhóm UC-009: Cấu Hình Cẩm Nang, Quy Tắc Sinh Hoạt & FAQ Lâm Sàng (Guidelines & FAQ CRUD):**
+6. **Nhóm UC-009: Cấu Hình Cẩm Nang, Quy Tắc Sinh Hoạt & FAQ Lâm Sàng (Guidelines & FAQ CRUD):**
    * `UC-009.1`: Thêm nội dung Cẩm nang 24h & Infographic bài học
    * `UC-009.2`: Xem danh mục Cẩm nang & Infographic bài học
    * `UC-009.3`: Chỉnh sửa nội dung Cẩm nang & Infographic bài học
@@ -56,7 +61,7 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
    * `UC-009.8`: Xóa quy tắc Nên làm / Cần tránh khỏi Template
    * `UC-009.9`: Quản lý ngân hàng tình huống hỏi đáp FAQ lâm sàng (Manage Clinical FAQ Bank)
 
-6. **Nhóm UC-026: Quản Lý Tài Khoản Nhân Viên và Phân Quyền Cơ Sở (Staff Accounts & Multi-Branch RBAC CRUD):**
+7. **Nhóm UC-026: Quản Lý Tài Khoản Nhân Viên và Phân Quyền Cơ Sở (Staff Accounts & Multi-Branch RBAC CRUD):**
    * `UC-026.1`: Khởi tạo tài khoản nhân viên y tế & gán chi nhánh
    * `UC-026.2`: Xem danh sách và tìm kiếm nhân viên theo cơ sở
    * `UC-026.3`: Chỉnh sửa thông tin định danh & vai trò RBAC nhân viên
@@ -68,9 +73,11 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 | Mã Use Case | Tên Use Case / Thao Tác | Nhóm Nghiệp Vụ / Bản Chất | Tác Nhân Chính | Tham Chiếu Kỹ Thuật (API & Query) |
 | :--- | :--- | :--- | :--- | :--- |
-| **UC-001** | Đăng ký & Đăng nhập Caregiver OTP | Xác thực Người dùng (Auth) | Caregiver (ACT-008) | Xem File 06 (§2.1) & File 07 (§2.1) |
+| **UC-001** | Đăng ký & Đăng nhập Caregiver OTP | Xác thực Người dùng (Auth) | Caregiver (ACT-005) | Xem File 06 (§2.1) & File 07 (§2.1) |
 | **UC-002** | Đăng nhập Nhân viên Y tế & 2FA | Xác thực Nhân sự (Auth) | Bác sĩ, Điều dưỡng, CSKH | Xem File 06 (§2.1) & File 07 (§2.1) |
-| **UC-003** | Quét QR Bàn Giao Liên Kết Bệnh Nhân | Kích hoạt Hồ sơ (Linking) | Caregiver (ACT-008) | Xem File 06 (§2.4) & File 07 (§2.4) |
+| **UC-003.1** | Quét QR Bàn Giao Liên Kết Bệnh Nhân | Kích hoạt Hồ sơ (Linking) | Caregiver (ACT-005) | Xem File 06 (§2.4) & File 07 (§2.4) |
+| **UC-003.2** | Xem & Lựa Chọn Care Recipient Chăm Sóc | Điều Hướng Ngữ Cảnh (Navigation) | Caregiver (ACT-005) | Xem File 06 (§2.4) & File 07 (§2.4) |
+| **UC-003.3** | Xem Timeline Chăm Sóc & Ca Mổ Cũ | Nhật Ký & Lưu Trữ (History/Audit) | Caregiver (ACT-005) | Xem File 06 (§2.4) & File 07 (§2.4) |
 | **UC-004.1** | Tạo Mới Hồ Sơ Bệnh Nhân | **Patient CRUD - Create** | Điều dưỡng (ACT-003) | Xem File 06 (§2.2) & File 07 (§2.2) |
 | **UC-004.2** | Tra Cứu & Lọc Danh Sách Bệnh Nhân | **Patient CRUD - Read (List)** | Bác sĩ, Điều dưỡng, CSKH | Xem File 06 (§2.2) & File 07 (§2.2) |
 | **UC-004.3** | Xem Chi Tiết Hồ Sơ & Timeline | **Patient CRUD - Read (Detail)**| Bác sĩ, Điều dưỡng, CSKH | Xem File 06 (§2.2) & File 07 (§2.2) |
@@ -191,23 +198,23 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 #### 5. Caregiver (Người Chăm Sóc / Thân Nhân)
 * **Đăng ký và đăng nhập bằng số điện thoại/OTP:** Truy cập tiện lợi, an toàn không cần ghi nhớ mật khẩu phức tạp.
-* **Quét QR để liên kết với bệnh nhân:** Thao tác 1 chạm từ camera điện thoại để kết nối hồ sơ người thân xuất viện.
-* **Xem danh sách bệnh nhân đang chăm sóc:** Hỗ trợ một Caregiver có thể chăm sóc cùng lúc nhiều người thân (ví dụ: cả bố và mẹ cùng mổ mắt).
+* **Quét QR để liên kết với bệnh nhân:** Thao tác 1 chạm từ camera điện thoại để kết nối hồ sơ người thân xuất viện (tối đa 3 Caregiver theo BR5).
+* **Xem danh sách và lựa chọn Care Recipient đang chăm sóc:** Hỗ trợ 1 Caregiver quản lý nhiều người thân (bố, mẹ); phân loại 2 Tab (Active vs Past Patients) và chuyển đổi ngữ cảnh 1-chạm (SCR-CG-02, SCR-CG-04).
 * **Xem Care Plan được cấp quyền:** Theo dõi toàn bộ lộ trình hồi phục, cẩm nang và lịch trình được bệnh viện phân công.
 * **Xem Learning Path:** Đọc các bài học hướng dẫn phục hồi thị lực theo từng giai đoạn.
 * **Học các bài hướng dẫn chăm sóc:** Xem infographic đồ họa tĩnh về tư thế ngủ, cách đeo kính bảo hộ và kỹ thuật kéo mi tra thuốc.
 * **Thực hiện Recovery Check:** Trả lời bộ 3–5 câu hỏi khảo sát ngắn vào mỗi buổi sáng trong 7 ngày đầu.
-* **Xác nhận đã cho bệnh nhân uống thuốc:** Bấm nút xác nhận đã cho uống thuốc hoặc nhỏ mắt để lưu vết giờ dùng thuốc thực tế.
+* **Xác nhận đã cho bệnh nhân uống thuốc:** Bấm nút xác nhận đã cho uống thuốc hoặc nhỏ mắt để lưu vết giờ dùng thuốc thực tế kèm định danh người xác nhận.
 * **Xem lịch dùng thuốc:** Theo dõi danh sách thuốc chia theo 4 khung giờ Sáng / Trưa / Chiều / Tối với màu nắp lọ nhận diện rõ ràng.
 * **Nhận thông báo khi đến giờ uống thuốc:** Nhận thông báo đẩy (Push Notification) hoặc tin nhắn nhắc nhở trước 15 phút.
-* **Xem bộ đếm ngược thời gian dùng thuốc nhỏ mắt:** Kích hoạt timer đếm lùi 5–10 phút giữa 2 loại thuốc nhỏ mắt để chống rửa trôi dược chất.
+* **Xem bộ đếm ngược thời gian dùng thuốc nhỏ mắt:** Kích hoạt timer đếm lùi 5–10 phút giữa 2 loại thuốc nhỏ mắt để chống rửa trôi dược chất (BR23).
 * **Xem lịch tái khám:** Theo dõi 5 mốc tái khám quan trọng kèm thông báo nhắc hẹn trước 24 giờ.
 * **Nhận cảnh báo Red Flag:** Nhận tín hiệu cảnh báo màu đỏ kèm nút gọi khẩn cấp 1 chạm đến Hotline VISI `0395 151 151`.
 * **Gửi phản hồi hoặc ghi chú chăm sóc:** Nhập ghi chú về biểu hiện hàng ngày của người bệnh cho nhân viên y tế theo dõi.
 * **Cập nhật tình trạng thực hiện nhiệm vụ chăm sóc:** Đánh dấu hoàn thành các hướng dẫn vệ sinh mắt và sinh hoạt.
-* **Theo dõi lịch sử chăm sóc của bệnh nhân:** Xem lại biểu đồ tuân thủ thuốc và các câu trả lời khảo sát những ngày trước.
+* **Xem dòng thời gian lịch sử chăm sóc (Care Action Timeline):** Xem chi tiết lịch sử dùng thuốc hiển thị rõ ai trong gia đình đã xác nhận (ngăn ngừa nhỏ trùng liều), kết quả Recovery Check hàng ngày và lịch sử cuộc gọi CSKH.
 * **Quản lý tối đa 03 Caregiver cho mỗi bệnh nhân nếu được cấp quyền:** Caregiver chính (người quét QR đầu tiên) có quyền phê duyệt hoặc xóa quyền của Caregiver phụ (tối đa 3 người theo BR5).
-* **Xem lịch sử các bệnh nhân đã từng chăm sóc:** Lưu trữ hồ sơ các ca phẫu thuật đã hoàn thành theo dõi để tra cứu lại khi cần.
+* **Xem lịch sử các bệnh nhân đã từng chăm sóc (Past Patients Archive):** Lưu trữ và tra cứu hồ sơ các ca phẫu thuật cũ đã hoàn thành đợt theo dõi 30 ngày (IOL, bác sĩ mổ, đơn thuốc cũ) phục vụ mổ mắt thứ hai hoặc tái khám định kỳ.
 
 #### 6. Admin (Quản Trị Viên Hệ Thống)
 * **CRUD tài khoản người dùng:** Khởi tạo, xem danh sách, chỉnh sửa thông tin và khóa/vô hiệu hóa tài khoản nhân viên y tế.
@@ -310,33 +317,101 @@ Nhằm giúp đội ngũ phát triển phần mềm (Dev) và kiểm thử (QA/Q
 
 ---
 
-### UC-003: Quét Mã QR Bàn Giao Liên Kết Hồ Sơ Bệnh Nhân (Caregiver-Patient Linking)
+### NHÓM UC-003: QUẢN LÝ LIÊN KẾT CAREGIVER, LỰA CHỌN CARE RECIPIENT & LỊCH SỬ CHĂM SÓC (CAREGIVER MULTI-PATIENT & CARE HISTORY)
+
+> **Mô tả nhóm nghiệp vụ:** Cung cấp toàn bộ chu trình quản trị và điều hướng của Caregiver đối với người bệnh: từ quét mã QR liên kết xuất viện ban đầu (tối đa 3 Caregiver theo BR5), lựa chọn và chuyển đổi ngữ cảnh người bệnh đang chăm sóc (Multi-Patient Care Recipient Selector & Switcher), đến theo dõi dòng thời gian chăm sóc chi tiết (Care Action Timeline đồng bộ người xác nhận dùng thuốc) và tra cứu hồ sơ các ca phẫu thuật cũ đã hoàn thành (Past Patients Archive).
+
+#### UC-003.1: Quét Mã QR Bàn Giao Liên Kết Hồ Sơ Bệnh Nhân (Caregiver-Patient Linking via QR)
 
 | Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
 |---|---|---|---|
-| **Mã Use Case (Use Case ID)** | **UC-003** | | |
-| **Tên Use Case (Use Case Name)** | Quét Mã QR Bàn Giao Liên Kết Hồ Sơ Bệnh Nhân (Caregiver-Patient Linking) | | |
+| **Mã Use Case (Use Case ID)** | **UC-003.1** | | |
+| **Tên Use Case (Use Case Name)** | Quét Mã QR Bàn Giao Liên Kết Hồ Sơ Bệnh Nhân (Caregiver-Patient Linking via QR) | | |
 | **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
-| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 15/09/2026 (Phiên bản V1 Chuẩn hóa) |
-| **Tác nhân chính (Primary Actor)** | ACT-001 (Caregiver) | | |
-| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-003 (Điều dưỡng), ACT-006 (Bệnh nhân) | | |
+| **Ngày tạo (Date Created)** | 24/01/2026 | **Ngày cập nhật (Date last updated)** | 16/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-005 (Caregiver) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| ACT-003 (Điều dưỡng), ACT-007 (Bệnh nhân / Care Recipient) | | |
 | **Tính năng liên quan (Features)** | F-004, F-021 | | |
 | **Mô tả tóm tắt (Brief Description)** | Caregiver sử dụng camera điện thoại quét mã QR in trên Phiếu xuất viện do Điều dưỡng bàn giao để gắn tài khoản chăm sóc vào bệnh nhân. | | |
-| **Mục tiêu (Goal)** | Giải mã QR token từ phiếu xuất viện và thiết lập liên kết điện tử bảo mật giữa Caregiver và Kế hoạch chăm sóc bệnh nhân; hỗ trợ tối đa 3 Caregiver. | | |
-| **Tác nhân kích hoạt (Trigger)** | Caregiver nhấn nút 'Quét mã QR' trên ứng dụng RemiCare. | | |
-| **Điều kiện tiên quyết (Pre-conditions)** | 1. Caregiver đã đăng nhập ứng dụng.<br>2. Phiếu xuất viện có in mã QR hợp lệ đã được Điều dưỡng kích hoạt.<br>3. Trình duyệt được cấp quyền truy cập camera. | | |
-| **Điều kiện sau (Post-conditions)** | 1. Bản ghi liên kết được tạo trong `caregiver_patient_links`.<br>2. Caregiver được phân quyền xem lịch thuốc, cẩm nang và nộp Recovery Check của bệnh nhân.<br>3. Đồng bộ dữ liệu chăm sóc. | | |
+| **Mục tiêu (Goal)** | Giải mã QR token từ phiếu xuất viện và thiết lập liên kết điện tử bảo mật giữa Caregiver và Kế hoạch chăm sóc bệnh nhân; hỗ trợ tối đa 3 Caregiver (BR5). | | |
+| **Tác nhân kích hoạt (Trigger)** | Caregiver nhấn nút 'Quét mã QR' trên ứng dụng RemiCare (SCR-CG-02 hoặc SCR-CG-03). | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | 1. Caregiver đã đăng nhập ứng dụng (UC-001).<br>2. Phiếu xuất viện có in mã QR hợp lệ đã được Điều dưỡng kích hoạt.<br>3. Trình duyệt được cấp quyền truy cập camera. | | |
+| **Điều kiện sau (Post-conditions)** | 1. Bản ghi liên kết được tạo trong `caregiver_patient_links`.<br>2. Caregiver được phân quyền xem lịch thuốc, cẩm nang và nộp Recovery Check của bệnh nhân.<br>3. Thiết lập bệnh nhân vừa quét thành người bệnh hoạt động (`active_patient_id`). | | |
 | **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| | 1 | Caregiver nhấn nút 'Quét mã QR' trên màn hình chính | Ứng dụng kích hoạt camera và hiển thị khung quét mã QR. |
+| | 1 | Caregiver nhấn nút 'Quét mã QR' trên màn hình chính (SCR-CG-02) | Ứng dụng kích hoạt camera và hiển thị khung quét mã QR (SCR-CG-01). |
 | | 2 | Caregiver hướng camera vào mã QR trên Phiếu xuất viện | Hệ thống quét, giải mã token bảo mật và truy vấn dữ liệu Care Plan tương ứng (BR4). |
-| | 3 | Caregiver kiểm tra thông tin tóm tắt bệnh nhân (Họ tên viết tắt, Năm sinh, Mắt phẫu thuật, Bác sĩ mổ) và nhấn 'Xác nhận liên kết' | Hệ thống kiểm tra số lượng Caregiver đã liên kết (BR5). Nếu ≤3, lưu bản ghi liên kết, thông báo thành công và chuyển vào Trang chủ bệnh nhân. |
+| | 3 | Caregiver kiểm tra thông tin tóm tắt bệnh nhân (Họ tên viết tắt, Năm sinh, Mắt phẫu thuật, Bác sĩ mổ) và nhấn 'Xác nhận liên kết' | Hệ thống kiểm tra số lượng Caregiver đã liên kết (BR5). Nếu ≤3, lưu bản ghi liên kết, thông báo thành công và chuyển vào Kế hoạch chăm sóc (SCR-CG-04). |
 | **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
-| **A1: Caregiver thứ 2 hoặc thứ 3 quét mã** | 1 | Thành viên khác trong gia đình quét cùng mã QR | Hệ thống ghi nhận thêm liên kết người chăm sóc đồng hành, đồng bộ dữ liệu cữ thuốc theo thời gian thực. |
+| **A1: Caregiver thứ 2 hoặc thứ 3 quét mã** | 1 | Thành viên khác trong gia đình quét cùng mã QR | Hệ thống ghi nhận thêm liên kết người chăm sóc đồng hành, đồng bộ dữ liệu cữ thuốc theo thời gian thực (BR5). |
 | **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
 | **E1: Mã QR hết hạn hoặc bị thu hồi** | 1 | Quét mã QR cũ đã bị cấp lại | Hệ thống báo lỗi 'Mã QR không hợp lệ hoặc đã bị thu hồi' và hướng dẫn liên hệ Điều dưỡng (BR4). |
 | **E2: Đã vượt quá 3 Caregiver** | 1 | Có người thứ 4 cố gắng quét mã liên kết | Hệ thống từ chối liên kết và hiển thị thông báo đã đủ giới hạn tối đa 3 người chăm sóc (BR5). |
 | **Mức độ ưu tiên (Priority)** | **P0** | | |
 | **Quy tắc nghiệp vụ (Business Rules)** | BR4 (Tính hợp lệ của mã QR), BR5 (Giới hạn tối đa 3 Caregiver liên kết) | | |
+
+---
+
+#### UC-003.2: Xem & Lựa Chọn Care Recipient Đang Chăm Sóc (Multi-Patient Care Recipient Selector & Switcher)
+
+| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
+|---|---|---|---|
+| **Mã Use Case (Use Case ID)** | **UC-003.2** | | |
+| **Tên Use Case (Use Case Name)** | Xem & Lựa Chọn Care Recipient Đang Chăm Sóc (Multi-Patient Care Recipient Selector & Switcher) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 16/09/2026 | **Ngày cập nhật (Date last updated)** | 16/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-005 (Caregiver) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| Hệ thống CSDL PostgreSQL, VISI Core | | |
+| **Tính năng liên quan (Features)** | F-003 (Quản lý Hồ sơ Người Chăm Sóc), F-004 | | |
+| **Mô tả tóm tắt (Brief Description)** | Caregiver xem danh sách toàn bộ các người thân đang chăm sóc (phân tách Tab Đang chăm sóc và Tab Lịch sử), chọn người bệnh để truy cập phác đồ chăm sóc chi tiết, và chuyển đổi ngữ cảnh 1-chạm giữa các bệnh nhân ngay trên Header. | | |
+| **Mục tiêu (Goal)** | Giúp 1 Caregiver quản lý song song nhiều người bệnh (ví dụ: chăm sóc cả Bố mổ Phaco và Mẹ mổ SILK) một cách trực quan, tách bạch phác đồ, không nhầm lẫn thuốc; thiết lập ngữ cảnh hoạt động (`active_patient_id`) trong phiên làm việc. | | |
+| **Tác nhân kích hoạt (Trigger)** | Caregiver mở ứng dụng (SCR-CG-02) hoặc bấm vào bộ chuyển đổi người bệnh (Header Switcher) tại màn hình SCR-CG-04. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | 1. Caregiver đã xác thực OTP thành công (UC-001).<br>2. Đã liên kết với ít nhất 1 bệnh nhân qua mã QR (UC-003.1). | | |
+| **Điều kiện sau (Post-conditions)** | 1. Ngữ cảnh bệnh nhân tích cực (`active_patient_id`) được cập nhật trên phiên làm việc.<br>2. Hệ thống tải toàn bộ dữ liệu lịch thuốc, cẩm nang, lịch tái khám và khảo sát Recovery Check của người bệnh được chọn. | | |
+| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| | 1 | Caregiver truy cập Bảng điều khiển Caregiver Dashboard (SCR-CG-02) | Hệ thống tự động gọi API `GET /api/v1/caregiver/patients` và hiển thị danh sách người bệnh phân tầng 2 Tab:<br>• **Tab 1: Đang chăm sóc (Active Patients):** Hiển thị thẻ người bệnh đang trong đợt hồi phục 30 ngày (Tên viết tắt, Mắt mổ, Loại mổ, Bác sĩ điều trị, % Tuân thủ thuốc, Cữ thuốc kế tiếp).<br>• **Tab 2: Lịch sử chăm sóc (Past Patients / Archive):** Hiển thị danh sách các ca bệnh đã hoàn thành đợt theo dõi 30 ngày (`COMPLETED`). |
+| | 2 | Caregiver nhấn chọn Thẻ của người bệnh muốn chăm sóc (ví dụ: 'Bố - Ng. V. An - Phaco MP') | Frontend gửi request `PUT /api/v1/caregiver/active-patient/{patient_id}` để cập nhật ngữ cảnh. |
+| | 3 | Hệ thống lưu trữ `active_patient_id` vào phiên làm việc và tải dữ liệu tương ứng | Chuyển hướng giao diện vào Patient Care Plan Hub (SCR-CG-04) của đúng bệnh nhân được chọn. |
+| | 4 | Caregiver thực hiện các nhiệm vụ chăm sóc trong phác đồ của người bệnh này | Dữ liệu thuốc, lịch hẹn và cẩm nang khớp 100% với bệnh nhân đang chọn. |
+| **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| **A1: Chuyển đổi nhanh 1-chạm tại Header Hub (Header Switcher)** | 1 | Khi đang ở màn hình SCR-CG-04, Caregiver chạm vào Care Recipient Switcher trên Header | Hiển thị menu trượt danh sách các người bệnh đang phụ trách. Caregiver chạm vào người thân khác (ví dụ: 'Mẹ - Tr. Th. Bình - SILK MT'). |
+| | 2 | Hệ thống chuyển đổi ngay lập tức | Tải lại tức thì toàn bộ lịch thuốc và bài học của người thân mới mà không cần thoát ra Dashboard (zero reload latency). |
+| **A2: Thêm người bệnh mới vào danh sách** | 1 | Caregiver nhấn nút `[+ Quét mã QR chăm sóc người mới]` trên SCR-CG-02 | Hệ thống mở camera và kích hoạt quy trình quét QR liên kết mới (UC-003.1). |
+| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| **E1: Chưa liên kết người bệnh nào** | 1 | Caregiver mới đăng nhập lần đầu, danh sách rỗng | Hệ thống hiển thị Empty State (SCR-CG-03) với nút kêu gọi hành động lớn `[Quét mã QR trên Phiếu Xuất Viện]`. |
+| **E2: Quyền chăm sóc người bệnh đã bị thu hồi** | 1 | Caregiver chọn bệnh nhân nhưng liên kết đã bị hủy (`revoked_at IS NOT NULL`) | Hệ thống thông báo 'Quyền chăm sóc người bệnh này đã được thay đổi hoặc thu hồi' và tự động làm mới danh sách. |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR3 (Phân quyền dữ liệu Caregiver), BR5 (Tối đa 3 Caregiver/bệnh nhân), BR17 (Bảo mật tên viết tắt NĐ 13/2023) | | |
+
+---
+
+#### UC-003.3: Xem Dòng Thời Gian Chăm Sóc & Hồ Sơ Ca Mổ Cũ (Care Action Timeline & Past Care Recipients History)
+
+| Mục / Trường | Bước / Mục con | Hành động của Tác nhân / Giá trị | Phản hồi của Hệ thống / Ghi chú |
+|---|---|---|---|
+| **Mã Use Case (Use Case ID)** | **UC-003.3** | | |
+| **Tên Use Case (Use Case Name)** | Xem Dòng Thời Gian Chăm Sóc & Hồ Sơ Ca Mổ Cũ (Care Action Timeline & Past Care Recipients History) | | |
+| **Người tạo (Created by)** | Phùng Đình Khang | **Người cập nhật (Last updated by)** | Đội ngũ BA — VISI Medical Group |
+| **Ngày tạo (Date Created)** | 16/09/2026 | **Ngày cập nhật (Date last updated)** | 16/09/2026 (Phiên bản V1 Chuẩn hóa) |
+| **Tác nhân chính (Primary Actor)** | ACT-005 (Caregiver) | | |
+| **Tác nhân hỗ trợ (Supporting Actors)**| Hệ thống CSDL PostgreSQL, VISI Core Alert Daemon | | |
+| **Tính năng liên quan (Features)** | F-003, F-009, F-016 | | |
+| **Mô tả tóm tắt (Brief Description)** | Cho phép Caregiver tra cứu dòng thời gian toàn diện các hành động chăm sóc (nhật ký uống/nhỏ thuốc kèm định danh người xác nhận trong tối đa 3 Caregiver, kết quả Recovery Check hàng ngày, cuộc gọi CSKH) và xem lại hồ sơ lịch sử các ca mổ cũ đã kết thúc theo dõi 30 ngày. | | |
+| **Mục tiêu (Goal)** | 1. Bảo đảm an toàn dược lý: Giúp các thành viên trong gia đình nắm rõ ai đã cho bệnh nhân uống thuốc lúc nào, tránh nhỏ trùng liều thuốc kháng sinh/kháng viêm liên tiếp gây quá liều và tổn thương giác mạc.<br>2. Lưu trữ và tra cứu lịch sử phẫu thuật nhãn khoa (thông số kính IOL, phản ứng thuốc, tiền sử hồi phục) phục vụ cho ca mổ mắt thứ hai hoặc tái khám định kỳ. | | |
+| **Tác nhân kích hoạt (Trigger)** | Caregiver nhấn nút 'Xem Lịch Sử Chăm Sóc' trên SCR-CG-04 hoặc chọn Tab 'Lịch sử chăm sóc' trên SCR-CG-02. | | |
+| **Điều kiện tiên quyết (Pre-conditions)** | 1. Caregiver đã xác thực và có quyền truy cập hồ sơ bệnh nhân.<br>2. Bệnh nhân có bản ghi hành động chăm sóc hoặc có ca phẫu thuật đã lưu trữ. | | |
+| **Điều kiện sau (Post-conditions)** | Dòng thời gian hiển thị chi tiết theo thứ tự đảo ngược thời gian (Chronological Descending) và tuân thủ bảo mật NĐ 13/2023. | | |
+| **Luồng chính (Main Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| | 1 | Caregiver nhấn nút 'Lịch Sử Chăm Sóc' (Care History Timeline) tại màn hình SCR-CG-04 | Frontend gọi API `GET /api/v1/caregiver/patients/{patient_id}/care-history`. |
+| | 2 | Hệ thống truy vấn dữ liệu từ bảng `medication_logs`, `recovery_check_submissions`, `patient_call_logs` | Tổng hợp và sắp xếp danh sách sự kiện chăm sóc theo thứ tự thời gian mới nhất lên đầu. |
+| | 3 | Màn hình hiển thị Care Action Timeline trực quan với 3 nhóm sự kiện | • **Sự kiện dùng thuốc:** Giờ cữ, tên thuốc, thời gian thực tế, trạng thái (`TAKEN`), và đặc biệt là **Họ tên thành viên đã xác nhận** (ví dụ: *"Đã xác nhận bởi: Con gái Nguyễn Thị Mai lúc 08:05"*).<br>• **Sự kiện kiểm tra hồi phục:** Điểm khảo sát ngày N, mức độ cảnh báo (Xanh/Vàng/Đỏ), nhận xét của thân nhân.<br>• **Sự kiện hỗ trợ y tế:** Tóm tắt cuộc gọi tư vấn từ Điều dưỡng/CSKH bệnh viện. |
+| | 4 | Caregiver có thể lọc dòng thời gian theo ngày hoặc theo loại sự kiện (Thuốc / Khảo sát / Cuộc gọi) | Hệ thống lọc và cập nhật danh sách hiển thị tương ứng. |
+| **Luồng thay thế (Alternative Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| **A1: Tra cứu Hồ sơ ca phẫu thuật cũ đã hoàn thành (Past Patients Archive)** | 1 | Caregiver tại SCR-CG-02 chuyển sang `Tab 2: Lịch sử chăm sóc (Past Patients / Archive)` | Hiển thị danh sách các ca bệnh đã hoàn thành đợt chăm sóc 30 ngày (hoặc ca mổ mắt trước đó). |
+| | 2 | Caregiver nhấn chọn một ca mổ cũ (ví dụ: 'Bố - Mổ Phaco mắt Phải - Tháng 03/2026') | Hệ thống mở chế độ Xem hồ sơ lưu trữ (Read-only Archive View): thông số kính nội nhãn IOL đã đặt, bác sĩ mổ, đơn thuốc xuất viện cũ và tỷ lệ tuân thủ tổng thể (98%), phục vụ mổ mắt thứ hai. |
+| **Luồng ngoại lệ (Exception Flow)** | **Bước** | **Hành động của Tác nhân** | **Phản hồi của Hệ thống** |
+| **E1: Chưa có sự kiện chăm sóc nào được ghi nhận** | 1 | Bệnh nhân mới xuất viện trong ngày, chưa tới cữ thuốc đầu tiên | Hệ thống hiển thị thông điệp thân thiện: 'Chưa có sự kiện chăm sóc nào trong hôm nay. Lịch cữ thuốc kế tiếp sẽ diễn ra vào lúc [Thời gian]'. |
+| **Mức độ ưu tiên (Priority)** | **P0** | | |
+| **Quy tắc nghiệp vụ (Business Rules)** | BR5 (Đồng bộ đa Caregiver tối đa 3 người), BR17 (Ẩn danh hóa thông tin NĐ 13/2023), BR21 (Nhật ký tuân thủ thuốc bất biến), BR24 (5 mốc theo dõi chuẩn) | | |
 
 ---
 

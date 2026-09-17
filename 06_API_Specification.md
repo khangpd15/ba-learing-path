@@ -342,6 +342,106 @@ Phục vụ bảng điều khiển trực quan tại phòng trực điều dư�
   ```
 * **Response (200 OK):** Xác nhận liên kết thành công. Kiểm soát tối đa 03 Caregiver (BR5).
 
+#### [GET] `/api/v1/caregiver/patients` — Danh Sách Bệnh Nhân & Lịch Sử Các Ca Chăm Sóc (F-003, UC-003)
+* **Quyền hạn:** `CAREGIVER`
+* **Mô tả:** Lấy toàn bộ danh sách các bệnh nhân mà Caregiver hiện tại đã liên kết, phân tách giữa các ca đang theo dõi (`ACTIVE`) và các ca đã hoàn tất trong quá khứ (`COMPLETED` / `ARCHIVED`).
+* **Query Params:** `status` (tùy chọn: `ACTIVE`, `COMPLETED`, `ALL` - mặc định `ACTIVE`)
+* **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "data": {
+      "active_patients": [
+        {
+          "patient_id": "pat-7712-42da-912b-bc22e89",
+          "display_name": "Ng. V. An",
+          "relationship": "CHILD",
+          "surgery_type": "PHACO",
+          "surgery_eye": "RIGHT_EYE",
+          "surgery_date": "2026-09-15",
+          "post_op_day": 2,
+          "doctor_name": "BS.CKII Trần Bá Kiền",
+          "facility_name": "Bệnh viện Mắt Kỹ thuật cao VISI Thủ Đức",
+          "is_current_active": true,
+          "today_medication_progress": {
+            "completed_doses": 2,
+            "total_doses": 4
+          },
+          "latest_alert_level": "GREEN"
+        }
+      ],
+      "completed_patients": [
+        {
+          "patient_id": "pat-6601-uuid",
+          "display_name": "Tr. T. Bình",
+          "relationship": "CHILD",
+          "surgery_type": "SILK",
+          "surgery_eye": "LEFT_EYE",
+          "surgery_date": "2026-06-10",
+          "completed_at": "2026-07-10T17:00:00Z",
+          "doctor_name": "BS. Lê Hoàng Nam",
+          "facility_name": "Bệnh viện Mắt VISI Hải Phòng"
+        }
+      ]
+    }
+  }
+  ```
+
+#### [PUT] `/api/v1/caregiver/active-patient/{patient_id}` — Chuyển Đổi Bệnh Nhân Đang Kích Hoạt Chăm Sóc (F-003)
+* **Quyền hạn:** `CAREGIVER`
+* **Mô tả:** Chuyển đổi ngữ cảnh làm việc sang một người thân khác khi Caregiver chăm sóc nhiều bệnh nhân cùng lúc (Switch Active Care Recipient).
+* **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "message": "Đã chuyển đổi ngữ cảnh chăm sóc thành công",
+    "data": {
+      "active_patient_id": "pat-7712-42da-912b-bc22e89",
+      "display_name": "Ng. V. An",
+      "surgery_type": "PHACO",
+      "post_op_day": 2
+    }
+  }
+  ```
+
+#### [GET] `/api/v1/caregiver/patients/{patient_id}/care-history` — Xem Dòng Thời Gian Lịch Sử Chăm Sóc Chi Tiết (F-003, F-009, F-016)
+* **Quyền hạn:** `CAREGIVER`, `CARE_RECIPIENT`
+* **Mô tả:** Trả về toàn bộ dòng thời gian (Timeline) các cữ thuốc đã nhỏ (kèm thông tin Caregiver nào đã xác nhận, thời điểm chính xác để tránh trùng liều giữa các thành viên gia đình), lịch sử kết quả Recovery Check và biên bản tư vấn của CSKH.
+* **Query Params:** `from_date`, `to_date`, `type` (tùy chọn: `ALL`, `MEDICATION`, `RECOVERY_CHECK`, `CLINICAL_CALL`)
+* **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "code": 200,
+    "data": [
+      {
+        "event_type": "MEDICATION_TAKEN",
+        "timestamp": "2026-09-15T08:03:12Z",
+        "title": "Nhỏ mắt cữ Sáng: Tobrex 0.3%",
+        "details": {
+          "medication_name": "Tobrex 0.3%",
+          "target_eye": "SURGERY_EYE",
+          "dose_amount": "1 giọt",
+          "confirmed_by": "Nguyễn Thị Mai (Con gái)",
+          "confirmed_by_role": "CAREGIVER",
+          "buffer_duration_seconds": 300
+        }
+      },
+      {
+        "event_type": "RECOVERY_CHECK_SUBMITTED",
+        "timestamp": "2026-09-15T08:15:00Z",
+        "title": "Khảo sát phục hồi Sáng Ngày 1",
+        "details": {
+          "alert_level": "GREEN",
+          "answers_summary": "Không đau nhức, thị lực sáng dần, không chảy mủ"
+        }
+      }
+    ]
+  }
+  ```
+
 ---
 
 ### 2.3 Phân Hệ Master Care Plan Template (Cấu Hình Mẫu Chuẩn)

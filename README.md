@@ -38,7 +38,8 @@ Toàn bộ hệ thống tài liệu trong kho lưu trữ đã được đồng b
 | **07** | **Danh Mục Câu Lệnh Truy Vấn CSDL (Database Queries & DML)** | [`07_Database_Queries.md`](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/07_Database_Queries.md) | **Tài liệu SQL độc lập:** Tổng hợp toàn bộ câu lệnh PostgreSQL 16+ tương ứng với từng Use Case: SELECT JOINs có Index, INSERT `gen_random_uuid()`, UPDATE tham số hóa, Xóa mềm `ARCHIVED`, khối giao dịch ACID `BEGIN ... COMMIT` (nhân bản Care Plan, Red Flag escalation). |
 | **08** | **Phân Tích Mô Hình Dữ Liệu** | [`01_Database_Analysis.md`](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/01_Database_Analysis.md) | Phân tích 20 thực thể dữ liệu nghiệp vụ, thuộc tính, khóa chính/ngoại, chỉ mục và ma trận thao tác CRUD đối ứng với các ca sử dụng chuẩn. |
 | **09** | **Sơ Đồ Thực Thể Quan Hệ (ERD)** | [`02_ERD.md`](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/02_ERD.md) | Sơ đồ Master ERD Mermaid tổng thể hệ thống và 3 sơ đồ phân rã phân hệ dữ liệu, bảng tổng hợp khóa ngoại và hành vi On Delete. |
-| **10** | **Thiết Kế Cơ Sở Dữ Liệu Vật Lý** | [`03_Database_Design.md`](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/03_Database_Design.md) | Đặc tả vật lý chi tiết 24 bảng CSDL PostgreSQL (kiểu dữ liệu, ràng buộc, default, indexes tối ưu và phân vùng dữ liệu theo 5 chi nhánh). |
+| **10** | **Thiết Kế Cơ Sở Dữ Liệu Vật Lý** | [`03_Database_Design.md`](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/03_Database_Design.md) | Đặc tả vật lý chi tiết 26 bảng CSDL PostgreSQL (kiểu dữ liệu, ràng buộc, default, indexes tối ưu và phân vùng dữ liệu theo 5 chi nhánh). |
+| **11** | **Đặc Tả Luồng Vận Hành Toàn Diện Hệ Thống (Operational Flow)** | [`08_System_Operational_Flow.md`](file:///d:/EXE101/DOC_UC_DB_PROJECT_EXE101/08_System_Operational_Flow.md) | **Đặc tả luồng vận hành khép kín (End-to-End closed loop):** Ánh xạ xuyên suốt 28 Features (`F-001`..`F-028`) qua 6 giai đoạn vòng đời vận hành thực tế tại 5 cơ sở VISI; sơ đồ Swimlane 6 làn; ma trận xử lý ngoại lệ (mất điện, mất phiếu QR, cấp cứu ban đêm) và bộ chỉ số SLA cam kết. |
 
 ---
 
@@ -55,22 +56,22 @@ Toàn bộ hệ thống tài liệu trong kho lưu trữ đã được đồng b
                    │
                    ▼
     [Use Cases: UC-001 .. UC-028]    ──► file_use_case_spec.md (Thuần Nghiệp Vụ & Rules)
-        │                  │                   │
-        ├──────────────────┼───────────────────┤
-        ▼                  ▼                   ▼
- [RESTful API Spec] [UI Screens Flow]   [Database Queries & DML]
-06_API_Specification 04_Screen_Flow      07_Database_Queries
-        │                  │                   │
-        └──────────────────┼───────────────────┘
-                           ▼
-                 [Entities & ERD & DDL]
-                 01_Database_Analysis.md
-                 02_ERD.md
-                 03_Database_Design.md
-                           │
-                           ▼
-                [Ma Trận Ánh Xạ 4 Tầng]
-              05_Screen_Entity_Mapping.md
+         │                  │                   │
+         ├──────────────────┼───────────────────┤
+         ▼                  ▼                   ▼
+  [RESTful API Spec] [UI Screens Flow]   [Database Queries & DML]
+ 06_API_Specification 04_Screen_Flow      07_Database_Queries
+         │                  │                   │
+         ├──────────────────┴───────────────────┤
+         ▼                                      ▼
+[System Operational Flow]             [Entities & ERD & DDL]
+08_System_Operational_Flow            01_Database_Analysis.md
+                                      02_ERD.md
+                                      03_Database_Design.md
+                                                │
+                                                ▼
+                                    [Ma Trận Ánh Xạ 4 Tầng]
+                                  05_Screen_Entity_Mapping.md
 ```
 
 ---
